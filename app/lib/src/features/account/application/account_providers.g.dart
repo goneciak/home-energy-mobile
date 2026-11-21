@@ -123,11 +123,13 @@ final class UserProfileProvider
   }
 }
 
-String _$userProfileHash() => r'ed9ab0de91ac2e717692bc196e01e423f08c6e38';
+String _$userProfileHash() => r'ff9c6c4f8baefec7e7ff1177681bdc23626b6e07';
 
 /// The language the app shows (plan §13.2), fed to `MaterialApp.locale`;
 /// `null` means the phone language.
 ///
+/// * A language picked in Settings ([languagePreferenceProvider]) wins
+///   over everything below, signed in or not.
 /// * Signed out (before login, after logout or "Zmień użytkownika"): the
 ///   phone language.
 /// * Signed in: the language of the user's GI Core profile, or the phone
@@ -142,6 +144,8 @@ final appLocaleProvider = AppLocaleProvider._();
 /// The language the app shows (plan §13.2), fed to `MaterialApp.locale`;
 /// `null` means the phone language.
 ///
+/// * A language picked in Settings ([languagePreferenceProvider]) wins
+///   over everything below, signed in or not.
 /// * Signed out (before login, after logout or "Zmień użytkownika"): the
 ///   phone language.
 /// * Signed in: the language of the user's GI Core profile, or the phone
@@ -156,6 +160,8 @@ final class AppLocaleProvider
   /// The language the app shows (plan §13.2), fed to `MaterialApp.locale`;
   /// `null` means the phone language.
   ///
+  /// * A language picked in Settings ([languagePreferenceProvider]) wins
+  ///   over everything below, signed in or not.
   /// * Signed out (before login, after logout or "Zmień użytkownika"): the
   ///   phone language.
   /// * Signed in: the language of the user's GI Core profile, or the phone
@@ -196,7 +202,7 @@ final class AppLocaleProvider
   }
 }
 
-String _$appLocaleHash() => r'e742045028dcd0293b673e9b0f615c78686f5a89';
+String _$appLocaleHash() => r'fb445dd2801fb571184733f4f87c2be37f62c85b';
 
 /// [requestLanguageProvider], kept on the language the app shows
 /// ([appLocaleProvider]), so `Accept-Language` follows the signed-in user's

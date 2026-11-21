@@ -18,6 +18,7 @@ export 'src/catalog/endpoint.dart';
 export 'src/catalog/endpoints.dart';
 export 'src/failures/api_error_envelope.dart';
 export 'src/failures/api_failure.dart';
+export 'src/failures/error_codes.dart';
 export 'src/failures/failure_mapping.dart'
     show
         LocalNetworkDeniedDetector,
@@ -33,6 +34,7 @@ export 'src/http/interceptors.dart'
 export 'src/http/response_decoding.dart' show DecodeMode, unknownJsonFields;
 export 'src/http/transport_policy.dart';
 export 'src/models/auth_models.dart';
+export 'src/models/device_commands.dart';
 export 'src/models/device_detail.dart';
 export 'src/models/device_list_item.dart';
 export 'src/models/entity_value.dart';

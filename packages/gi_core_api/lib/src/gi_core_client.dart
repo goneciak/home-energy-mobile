@@ -16,8 +16,10 @@ import 'package:gi_core_api/src/http/dio_factory.dart';
 import 'package:gi_core_api/src/http/interceptors.dart';
 import 'package:gi_core_api/src/http/response_decoding.dart';
 import 'package:gi_core_api/src/models/auth_models.dart';
+import 'package:gi_core_api/src/models/device_commands.dart';
 import 'package:gi_core_api/src/models/device_detail.dart';
 import 'package:gi_core_api/src/models/device_list_item.dart';
+import 'package:gi_core_api/src/models/enums.dart';
 import 'package:gi_core_api/src/models/room.dart';
 import 'package:gi_core_api/src/models/system_models.dart';
 import 'package:gi_core_api/src/models/user_models.dart';
@@ -210,6 +212,97 @@ final class GiCoreClient {
     (device) => device.toJson(),
     pathParams: {'id': id},
   );
+
+  /// `GET /settings/system` (OWNER, ADMIN, SERVICE).
+  Future<SystemSettings> systemSettings() => _call(
+    GiEndpoints.settingsSystem,
+    (json) => SystemSettings.fromJson(asJsonObject(json)),
+    (settings) => settings.toJson(),
+  );
+
+  /// `GET /appliance/updates/status` (OWNER, ADMIN).
+  Future<ApplianceUpdateStatus> applianceUpdateStatus() => _call(
+    GiEndpoints.applianceUpdatesStatus,
+    (json) => ApplianceUpdateStatus.fromJson(asJsonObject(json)),
+    (status) => status.toJson(),
+  );
+
+  /// `PUT /devices/:deviceId/entities/:entityId/state` with exactly
+  /// `{"state": state}` (OWNER, ADMIN; plan §12.2).
+  ///
+  /// The returned [SwitchCommandResult.state] is NOT the new state of the
+  /// switch: a GI Edge device in dry-run returns its OLD value, a GI Edge
+  /// device otherwise echoes the request before the controller acted, and
+  /// the response never states the communication mode or the outcome. The
+  /// caller must re-read the device and confirm the command its own way.
+  ///
+  /// Never retried automatically (only the single replay after a 401
+  /// refresh): repeating a switch command is the user's decision.
+  Future<SwitchCommandResult> setSwitchState(
+    String deviceId,
+    String entityId, {
+    required bool state,
+  }) => _call(
+    GiEndpoints.setSwitchState,
+    (json) => SwitchCommandResult.fromJson(asJsonObject(json)),
+    (result) => result.toJson(),
+    pathParams: {'id': deviceId, 'entityId': entityId},
+    data: {'state': state},
+  );
+
+  /// `PATCH /devices/:deviceId` with ONLY `{"heatingSuspended": suspended}`
+  /// (OWNER, ADMIN; plan §12.1). Returns the list-item shape
+  /// (`DeviceResponseDto`: UPPERCASE status, `currentState`,
+  /// `activeFaultCount`), not the details shape.
+  ///
+  /// The server turns the relays off and rewrites the effective strategy
+  /// asynchronously after answering; confirm by re-reading the device.
+  /// Never retried automatically.
+  Future<DeviceListItem> setHeatingSuspended(
+    String deviceId, {
+    required bool suspended,
+  }) => _call(
+    GiEndpoints.updateDevice,
+    (json) => DeviceListItem.fromJson(asJsonObject(json)),
+    (device) => device.toJson(),
+    pathParams: {'id': deviceId},
+    data: {'heatingSuspended': suspended},
+  );
+
+  /// `PATCH /devices/:deviceId/control-strategy` (OWNER, ADMIN; plan
+  /// §12.5). All three fields are sent; [targetTemperatureCelsius] must be
+  /// within 0–100, [hysteresisCelsius] within 1–20 and [mode] a known mode,
+  /// otherwise an [ArgumentError] is thrown before anything is sent.
+  /// Never retried automatically.
+  Future<ControlStrategyUpdateResult> updateControlStrategy(
+    String deviceId, {
+    required double targetTemperatureCelsius,
+    required double hysteresisCelsius,
+    required ControlStrategyMode mode,
+  }) {
+    _checkRange(targetTemperatureCelsius, 0, 100, 'targetTemperatureCelsius');
+    _checkRange(hysteresisCelsius, 1, 20, 'hysteresisCelsius');
+    if (mode == ControlStrategyMode.unknown) {
+      throw ArgumentError.value(mode, 'mode', 'must be AUTO, OFF or MANUAL');
+    }
+    return _call(
+      GiEndpoints.updateControlStrategy,
+      (json) => ControlStrategyUpdateResult.fromJson(asJsonObject(json)),
+      (result) => result.toJson(),
+      pathParams: {'id': deviceId},
+      data: {
+        'targetTemperatureCelsius': targetTemperatureCelsius,
+        'hysteresisCelsius': hysteresisCelsius,
+        'mode': mode.name.toUpperCase(),
+      },
+    );
+  }
+
+  static void _checkRange(double value, int min, int max, String name) {
+    if (!value.isFinite || value < min || value > max) {
+      throw RangeError.range(value, min, max, name);
+    }
+  }
 
   /// Closes both HTTP clients and the session state stream.
   Future<void> close() async {

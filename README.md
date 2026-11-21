@@ -33,7 +33,7 @@ home-energy-mobile/
 │  ├─ backend/dev.env                lokalne dane logowania dev (gitignored)
 │  ├─ fake_esphome/                  udawany sterownik ESPHome (Dockerfile, serwer dart:io)
 │  ├─ seed_core.dart                 seeder przez publiczne API
-│  ├─ seed_accounts.example.json     testowe konta ADMIN i USER seedera
+│  ├─ seed_accounts.example.json     testowe konta ADMIN, USER i SERVICE seedera
 │  ├─ spec_diff.dart                 dryf specyfikacji: żywy /docs-json vs snapshot
 │  ├─ gen_backend_contract.dart      generuje docs/backend-contract.md z katalogu
 │  ├─ dev_lan_proxy/                 forwarder TCP dla telefonu w LAN
@@ -51,6 +51,68 @@ home-energy-mobile/
 Architekturę aplikacji (routing, polling, uwagi platformowe) opisuje
 [`app/README.md`](app/README.md), a klienta API
 [`packages/gi_core_api/README.md`](packages/gi_core_api/README.md).
+
+## Funkcje M2: sterowanie ogrzewaniem
+
+Sterowanie jest krytyczne dla bezpieczeństwa (plan §12). Zasady: żadnego
+optymistycznego UI dla stanu przełącznika, żadnego kolejkowania zapisów
+offline, żadnych ponowień zapisów, żaden tekst nie twierdzi, że przekaźnik
+fizycznie się przełączył. Mapa reguł → kod → testy:
+[`docs/safety-review.md`](docs/safety-review.md); semantyka potwierdzeń:
+ADR [0009](docs/decisions/0009-switch-confirmation-semantics.md).
+
+- **Przełączniki** (`PUT /devices/:id/entities/:entityId/state`): ON z
+  arkuszem konsekwencji, OFF bez potwierdzenia. LEGACY_ESPHOME: „Urządzenie
+  potwierdziło polecenie”; GI_EDGE_V1: „Zlecono · czeka na potwierdzenie”
+  do heartbeatu po `confirmedAt` (30 s). Przekaźniki kotła i pompy są tylko
+  do odczytu.
+- **Wstrzymanie i wznowienie ogrzewania** (`PATCH /devices/:id
+  {heatingSuspended}`): wstrzymanie przytrzymaniem (~600 ms, także akcja
+  czytnika ekranu), dostępne nawet na nieaktualnych danych; wznowienie z
+  arkuszem konsekwencji („Kocioł może się włączyć w ciągu ~30 s”).
+- **Nastawa** (`PATCH /devices/:id/control-strategy`): cel 5–80 °C co
+  0,5 °C, histereza 1–20, tryb AUTO/OFF/MANUAL; ponowny odczyt i wykrywanie
+  konfliktu po wartościach tuż przed zapisem.
+- **Blokady** (`SafetyPolicy`): rola, nieaktualne dane (ostrzej niż Core),
+  wstrzymanie (tylko ON), zatrzaśnięta usterka FAULT/SAFE_MODE (tylko ON),
+  encja wyłączona, niedostępna lub niezapisywalna. Każda blokada ma tekst z
+  powodem.
+- **Ustawienia:** język aplikacji, informacje o sesji i urządzeniu,
+  wylogowanie.
+
+### Role
+
+| Rola | Podgląd | Przełączniki, wstrzymanie, nastawa |
+|---|---|---|
+| OWNER, ADMIN | tak | tak |
+| USER, SERVICE | tak | nie: kontrolki ukryte, podpowiedź „Zmiany ogrzewania może wprowadzić właściciel.”; serwer i tak zwraca `HTTP_403` |
+
+Uprawnienia wynikają z katalogu endpointów (`Endpoint.roles`), nie z kodu UI
+(`HeatingPermission.of`). Konta testowe ADMIN, USER i SERVICE zakłada
+seeder (`tools/seed_accounts.example.json`).
+
+### Testy kontraktowe sterowania
+
+```powershell
+$env:PATH = "$env:USERPROFILE\fvm\versions\3.50.0\bin;$env:PATH"
+.\tools\dev-up.ps1 -Contract -RunId m2 -Seed     # wypisze GI_CORE_URL i FAKE_ESPHOME_URL
+cd packages\gi_core_api
+$env:GI_CORE_URL='<z dev-up>'; $env:FAKE_ESPHOME_URL='<z dev-up>'
+dart test -t contract -j 1 test/contract/control_contract_test.dart
+cd ..\..; .\tools\dev-up.ps1 -Contract -RunId m2 -Down
+```
+
+Zakres `control_contract_test.dart` i ścieżki nieosiągalne na urządzeniu
+fake opisuje sekcja „Testy kontraktowe” niżej. Limit logowania Core to 5 na
+minutę.
+
+### Tryb demo
+
+Na ekranie łączenia przycisk „Wypróbuj wersję demonstracyjną” otwiera
+przykładowy dom zalogowany jako właściciel, bez sieci i bez Pi (dane z
+`app/assets/demo_fixtures/demo_core.json`, w pamięci). Baner „DEMO” jest na
+każdym ekranie; „Zakończ demo” czyści dane. Notatka dla recenzentów sklepów:
+[`docs/release-runbook.md`](docs/release-runbook.md) §3.1.
 
 ## Wymagania
 
@@ -283,8 +345,13 @@ właściciel z tym e-mailem, ciasteczko refresh rotuje przy każdym
 `/auth/refresh` (ponowne użycie starego daje `AUTH_REFRESH_TOKEN_REUSED` i
 kończy sesję), działają `me`, `profile`, zmiana hasła i wylogowanie. Szczegóły
 urządzenia są z nagrań po id (urządzenie z listy bez nagranych szczegółów
-dostaje szczegóły zbudowane z listy), `lastSeenAt` to czas żądania. Inne
-ścieżki dają kopertę `404 HTTP_404` jak Core. Bez limitu logowań.
+dostaje szczegóły zbudowane z listy), `lastSeenAt` to czas żądania. Zapisy M2
+(`PUT .../state`, `PATCH /devices/{id}`, `PATCH .../control-strategy`) działają
+na kopii szczegółów w pamięci z kontrolami w kolejności Core (404, 409
+`HEATING_SUSPENDED`, 422, 409 `ENTITY_DISABLED`, 503 `DEVICE_OFFLINE`); GI Edge
+zapisuje optymistycznie, a w dry-run zwraca stary stan; `MockCore.switchFailure`
+wstrzykuje błąd ESPHOME 502/503/504 na ścieżce legacy. Inne ścieżki dają
+kopertę `404 HTTP_404` jak Core. Bez limitu logowań.
 
 ```sh
 dart run tools/mock_core/bin/mock_core.dart                       # http://127.0.0.1:3100
@@ -554,19 +621,19 @@ CI (`dart test -x contract`). Główny cel to stos kontraktowy; to warunek Exit 
 .\tools\dev-up.ps1 -Contract -RunId a -Seed
 cd packages\gi_core_api
 $env:GI_CORE_URL='http://127.0.0.1:<port>'; $env:FAKE_ESPHOME_URL='http://127.0.0.1:<port2>'
-dart test -t contract
+dart test -t contract -j 1
 cd ..\..; .\tools\dev-up.ps1 -Contract -RunId a -Down
 ```
 
 ```sh
 cd packages/gi_core_api
-dart test -t contract                                    # stos dev, http://localhost:3000
-GI_CORE_URL=http://127.0.0.1:<port> FAKE_ESPHOME_URL=http://127.0.0.1:<port2> dart test -t contract
+dart test -t contract -j 1                             # stos dev, http://localhost:3000
+GI_CORE_URL=http://127.0.0.1:<port> FAKE_ESPHOME_URL=http://127.0.0.1:<port2> dart test -t contract -j 1
 ```
 
 - Uruchamiaj z `packages/gi_core_api`. Właściciel: `../../tools/backend/dev.env`
-  (`GI_DEV_EMAIL`, `GI_DEV_PASSWORD`); ADMIN i USER: konta seedera. Hasła nigdy
-  nie są wypisywane.
+  (`GI_DEV_EMAIL`, `GI_DEV_PASSWORD`); ADMIN, USER i SERVICE: konta seedera.
+  Hasła nigdy nie są wypisywane.
 - `GI_CORE_URL` (domyślnie `http://localhost:3000`) wskazuje Core.
   `FAKE_ESPHOME_URL` deklaruje stos kontraktowy: wtedy brak urządzenia fake to
   błąd, a testy sprawdzają też fizyczny stan przekaźnika (`GET /fake/state`).
@@ -585,10 +652,23 @@ GI_CORE_URL=http://127.0.0.1:<port> FAKE_ESPHOME_URL=http://127.0.0.1:<port2> da
   ciasteczka, zmiana hasła i powrót, wylogowanie), `devices_contract_test.dart`
   (urządzenie fake ONLINE mimo 404 na `/gi-provision`, przełącznik w obie
   strony, USER dostaje `HTTP_403`, kształt odpowiedzi `control-strategy`),
-  `appliance_fingerprint_contract_test.dart` (test akceptacyjny §9.3).
-- Logowania: łącznie pięć (właściciel 2, ADMIN 1, USER 2). Limit GI Core to 5
-  na minutę z jednego IP, a seeder loguje się wcześniej, więc jedno logowanie
-  zwykle czeka `Retry-After` (do 60 s) i przebieg trwa około minuty.
+  `appliance_fingerprint_contract_test.dart` (test akceptacyjny §9.3),
+  `control_contract_test.dart` (ścieżki sterowania M2 na urządzeniu fake:
+  `PUT .../state` w obie strony z potwierdzeniem `/fake/state` i
+  `lastSeenAt == confirmedAt`, 404/400/422/409 `ENTITY_DISABLED`, wstrzymanie
+  ogrzewania z 409 `HEATING_SUSPENDED` i trybem efektywnym OFF, wznowienie,
+  `dryRun` ignorowany na ścieżce legacy, `control-strategy` z walidacją,
+  `HTTP_403` dla USER i SERVICE; każdy test przywraca stan seedera).
+- Ścieżki GI Edge (zapis optymistyczny, dry-run zwracający stary stan,
+  potwierdzenie heartbeatem), `DEVICE_OFFLINE`, błędy ESPHOME 502/503/504,
+  boost PV i FAULT nie są osiągalne na urządzeniu fake (tylko LEGACY_ESPHOME);
+  pokrywają je fixture'y ręczne (`m2_writes_test.dart`) i `tools/mock_core`
+  (`MockCore.switchFailure`).
+- `-j 1`: pliki `devices_` i `control_contract_test.dart` przełączają ten sam
+  przekaźnik, więc zestaw kontraktowy idzie plik po pliku.
+- Logowania: łącznie osiem (właściciel 2, ADMIN 2, USER 3, SERVICE 1). Limit
+  GI Core to 5 na minutę z jednego IP, więc logowanie ponad limit czeka raz
+  `Retry-After` (do 60 s), a przebieg trwa około dwóch minut.
 
 #### Dwa Core: test akceptacyjny odcisku urządzenia (§9.3)
 
@@ -603,7 +683,7 @@ ciasteczko (rotacja się udaje).
 .\tools\dev-up.ps1 -Contract -RunId b -Seed   # B: zapisz GI_CORE_URL jako GI_CORE_URL_B
 cd packages\gi_core_api
 $env:GI_CORE_URL='<A>'; $env:FAKE_ESPHOME_URL='<fake A>'; $env:GI_CORE_URL_B='<B>'
-dart test -t contract
+dart test -t contract -j 1
 cd ..\..; .\tools\dev-up.ps1 -Contract -RunId a -Down; .\tools\dev-up.ps1 -Contract -RunId b -Down
 ```
 
@@ -647,7 +727,7 @@ zakaz znacznika TODO dla backendu, plan G5) i ten sam Flutter z `.fvmrc` (`.gith
 | Plik | Kiedy | Co robi |
 |---|---|---|
 | [`ci.yml`](.github/workflows/ci.yml) | PR, push na `main`, ręcznie, wywołanie z `build.yml` | `flutter gen-l10n`, `build_runner` w obu członkach i **kontrola aktualności wygenerowanego kodu** (`tools/ci/check-generated.sh`: `git diff --exit-code` + nieśledzone pliki; wymaga commitowania `*.g.dart`, `*.freezed.dart` i `app_localizations*.dart`), analiza każdego członka, testy (`gi_core_api` z regułą pokrycia katalogu, `tools/`, `app` bez goldenów), **bramka pokrycia**, osobny krok **goldenów** (`flutter test --tags golden`) |
-| [`contract.yml`](.github/workflows/contract.yml) | co noc, ręcznie, PR do `packages/gi_core_api/**`, `contract/**`, `tools/**` | checkout backendu na SHA z `contract/backend.lock`, `tools/dev-up.sh --contract`, seeder `--init --yes --fixtures`, `dart test -t contract`, `spec_diff` względem `contract/openapi`, artefakty (nowe fixture'y, żywy `/docs-json`, logi compose), zawsze `--down`. Nocą także kanarek na `main` backendu (nie blokuje) |
+| [`contract.yml`](.github/workflows/contract.yml) | co noc, ręcznie, PR do `packages/gi_core_api/**`, `contract/**`, `tools/**` | checkout backendu na SHA z `contract/backend.lock`, `tools/dev-up.sh --contract`, seeder `--init --yes --fixtures`, `dart test -t contract -j 1`, `spec_diff` względem `contract/openapi`, artefakty (nowe fixture'y, żywy `/docs-json`, logi compose), zawsze `--down`. Nocą także kanarek na `main` backendu (nie blokuje) |
 | [`e2e.yml`](.github/workflows/e2e.yml) | PR do `app/**` (mock), co noc i ręcznie (prawdziwy Core) | emulator Androida (`reactivecircus/android-emulator-runner` v2.38.0 przypięty do SHA commita, API 34, x86_64), `integration_test/app_flow_test.dart` we flavorze dev: na PR z wbudowanym mockiem (`FF_MOCK_CORE`), nocą przeciw seedowanemu stosowi kontraktowemu przez `10.0.2.2:<port>` |
 | [`build.yml`](.github/workflows/build.yml) | PR do `app/**`/`packages/**`, push na `main`, tagi `v*`, ręcznie | AAB prod na Linuksie + kontrola wyrównania 16 KB (`tools/ci/check-16kb-alignment.sh`) + artefakt; iOS `--no-codesign` na macOS (**nie da się sprawdzić lokalnie** na Windows). Na tagach najpierw całe `ci.yml`, a AAB musi być podpisany kluczem uploadu |
 | [`codemagic.yaml`](codemagic.yaml) | tagi `v*` | `ios-testflight-internal` (TestFlight, tylko testerzy wewnętrzni) i `android-play-internal` (ścieżka internal w Play) |

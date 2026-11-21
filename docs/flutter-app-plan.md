@@ -163,7 +163,7 @@ Pole `message` jest po polsku tylko dla kodów z tabeli `common/i18n/api-message
   | 409 `HEATING_SUSPENDED`, 409 `ENTITY_DISABLED` | Sterowanie zablokowane |
   | 422 `ENTITY_NOT_WRITABLE` | Encja tylko do odczytu |
   | 503 `DEVICE_OFFLINE`, 503 `ESPHOME_DEVICE_UNREACHABLE` | Urządzenie nieosiągalne |
-  | 502 `ESPHOME_COMMAND_UNCONFIRMED`, 504 `ESPHOME_COMMAND_TIMEOUT` | Brak potwierdzenia |
+  | 502 `ESPHOME_COMMAND_REJECTED`, 502 `ESPHOME_COMMAND_UNCONFIRMED`, 504 `ESPHOME_COMMAND_TIMEOUT` | Brak potwierdzenia |
 
 - **GI_EDGE_V1: zapis optymistyczny.** W `esphome-switch-command.service.ts` po `giEdgeCommands.enqueue(...)` (l.249) Core zapisuje na encji żądaną wartość i `lastSeenAt: requestedAt` (l.281), z wynikiem audytu `REQUESTED` (l.296), **zanim urządzenie cokolwiek zrobi** (**zweryfikowane**). Polecenia nie mają ID.
 
@@ -531,6 +531,9 @@ PlainServerError(500)
 | 409 `ENTITY_DISABLED`, 422 `ENTITY_NOT_WRITABLE` | „Tego przełącznika nie można teraz użyć” |
 | 503 `DEVICE_OFFLINE` | „Urządzenie jest offline. Polecenie nie zostało wysłane.” |
 | 503 `ESPHOME_DEVICE_UNREACHABLE`, 502 `…_UNCONFIRMED`, 504 `…_TIMEOUT` | „Urządzenie nie potwierdziło polecenia”, a następnie odświeżenie szczegółów |
+| 502 `ESPHOME_COMMAND_REJECTED` | Jak `…_UNCONFIRMED`: urządzenie ESPHome odpowiedziało statusem innym niż 2xx (`esphome-http.client.ts`). Kod nie był wcześniej w tej tabeli |
+| 400 `ESPHOME_HOST_FORBIDDEN` | „Adres sterownika jest poza siecią domową” (mało prawdopodobne; host rozwiązuje się na adres publiczny) |
+| 403 `HTTP_403` | „Nie masz uprawnień do tej operacji.” i jednorazowe przeładowanie `/auth/me` |
 | 404 `DEVICE_ENTITY_NOT_FOUND` | „Element został usunięty lub zmieniony.” |
 | 400 `VALIDATION_FAILED` | Błąd przy polu |
 | 500 | Komunikat ogólny, ponowienie, `requestId` |
@@ -703,6 +706,7 @@ Reguły są w `SafetyPolicy` i `ConfirmationPolicy` (czysty Dart, 100% pokrycia 
 - **Wstrzymanie:** przytrzymanie przez ok. 600 ms, bez dialogu (OFF to kierunek bezpieczny). Akcja dostępna też w VoiceOver i TalkBack. Wysyła `PATCH /devices/:id {"heatingSuspended": true}`, a następnie polluje do potwierdzenia.
 - **Wznowienie:** zawsze arkusz konsekwencji z temperaturą zasilania i powrotu (z wiekiem danych), trybem i celem, które zaczną obowiązywać, oraz tekstem „Kocioł może się włączyć w ciągu ~30 s”.
 - **Gdy ogrzewanie jest wstrzymane:** przypięty baner, ukryte akcje ON z wyjaśnieniem, a 409 dostaje ten sam komunikat.
+- **Odstępstwa M2 (otwarte):** arkusz wznowienia pokazuje dziś tylko temperaturę sterującą (z wiekiem danych), bez osobnej temperatury zasilania i powrotu; przypiętego banera wstrzymania nie ma jeszcze na karcie Ustawienia. Do uzupełnienia, zanim §12.1 uznamy za spełniony.
 
 ### 12.2 Przełączniki bez optymizmu
 Stany:
@@ -712,11 +716,13 @@ Stany:
    - **GI_EDGE_V1**: „Zlecono · czeka na potwierdzenie”.
 3. Szybki polling szczegółów.
 
-**Potwierdzenie dla GI_EDGE_V1.** Nigdy nie używamy `entity.value` ani `entity.lastSeenAt`: Core zapisuje je optymistycznie zaraz po zakolejkowaniu polecenia (§3.6). Potwierdzenie wymaga **poziomu urządzenia** `lastSeenAt` (heartbeat lub telemetria) **ściśle późniejszego niż `confirmedAt` z odpowiedzi PUT**; to zegar serwera, więc nie ma przesunięcia zegara klienta. Preferowane źródło to `diagnostics.relayNCommanded` raportowane przez firmware albo wartość pochodząca z telemetrii, jeśli istnieje. Inaczej zostaje „Zlecono · czeka na potwierdzenie”, a po 45 s „Brak potwierdzenia – pokazujemy ostatni zgłoszony stan”.
+**Potwierdzenie dla GI_EDGE_V1.** Nigdy nie używamy `entity.value` ani `entity.lastSeenAt`: Core zapisuje je optymistycznie zaraz po zakolejkowaniu polecenia (§3.6). Potwierdzenie wymaga **poziomu urządzenia** `lastSeenAt` (heartbeat lub telemetria) **ściśle późniejszego niż `confirmedAt` z odpowiedzi PUT**; to zegar serwera, więc nie ma przesunięcia zegara klienta. Źródłem jest `diagnostics.relayN.{output, commanded}` z heartbeatu. Heartbeat i dostarczenie polecenia to w Core osobne kanały, więc heartbeat liczy się jako raport dopiero, gdy `relayN.commanded` równa się żądanemu stanowi (przy wstrzymaniu: gdy żaden przekaźnik nie ma już `commanded: true`). Inaczej zostaje „Zlecono · czeka na potwierdzenie”, a po 45 s (dłużej niż interwał heartbeatu 30 s plus dwa polle; to nie TTL polecenia) pokazujemy ostatni heartbeat po `confirmedAt` taki, jaki jest, albo „Brak potwierdzenia”, gdy żadnego nie było. Stan przełącznika i wartość encji przekaźnika GI Edge bierzemy z `diagnostics.relayN.output` (w dry-run z `commanded`), nigdy z `entity.value`; bez diagnostyki przekaźnika wartość encji zapisana po ostatnim heartbeacie to „czeka na raport sterownika”.
 
-Otwarte kwestie (§24):
-- Czy da się rozpoznać GI_EDGE_V1 po odpowiedzi szczegółów? Jeśli nie, stosujemy tę ostrą regułę do wszystkich urządzeń.
-- Czy heartbeat aktualizuje `Device.lastSeenAt`?
+Kwestie z §24, zamknięte w M2 (odczyt kodu backendu, ADR [0009](decisions/0009-switch-confirmation-semantics.md)):
+- **`communicationMode` jest w `GET /devices/:id`** (`device-details-query.service.ts:54`), więc GI_EDGE_V1 rozpoznajemy wprost; ostrej reguły nie stosujemy do LEGACY_ESPHOME. Odpowiedź PUT nie mówi ani o trybie, ani o wyniku.
+- **Heartbeat aktualizuje `Device.lastSeenAt`** zegarem serwera (`gi-edge-heartbeat.service.ts`, HTTP i MQTT) i nadpisuje encje przekaźników z `diagnostics.relayN.{output, commanded}`.
+- **GI_EDGE i `dryRun`: PUT zwraca STARY stan** encji (encja nie jest zapisywana, audyt `REQUESTED_DRY_RUN`, `confirmedAt` = czas żądania). `response.state` nigdy nie jest traktowane jako nowy stan, na żadnej ścieżce.
+- **409 `HEATING_SUSPENDED` dotyczy wszystkich przełączników urządzenia, tylko żądań ON.** OFF jest zawsze dozwolone przy wstrzymaniu (`esphome-switch-command.service.ts:87-99`).
 
 Test fixture odtwarza zapis optymistyczny: w pierwszym pollu wartość encji się zgadza, a UI **nie** pokazuje „Potwierdzone”.
 
@@ -724,7 +730,7 @@ Komunikat **nigdy** nie twierdzi, że przekaźnik fizycznie się przełączył. 
 
 ### 12.3 Dry-run
 - Bursztynowy baner „Tryb testowy: przekaźniki nie przełączają się fizycznie”.
-- Podpowiedź „Sterownik chciałby: WŁ” na podstawie `diagnostics.relayNCommanded`.
+- Podpowiedź „Sterownik chciałby: WŁ” na podstawie `diagnostics.relayN.commanded`.
 - Przełącznik dry-run zostaje w panelu web.
 
 ### 12.4 Przekaźniki kotła i pompy
@@ -732,7 +738,7 @@ Nigdy nie są ręcznymi przełącznikami w v1. Wyświetlamy je tylko do odczytu 
 
 ### 12.5 Edytor strategii
 - **Wartość efektywna a bazowa:**
-  - **M2:** gdy wartość efektywna różni się od bazowej (inny cel lub histereza), pokazujemy „Harmonogram aktywny” obok „Ustawienie domyślne: 20 °C, histereza 0,5 °C”. API nie mówi, który harmonogram obowiązuje.
+  - **M2:** gdy wartość efektywna różni się od bazowej (inny cel lub histereza), pokazujemy „Harmonogram aktywny” obok „Ustawienie domyślne: 20 °C, histereza 0,5 °C”. API nie mówi, który harmonogram obowiązuje. **Porównujemy wyłącznie cel i histerezę, nigdy `mode`:** przy wstrzymaniu rekoncyliacja zapisuje efektywne `mode: 'OFF'` przy niezmienionej bazie (`heating-schedule-reconciliation.service.ts:52-61`). Przy `heatingSuspended` podpowiedzi „Harmonogram aktywny” nie pokazujemy wcale, tylko wstrzymanie.
   - **M3:** nazwa harmonogramu i godzina końca („„Rano” 21 °C do 08:00”), **wyliczone** przez klientowy `ScheduleClock`. To replika `windowMatches` z Core: pierwszy pasujący według `createdAt asc`, `mode` zawsze z bazy, zegar procesu gi-core (`heating-schedule-reconciliation.service.ts:164-169`). Etykieta „wywnioskowane”.
 - **Wykrywanie konfliktu.** Przy otwarciu arkusza zapamiętujemy `baseControlStrategy {targetTemperatureCelsius, hysteresisCelsius, mode}` i `heatingSuspended`. Przed PATCH pobieramy świeże `GET /devices/:id` i **porównujemy te wartości**. Jeśli się różnią, pokazujemy „Ktoś zmienił ustawienia w międzyczasie”, przeładowujemy i pytamy ponownie. `configurationVersion` jest tylko informacyjne, bo cron zwiększa je co minutę (§3.6). Last-write-wins jest ograniczony, nie wyeliminowany (L16).
 - **Zakresy:** cel w krokach 0,5 °C, UI ogranicza do 5–80 °C (serwer przyjmuje 0–100). Ostrzeżenie powyżej `pvHeatingConfig.safeMaxTemperatureCelsius`. Podniesienie o ponad 10 °C wymaga potwierdzenia. Histereza 1–20. Zawsze wysyłamy trzy pola.
@@ -740,6 +746,8 @@ Nigdy nie są ręcznymi przełącznikami w v1. Wyświetlamy je tylko do odczytu 
 
 ### 12.6 Blokada przy nieaktualnych danych
 Przy OFFLINE, STALE lub snapshocie kontrolki przełączników i strategii są wyłączone. **Wstrzymanie zostaje dostępne.**
+
+Blokada klienta jest **świadomie ostrzejsza niż serwer**: `validateEntity` w Core sprawdza zapisany `status == ONLINE`, nie `connectivityState`, więc urządzenie STALE (5–15 min bez heartbeatu) nadal przyjęłoby polecenie. Aplikacja go nie wyśle (`LockReason.staleData`).
 
 ### 12.7 Usterki
 - Gdy `currentState ∈ {FAULT, SAFE_MODE}` lub `activeFaultCount > 0`, pokazujemy „Wymaga uwagi”. Oba pola pochodzą z listy (§4.1), ze źródłem i świeżością.
@@ -770,6 +778,7 @@ Przy OFFLINE, STALE lub snapshocie kontrolki przełączników i strategii są wy
 - Przed logowaniem: język telefonu.
 - Po logowaniu: `GET /users/me/profile`.locale, bo `AuthUserDto` nie ma pola locale.
 - Zmiana: `PATCH /users/me/profile {locale}` (v1.0).
+- M2: Ustawienia → „Język” (Automatycznie / Polski / English) to preferencja telefonu (`app_language.v1`), ważniejsza od profilu i języka telefonu; przeżywa wylogowanie, a GI Core o niej nie wie.
 
 ### 13.3 Formatowanie
 - `intl` z językiem aplikacji. Stopnie Celsjusza z 1 miejscem po przecinku. „—” z etykietą „Brak danych”.
@@ -940,7 +949,7 @@ C:\
    ├─ README.md              uruchamianie backendu, base URL, zapora, polityka prywatności
    ├─ .fvmrc  pubspec.yaml (pub workspace)  analysis_options.yaml
    ├─ docs/
-   │  ├─ decisions/          0001-cookie-refresh … 0008-feature-flags
+   │  ├─ decisions/          0001-cookie-refresh … 0009-switch-confirmation-semantics
    │  ├─ backend-contract.md generowany z katalogu
    │  ├─ release-runbook.md  phased release / staged rollout / halt
    │  └─ spikes/             wyniki S1–S8
@@ -1276,8 +1285,8 @@ Każda ma proponowaną wartość domyślną, żeby nie blokować startu. **Żadn
 
 1. **Źródło przypiętego ref backendu.** *(Rozstrzygnięte.)* `C:\home-energy-poc` to klon `https://github.com/biQte/home-energy-poc.git`, gałąź `main`. Plan był pisany pod commit `8be59cd907df1af964a817331edbcf8e1597d3e2`; ten SHA trafia do `backend.lock`. Do rozstrzygnięcia zostaje tylko, czy CI repo mobilnego ma dostęp do tego repozytorium (publiczne czy wymaga tokenu).
 2. Czy target `production` z `NODE_ENV=production` wystawia `/docs-json` przy `SWAGGER_ENABLED=true` i czy mosquitto bez konfiguracji (local-only) wystarcza dla gi-core we wspólnej przestrzeni sieciowej? (S8)
-3. Czy z odpowiedzi szczegółów da się odróżnić GI_EDGE_V1 od LEGACY_ESPHOME i czy heartbeat GI Edge aktualizuje `Device.lastSeenAt`? (S5, lista sprzętowa)
-4. Nazwy kluczy w `diagnostics` dla `currentState`/`activeFaults` i `relayNCommanded`. (S5)
+3. ~~Czy z odpowiedzi szczegółów da się odróżnić GI_EDGE_V1 od LEGACY_ESPHOME i czy heartbeat GI Edge aktualizuje `Device.lastSeenAt`?~~ *(Rozstrzygnięte w M2, odczyt kodu.)* Tak i tak: `communicationMode` jest w szczegółach (`device-details-query.service.ts:54`), a każdy heartbeat (HTTP i MQTT) zapisuje `Device.lastSeenAt` zegarem serwera (`gi-edge-heartbeat.service.ts`). Klucze przekaźników: `diagnostics.relayN.{output, commanded}`. Zostaje potwierdzenie na prawdziwym sterowniku (lista sprzętowa §17.1). Zob. §12.2 i ADR [0009](decisions/0009-switch-confirmation-semantics.md).
+4. Nazwy kluczy w `diagnostics` dla `currentState`/`activeFaults`. (S5) Część o przekaźnikach *(rozstrzygnięta w M2)*: `diagnostics.relayN.{output, commanded}`, zob. pkt 3.
 5. Czy `GET /devices`, `/devices/:id` zwracają ETag i 304? (S4)
 6. Czy odpowiedź 429 zawiera `Retry-After`?
 7. Czy `initializedAt` jest stabilne po `PATCH /settings/system`? (S5)

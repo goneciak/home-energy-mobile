@@ -66,6 +66,81 @@ void main() {
       expect(temperature.value, const EntityValue.number(45.5));
       expect(device.baseControlStrategy?.mode, ControlStrategyMode.manual);
     });
+
+    group('M2 writes on the legacy fake device', () {
+      for (final (file, state) in [
+        ('legacy_on.json', true),
+        ('legacy_off.json', false),
+      ]) {
+        test('switch $file: confirmed echo, four keys', () {
+          final body = fixtureObject(
+            'DeviceEspHomeSyncController_setSwitchState/$file',
+          );
+          final result = SwitchCommandResult.fromJson(body);
+
+          expect(body.keys, {
+            'entityId',
+            'state',
+            'availability',
+            'confirmedAt',
+          });
+          expect(unknownJsonFields(body, result.toJson()), isEmpty);
+          expect(result.state, state);
+          expect(result.availability, isTrue);
+          expect(result.confirmedAt.isUtc, isTrue);
+        });
+      }
+
+      for (final (file, status, code) in [
+        ('error_entity_not_found.json', 404, 'DEVICE_ENTITY_NOT_FOUND'),
+        ('error_entity_not_writable.json', 422, 'ENTITY_NOT_WRITABLE'),
+        ('error_validation.json', 400, 'VALIDATION_FAILED'),
+      ]) {
+        test('switch $file: $status $code envelope', () {
+          final envelope = ApiErrorEnvelope.tryParse(
+            fixtureJson('DeviceEspHomeSyncController_setSwitchState/$file'),
+          );
+
+          expect(envelope?.statusCode, status);
+          expect(envelope?.code, code);
+        });
+      }
+
+      test('resume answers with the list-item shape', () {
+        final body = fixtureObject('DevicesController_update/resumed.json');
+        final device = DeviceListItem.fromJson(body);
+
+        expect(device.status, DeviceListStatus.online);
+        expect(device.heatingSuspended, isFalse);
+        expect(device.dryRun, isFalse);
+        expect(device.activeFaultCount, 0);
+        expect(device.connectivityState, ConnectivityState.online);
+      });
+
+      test('seeded control strategy: effective equals base', () {
+        final body = fixtureObject(
+          'DevicesController_updateControlStrategy/seeded.json',
+        );
+        final result = ControlStrategyUpdateResult.fromJson(body);
+
+        expect(unknownJsonFields(body, result.toJson()), isEmpty);
+        expect(result.controlStrategy, result.baseControlStrategy);
+        expect(result.baseControlStrategy?.mode, ControlStrategyMode.manual);
+        expect(result.baseControlStrategy?.targetTemperatureCelsius, 55);
+        expect(result.baseControlStrategy?.hysteresisCelsius, 4);
+      });
+
+      test('control strategy out of range: 400 VALIDATION_FAILED', () {
+        final envelope = ApiErrorEnvelope.tryParse(
+          fixtureJson(
+            'DevicesController_updateControlStrategy/error_validation.json',
+          ),
+        );
+
+        expect(envelope?.statusCode, 400);
+        expect(envelope?.code, 'VALIDATION_FAILED');
+      });
+    });
   });
 
   group('fixture layout (plan §17.4)', () {
@@ -92,7 +167,6 @@ void main() {
       final catalogIds = {for (final e in GiEndpoints.all) e.id};
       const outsideCatalog = {
         'AuthController_listSessions',
-        'SettingsController_getSystem',
         'SetupController_initialize',
         '_unrouted',
       };

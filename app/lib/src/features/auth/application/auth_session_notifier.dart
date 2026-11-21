@@ -7,6 +7,7 @@ import 'package:gi_home/src/features/appliance/application/appliance_profile_not
 import 'package:gi_home/src/features/appliance/application/connection_ladder.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
+import 'package:gi_home/src/features/demo/application/demo_mode.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostic_report_sharer.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -156,7 +157,10 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
   /// language) and the local diagnostics, including a report file left for
   /// the share sheet (plan §8.3: logout clears secure storage, prefs and
   /// files). The app returns to the phone language.
+  ///
+  /// In demo mode it only ends the demo: nothing real is wiped.
   Future<LogoutResult> logout() async {
+    if (_exitDemo()) return const LogoutResult(serverSessionEnded: true);
     final diagnostics = ref.read(diagnosticsServiceProvider);
     final reports = ref.read(reportDirectoryProvider);
     final locales = ref.read(sessionLocaleStoreProvider);
@@ -181,7 +185,10 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
   /// Logs out (best effort) and removes the appliance and its stored
   /// session from this phone. Without an authenticated session (restore
   /// failed, appliance not set up) the cookie is only wiped locally.
+  ///
+  /// In demo mode it only ends the demo.
   Future<void> forgetAppliance() async {
+    if (_exitDemo()) return;
     await _endApplianceSession();
     await ref.read(applianceProfileProvider.notifier).forget();
   }
@@ -196,6 +203,9 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
     ProbeResult probe, {
     bool cleartextNoticeShown = false,
   }) async {
+    // A real appliance confirmed during the demo: the demo ends first, so
+    // the saved profile and its session are the ones replaced.
+    _exitDemo();
     final profiles = ref.read(applianceProfileProvider.notifier);
     await _endApplianceSession();
     await profiles.replaceWith(
@@ -204,6 +214,13 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
         cleartextNoticeShown: cleartextNoticeShown,
       ),
     );
+  }
+
+  /// Ends demo mode; `false` when it was not on.
+  bool _exitDemo() {
+    if (ref.read(demoModeProvider) == null) return false;
+    ref.read(demoModeProvider.notifier).exit();
+    return true;
   }
 
   Future<void> _endApplianceSession() async {

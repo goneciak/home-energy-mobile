@@ -105,6 +105,16 @@
   "errorApplianceReset": "GI Home został zresetowany. Dokończ jego konfigurację, a potem zaloguj się ponownie.",
   "errorCancelled": "Operacja została przerwana.",
   "errorGeneric": "Coś poszło nie tak. Spróbuj ponownie.",
+  "errorDeviceEntityNotFound": "Ten element nie należy już do urządzenia. Odśwież widok.",
+  "errorDeviceNotFound": "Urządzenie zostało usunięte lub zmienione. Odśwież widok.",
+  "errorHeatingSuspended": "Ogrzewanie jest wstrzymane, więc nie można niczego włączyć. Najpierw wznów ogrzewanie.",
+  "errorEntityDisabled": "Ten element jest wyłączony w konfiguracji urządzenia.",
+  "errorEntityNotWritable": "Tym elementem nie można sterować z aplikacji.",
+  "errorDeviceOffline": "Urządzenie jest offline. Polecenie nie zostało wysłane.",
+  "errorDeviceUnreachable": "GI Home nie zna adresu sterownika. Polecenie nie zostało wysłane.",
+  "errorCommandUnconfirmed": "Sterownik nie potwierdził polecenia. Stan jest nieznany – odśwież widok i sprawdź go przed kolejną próbą.",
+  "errorCommandTimeout": "Sterownik nie odpowiedział na czas. Nie wiadomo, czy polecenie zostało wykonane – odśwież widok przed kolejną próbą.",
+  "errorDeviceHostForbidden": "Adres sterownika jest poza siecią domową, więc GI Home go zablokował. Sprawdź konfigurację urządzenia w panelu GI Home.",
   "errorRequestId": "Identyfikator zgłoszenia: {requestId}",
   "@errorRequestId": {
     "placeholders": {
@@ -612,5 +622,463 @@
   },
   "staleAppBody": "Ta wersja aplikacji nie rozumie części odpowiedzi GI Home. Zainstaluj najnowszą wersję.",
   "staleAppOpenStore": "Otwórz sklep",
-  "staleAppDismiss": "Ukryj komunikat"
+  "staleAppDismiss": "Ukryj komunikat",
+  "heatingViewOnlyHint": "Zmiany ogrzewania może wprowadzić właściciel.",
+  "@heatingViewOnlyHint": {
+    "description": "Shown instead of heating controls to USER/SERVICE roles (plan §12.8)."
+  },
+  "heatingDryRunBanner": "Tryb testowy: polecenia są zapisywane, ale przekaźniki pozostają wyłączone.",
+  "@heatingDryRunBanner": {
+    "description": "Amber banner while the device is in dry-run (plan §12.3)."
+  },
+  "lockNotOwnerAdmin": "Zmiany ogrzewania może wprowadzić właściciel lub administrator. Poproś go o zmianę.",
+  "@lockNotOwnerAdmin": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockHeatingOrPumpRelay": "Przekaźnikiem kotła i pompy steruje sterownik. W aplikacji jest tylko podgląd.",
+  "@lockHeatingOrPumpRelay": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockEntityMissing": "Tego elementu nie ma już w urządzeniu. Odśwież widok.",
+  "@lockEntityMissing": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockNotWritableSwitch": "Tego elementu nie da się przełączać z aplikacji.",
+  "@lockNotWritableSwitch": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockEntityDisabled": "Element jest wyłączony. Włącz go w panelu GI Home, aby nim sterować.",
+  "@lockEntityDisabled": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockEntityUnavailable": "Element jest niedostępny. Sprawdź połączenie urządzenia i spróbuj ponownie.",
+  "@lockEntityUnavailable": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockStaleData": "Dane są nieaktualne, więc sterowanie jest zablokowane. Poczekaj na odświeżenie. Wstrzymanie ogrzewania działa nadal.",
+  "@lockStaleData": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockSuspendedOnRequest": "Ogrzewanie jest wstrzymane. Wznów je, aby móc włączać przełączniki.",
+  "@lockSuspendedOnRequest": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "lockFaultLatched": "Sterownik zgłasza usterkę lub tryb bezpieczny. Wymaga to autoryzowanego, ręcznego resetu na urządzeniu – w razie zagrożenia wezwij serwis.",
+  "@lockFaultLatched": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceStopsHeating": "GI Home wyłączy ogrzewanie. Możesz je później wznowić.",
+  "@consequenceStopsHeating": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceBoilerMayStartSoon": "Kocioł może się włączyć w ciągu ~30 s.",
+  "@consequenceBoilerMayStartSoon": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceRestoresBaseOrSchedule": "Wróci ustawienie domyślne lub aktywny harmonogram.",
+  "@consequenceRestoresBaseOrSchedule": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceCommandNotPhysicallyVerified": "Polecenie zostanie wysłane, ale aplikacja nie potwierdza fizycznego przełączenia przekaźnika.",
+  "@consequenceCommandNotPhysicallyVerified": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceLargeTargetRaise": "Temperatura docelowa wzrośnie o ponad 10 °C.",
+  "@consequenceLargeTargetRaise": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceLeavesOffMode": "GI Home znów zacznie sterować kotłem i może go włączyć.",
+  "@consequenceLeavesOffMode": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceAboveSafeMax": "Temperatura docelowa przekracza bezpieczne maksimum ustawione dla nadwyżki PV.",
+  "@consequenceAboveSafeMax": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "consequenceDryRunOutputsStayOff": "Tryb testowy: polecenie zostanie zapisane, ale przekaźniki pozostaną wyłączone.",
+  "@consequenceDryRunOutputsStayOff": {
+    "description": "Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6)."
+  },
+  "switchCommandSending": "Wysyłanie…",
+  "@switchCommandSending": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched."
+  },
+  "switchCommandLegacyConfirmed": "Urządzenie potwierdziło polecenie: {state}, {time}. Fizyczny stan przekaźnika nie jest weryfikowany.",
+  "@switchCommandLegacyConfirmed": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched.",
+    "placeholders": {
+      "state": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "switchCommandAwaitingHeartbeat": "Zlecono · czeka na raport sterownika",
+  "@switchCommandAwaitingHeartbeat": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched."
+  },
+  "switchCommandHeartbeatObserved": "Po poleceniu sterownik zgłosił: polecenie {commanded}, wyjście {output} – to nie potwierdza fizycznego stanu przekaźnika.",
+  "@switchCommandHeartbeatObserved": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched.",
+    "placeholders": {
+      "commanded": {
+        "type": "String"
+      },
+      "output": {
+        "type": "String"
+      }
+    }
+  },
+  "switchCommandDryRunRecorded": "Zapisano w trybie testowym: polecenie {commanded}, wyjście pozostaje wyłączone.",
+  "@switchCommandDryRunRecorded": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched.",
+    "placeholders": {
+      "commanded": {
+        "type": "String"
+      }
+    }
+  },
+  "switchCommandTimedOut": "Sterownik nie zgłosił się w ciągu 45 s – stan jest nieznany. Odśwież widok przed kolejną próbą.",
+  "@switchCommandTimedOut": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched."
+  },
+  "entitySwitchAwaitingReport": "czeka na raport sterownika",
+  "@entitySwitchAwaitingReport": {
+    "description": "GI Edge switch value written by GI Core on enqueue, not yet reported by a heartbeat (plan §12.2). Never shows the requested state."
+  },
+  "switchControllerCommanded": "Polecenie sterownika: {state}",
+  "@switchControllerCommanded": {
+    "description": "Read-only commanded state of a boiler/pump relay from diagnostics.relayN.commanded (plan §12.4).",
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "switchDryRunWouldSet": "Sterownik chciałby: {state}",
+  "@switchDryRunWouldSet": {
+    "description": "Dry-run hint from diagnostics.relayN.commanded (plan §12.3); the output does not switch.",
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "switchCommandNotReported": "nie zgłoszono",
+  "@switchCommandNotReported": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched."
+  },
+  "switchConfirmOnTitle": "Wysłać polecenie włączenia: {name}?",
+  "@switchConfirmOnTitle": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "switchConfirmSend": "Wyślij polecenie",
+  "@switchConfirmSend": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched."
+  },
+  "actionRefresh": "Odśwież",
+  "@actionRefresh": {
+    "description": "Switch command (plan §12.2). Never claims the relay physically switched."
+  },
+  "heatingStrategyTarget": "Cel {temperature} °C, histereza {hysteresis} °C",
+  "@heatingStrategyTarget": {
+    "description": "Effective control strategy (controlStrategy, what the firmware gets), plan §12.5.",
+    "placeholders": {
+      "temperature": {
+        "type": "String",
+        "example": "55,0"
+      },
+      "hysteresis": {
+        "type": "String",
+        "example": "4,0"
+      }
+    }
+  },
+  "heatingStrategyModeAuto": "GI Home steruje kotłem",
+  "heatingStrategyModeOff": "Sterowanie wyłączone – GI Home nie będzie włączać kotła",
+  "heatingStrategyModeManual": "GI Home nie steruje automatycznie",
+  "heatingStrategyModeUnknown": "Nieznany tryb sterowania",
+  "heatingStrategyNone": "Brak ustawień sterowania – skonfiguruj je w panelu web GI Home",
+  "@heatingStrategyNone": {
+    "description": "Both controlStrategy and baseControlStrategy are null."
+  },
+  "heatingScheduleActive": "Harmonogram aktywny",
+  "@heatingScheduleActive": {
+    "description": "Effective target or hysteresis differs from the base one. The API does not say which schedule (plan §12.5 M2)."
+  },
+  "heatingStrategyDefault": "Ustawienie domyślne: {temperature} °C, histereza {hysteresis} °C",
+  "@heatingStrategyDefault": {
+    "description": "baseControlStrategy, shown next to the schedule-active hint.",
+    "placeholders": {
+      "temperature": {
+        "type": "String",
+        "example": "55,0"
+      },
+      "hysteresis": {
+        "type": "String",
+        "example": "4,0"
+      }
+    }
+  },
+  "heatingSuspendedTitle": "Ogrzewanie wstrzymane",
+  "heatingSuspendedEffect": "GI Home nie włączy kotła, dopóki ogrzewanie nie zostanie wznowione.",
+  "heatingSuspendedResumeHint": "Aby wznowić ogrzewanie, otwórz szczegóły urządzenia.",
+  "@heatingSuspendedResumeHint": {
+    "description": "Next action for OWNER/ADMIN when no resume action is wired."
+  },
+  "heatingSuspendedAskOwner": "Wznowić ogrzewanie może właściciel lub administrator.",
+  "@heatingSuspendedAskOwner": {
+    "description": "Next action for USER/SERVICE."
+  },
+  "heatingResumeAction": "Wznów ogrzewanie",
+  "heatingPvBoost": "PV boost: grzanie do {temperature} °C",
+  "@heatingPvBoost": {
+    "description": "pvBoostActive; the target is pvHeatingConfig.safeMaxTemperatureCelsius, not exposed directly.",
+    "placeholders": {
+      "temperature": {
+        "type": "String",
+        "example": "55,0"
+      }
+    }
+  },
+  "heatingPvBoostDerived": "Cel wyliczony z limitu bezpieczeństwa PV",
+  "heatingPvBoostUnknownTarget": "PV boost aktywny – cel nieznany",
+  "@heatingPvBoostUnknownTarget": {
+    "description": "pvBoostActive without pvHeatingConfig."
+  },
+  "heatingStrategySource": "Według GI Core · dane z {time}",
+  "@heatingStrategySource": {
+    "description": "Source and freshness of the strategy values.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "heatingControlSection": "Sterowanie ogrzewaniem",
+  "strategyEditAction": "Zmień ustawienia sterowania",
+  "strategyEditorTitle": "Ustawienia sterowania",
+  "strategyEditorIntro": "Zmieniasz ustawienie domyślne. Aktywny harmonogram może je czasowo zastąpić.",
+  "strategyTargetLabel": "Temperatura docelowa (°C)",
+  "strategyHysteresisLabel": "Histereza (°C)",
+  "strategyModeLabel": "Tryb sterowania",
+  "strategyModeAutoShort": "Auto",
+  "strategyModeOffShort": "Wył.",
+  "strategyModeManualShort": "Ręczny",
+  "strategyErrorNotANumber": "Wpisz liczbę",
+  "strategyErrorRange": "Dozwolony zakres: {min}–{max} °C",
+  "@strategyErrorRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "strategyErrorStep": "Podaj wartość co {step} °C",
+  "@strategyErrorStep": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "strategyAboveSafeMaxWarning": "To więcej niż bezpieczne maksimum dla nadwyżki PV ({temperature} °C).",
+  "@strategyAboveSafeMaxWarning": {
+    "placeholders": {
+      "temperature": {
+        "type": "String"
+      }
+    }
+  },
+  "strategySuspendedNote": "Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu tryb efektywny to Wył.",
+  "strategySave": "Zapisz",
+  "strategyChecking": "Sprawdzanie aktualnych ustawień…",
+  "strategySaving": "Zapisywanie…",
+  "strategyConflictTitle": "Ktoś zmienił ustawienia w międzyczasie",
+  "strategyConflictBody": "Nic nie zostało zapisane. Sprawdź, co się zmieniło, i zdecyduj, co dalej.",
+  "strategyConflictRow": "{field}: {before} → {after}",
+  "@strategyConflictRow": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "strategyFieldTarget": "Temperatura docelowa",
+  "strategyFieldHysteresis": "Histereza",
+  "strategyFieldMode": "Tryb",
+  "strategyFieldSuspended": "Ogrzewanie",
+  "strategyValueNone": "brak",
+  "strategyValueSuspended": "wstrzymane",
+  "strategyValueActive": "aktywne",
+  "strategyConflictReapply": "Zapisz moje zmiany mimo to",
+  "strategyConflictDiscard": "Odrzuć moje zmiany",
+  "strategySavedTitle": "Zapisano w GI Core",
+  "strategySavedBase": "Ustawienie domyślne: {value}",
+  "@strategySavedBase": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "strategySavedEffective": "Obowiązuje teraz: {value}",
+  "@strategySavedEffective": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "strategySavedSuspended": "Ogrzewanie jest wstrzymane, więc tryb efektywny pozostaje Wył. do czasu wznowienia.",
+  "strategyValue": "{target} °C, histereza {hysteresis} °C, {mode}",
+  "@strategyValue": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "hysteresis": {
+        "type": "String"
+      },
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
+  "strategyConfirmTitle": "Potwierdź zmianę ustawień",
+  "strategyConfirmSave": "Zapisz zmiany",
+  "suspendHoldAction": "Przytrzymaj, aby wstrzymać ogrzewanie",
+  "suspendHoldHint": "Przytrzymaj przycisk – zwykłe dotknięcie niczego nie zmienia.",
+  "suspendA11yHint": "otwiera potwierdzenie wstrzymania",
+  "suspendConfirmTitle": "Wstrzymać ogrzewanie?",
+  "suspendConfirmAction": "Wstrzymaj ogrzewanie",
+  "suspendAwaiting": "Wysłano · czekamy, aż GI Core potwierdzi wstrzymanie",
+  "resumeAwaiting": "Wysłano · czekamy, aż GI Core potwierdzi wznowienie",
+  "suspendAppliedAwaitingHeartbeat": "Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników · czeka na raport sterownika",
+  "suspendAppliedOutputsOff": "Ogrzewanie wstrzymane. Raport sterownika z {time}: wyjścia przekaźników wyłączone. To nie potwierdza fizycznego stanu przekaźników.",
+  "@suspendAppliedOutputsOff": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "suspendAppliedOutputOn": "Ogrzewanie wstrzymane, ale raport sterownika z {time} wciąż pokazuje włączone wyjście. Odśwież za chwilę, a w razie zagrożenia wyłącz kocioł ręcznie.",
+  "@suspendAppliedOutputOn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "suspendAppliedNotReported": "Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie raportuje stanu wyjść.",
+  "suspendAppliedNoHeartbeat": "Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie zgłosił się w ciągu 45 s – stan przekaźników jest nieznany.",
+  "suspendAppliedLegacy": "Ogrzewanie wstrzymane w GI Core. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.",
+  "resumeApplied": "Ogrzewanie wznowione. Znów obowiązuje ustawienie domyślne lub harmonogram.",
+  "resumeAppliedPending": "Ogrzewanie wznowione. GI Core nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.",
+  "suspendTimedOut": "GI Core nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.",
+  "resumeTimedOut": "GI Core nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.",
+  "resumeSheetTitle": "Wznowić ogrzewanie?",
+  "resumeSheetWillApply": "Zacznie obowiązywać: {value}",
+  "@resumeSheetWillApply": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "resumeSheetTemperature": "Temperatura sterująca: {value} · dane z {time}",
+  "@resumeSheetTemperature": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resumeSheetTemperatureMissing": "Brak aktualnego odczytu temperatury sterującej.",
+  "settingsLanguage": "Język",
+  "settingsLanguageAutomatic": "Automatycznie",
+  "settingsLanguageAutomaticSubtitle": "Język z profilu GI Home, a bez niego język telefonu",
+  "settingsLanguagePolish": "Polski",
+  "@settingsLanguagePolish": {
+    "description": "Language name in its own language; same in every locale."
+  },
+  "settingsLanguageEnglish": "English",
+  "@settingsLanguageEnglish": {
+    "description": "Language name in its own language; same in every locale."
+  },
+  "settingsLanguageDialogTitle": "Język aplikacji",
+  "settingsCoreVersion": "Wersja oprogramowania GI Home",
+  "settingsCoreVersionSubtitle": "{version} (według ostatniego sprawdzenia aktualizacji)",
+  "@settingsCoreVersionSubtitle": {
+    "description": "Best-effort running GI Core version (plan §16).",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.4.2"
+      }
+    }
+  },
+  "settingsTimezone": "Strefa czasowa urządzenia",
+  "settingsSessionRenewSoon": "{days, plural, =0{Sesja wygasła – zaloguj się ponownie} =1{Za 1 dzień trzeba będzie zalogować się ponownie} few{Za {days} dni trzeba będzie zalogować się ponownie} many{Za {days} dni trzeba będzie zalogować się ponownie} other{Za {days} dnia trzeba będzie zalogować się ponownie}}",
+  "@settingsSessionRenewSoon": {
+    "description": "Shown from 3 days before the 30-day session ends (plan §7.6).",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "demoEntryTitle": "Nie masz jeszcze GI Home?",
+  "@demoEntryTitle": {
+    "description": "Connect screen: heading of the demo mode entry (plan §19.5)."
+  },
+  "demoEntryBody": "Zobacz aplikację na przykładowym domu. Dane są zmyślone i zostają w pamięci telefonu, a polecenia nie trafiają do żadnego urządzenia.",
+  "@demoEntryBody": {
+    "description": "Connect screen: what demo mode is."
+  },
+  "demoEnter": "Wypróbuj wersję demonstracyjną",
+  "@demoEnter": {
+    "description": "Visible demo mode entry button on the connect screen (plan §19.5, Guideline 2.3.1)."
+  },
+  "demoStartFailed": "Nie udało się uruchomić wersji demonstracyjnej. Spróbuj ponownie.",
+  "@demoStartFailed": {
+    "description": "Snackbar when the demo fixtures could not be loaded."
+  },
+  "demoBadge": "DEMO",
+  "@demoBadge": {
+    "description": "Badge of the permanent demo banner."
+  },
+  "demoBadgeSemantics": "Wersja demonstracyjna",
+  "@demoBadgeSemantics": {
+    "description": "Screen reader label of the DEMO badge."
+  },
+  "demoBannerMessage": "Przykładowe dane – nic nie jest naprawdę sterowane.",
+  "@demoBannerMessage": {
+    "description": "Permanent demo banner text; never claims a device acted."
+  },
+  "demoExit": "Zakończ demo",
+  "@demoExit": {
+    "description": "Demo banner button: leaves demo mode and wipes its state."
+  }
 }

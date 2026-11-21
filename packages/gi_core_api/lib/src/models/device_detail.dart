@@ -258,7 +258,26 @@ abstract class DeviceDiagnostics with _$DeviceDiagnostics {
   /// The controller detected repeated restarts (`rebootLoopDetected`).
   bool? get rebootLoopDetected => _bool(raw['rebootLoopDetected']);
 
+  /// GI Edge relay [n] (`relayN: {output, commanded}`), or `null` when the
+  /// heartbeat has no such object. Neither value is the physical relay
+  /// state: [RelayDiagnostics.output] is what the firmware drives (stays
+  /// `false` in dry-run), [RelayDiagnostics.commanded] what it was asked to
+  /// do. Never present either as physically verified (docs/safety.md).
+  RelayDiagnostics? relay(int n) => switch (raw['relay$n']) {
+    final Map<Object?, Object?> relay => RelayDiagnostics(
+      output: _bool(relay['output']),
+      commanded: _bool(relay['commanded']),
+    ),
+    _ => null,
+  };
+
   static bool? _bool(Object? value) => value is bool ? value : null;
+}
+
+/// `diagnostics.relayN` of a GI Edge heartbeat; a mistyped field is `null`.
+@freezed
+abstract class RelayDiagnostics with _$RelayDiagnostics {
+  const factory({bool? output, bool? commanded}) = _RelayDiagnostics;
 }
 
 /// Diagnostics are `null` for legacy devices; any non-object value is treated

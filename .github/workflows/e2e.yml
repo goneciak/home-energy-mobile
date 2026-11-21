@@ -1,14 +1,20 @@
-# End-to-end test on an Android emulator (plan §17.1 E2E, §19.1 step 3):
-# app/integration_test/app_flow_test.dart (connect → login → Home → device
-# details → Settings → logout) in the dev flavor.
+# End-to-end tests on an Android emulator (plan §17.1 E2E, §19.1 step 3,
+# §20 M2 item 8) in the dev flavor:
+#   app_flow_test.dart      connect → login → Home → device details →
+#                           Settings → logout
+#   demo_flow_test.dart     demo mode: switch → suspend → resume → exit, no
+#                           Core at all (Exit M2 "tryb demo przechodzi E2E")
+#   control_flow_test.dart  M2 control on the contract stack's fake device:
+#                           strategy edit → suspend → resume → strategy back
 #
-#   e2e-android-mock  PRs touching app/** (and on demand): against the app's
-#                     in-process mock GI Core (FF_MOCK_CORE, dev flavor only),
-#                     no backend.
-#   e2e-android       nightly and on demand: against the real GI Core of the
-#                     contract stack (contract/compose.contract.yml), seeded
-#                     with tools/seed_core.dart. The emulator reaches the
-#                     host's 127.0.0.1:<port> as 10.0.2.2:<port>.
+#   e2e-android-mock  PRs touching app/** (and on demand): app_flow against
+#                     the app's in-process mock GI Core (FF_MOCK_CORE, dev
+#                     flavor only), then demo_flow; no backend.
+#   e2e-android       nightly and on demand: app_flow and control_flow
+#                     against the real GI Core of the contract stack
+#                     (contract/compose.contract.yml), seeded with
+#                     tools/seed_core.dart. The emulator reaches the host's
+#                     127.0.0.1:<port> as 10.0.2.2:<port>.
 #
 # Backend access: the same GI_BACKEND_REPO variable and GI_BACKEND_TOKEN secret
 # as contract.yml (plan §24.1).
@@ -93,7 +99,7 @@ jobs:
           disable-animations: true
           working-directory: app
           # One line: the runner executes each script line in its own shell.
-          script: flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/app_flow_test.dart --dart-define-from-file=config/dev.json --dart-define-from-file=$RUNNER_TEMP/e2e-mock.json
+          script: flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/app_flow_test.dart --dart-define-from-file=config/dev.json --dart-define-from-file=$RUNNER_TEMP/e2e-mock.json && flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/demo_flow_test.dart --dart-define-from-file=config/dev.json
 
   e2e-android:
     name: E2E Android (contract stack)
@@ -165,7 +171,7 @@ jobs:
           arch: x86_64
           disable-animations: true
           working-directory: app
-          script: flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/app_flow_test.dart --dart-define-from-file=config/dev.json --dart-define-from-file=../tools/backend/dev.env --dart-define=GI_CORE_ADDRESS=$GI_CORE_ADDRESS
+          script: flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/app_flow_test.dart --dart-define-from-file=config/dev.json --dart-define-from-file=../tools/backend/dev.env --dart-define=GI_CORE_ADDRESS=$GI_CORE_ADDRESS && flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/control_flow_test.dart --dart-define-from-file=config/dev.json --dart-define-from-file=../tools/backend/dev.env --dart-define=GI_CORE_ADDRESS=$GI_CORE_ADDRESS
 
       - name: Collect logs
         if: always()

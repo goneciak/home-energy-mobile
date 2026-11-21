@@ -14,12 +14,17 @@ import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart
 import 'package:gi_home/src/features/auth/application/switch_user_controller.dart';
 import 'package:gi_home/src/features/diagnostics/presentation/diagnostic_report_tile.dart';
 import 'package:gi_home/src/features/experimental/presentation/experimental_features_screen.dart';
+import 'package:gi_home/src/features/settings/application/settings_providers.dart';
+import 'package:gi_home/src/features/settings/presentation/language_tile.dart';
 import 'package:gi_home/src/features/settings/presentation/switch_user_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// "Ustawienia": appliance, account, logout, switch user, change appliance,
-/// app version, open-source licences, diagnostic report.
+/// "Ustawienia" (plan §20 M2 item 6): appliance (name, address, the HTTP
+/// indicator, best-effort software version and time zone for the roles
+/// allowed to read them), account (role, session expiry, logout, switch
+/// user), change appliance, language, app version, open-source licences,
+/// diagnostic report.
 class SettingsScreen extends ConsumerWidget {
   const new({super.key});
 
@@ -30,7 +35,9 @@ class SettingsScreen extends ConsumerWidget {
     final profile = ref.watch(applianceProfileProvider);
     final user = ref.watch(currentUserProvider);
     final appInfo = ref.watch(appInfoProvider);
-    final sessionExpiresAt = ref.watch(sessionExpiresAtProvider);
+    final sessionExpiry = ref.watch(sessionExpiryProvider);
+    final coreVersion = ref.watch(applianceRunningVersionProvider).value;
+    final system = ref.watch(systemSettingsProvider).value;
 
     Future<void> logout() async {
       final result = await ref.read(authSessionProvider.notifier).logout();
@@ -103,6 +110,20 @@ class SettingsScreen extends ConsumerWidget {
               ),
               subtitle: Text(l10n.settingsLanOnly),
             ),
+            if (coreVersion != null)
+              ListTile(
+                key: const ValueKey('settings-core-version'),
+                leading: const Icon(Icons.memory_outlined),
+                title: Text(l10n.settingsCoreVersion),
+                subtitle: Text(l10n.settingsCoreVersionSubtitle(coreVersion)),
+              ),
+            if (system != null)
+              ListTile(
+                key: const ValueKey('settings-timezone'),
+                leading: const Icon(Icons.public),
+                title: Text(l10n.settingsTimezone),
+                subtitle: Text(system.timezone),
+              ),
           ],
           if (user != null) ...[
             SectionHeader(l10n.settingsAccountSection),
@@ -121,12 +142,23 @@ class SettingsScreen extends ConsumerWidget {
               title: Text(l10n.settingsUserRole),
               subtitle: Text(roleLabel(l10n, user.role)),
             ),
-            if (sessionExpiresAt != null)
+            if (sessionExpiry != null)
               ListTile(
-                leading: const Icon(Icons.schedule),
-                title: Text(
-                  l10n.settingsSessionValidUntil(sessionExpiresAt.toLocal()),
+                key: const ValueKey('settings-session-expiry'),
+                leading: Icon(
+                  Icons.schedule,
+                  color: sessionExpiry.isWarning ? tokens.warning : null,
                 ),
+                title: Text(
+                  l10n.settingsSessionValidUntil(
+                    sessionExpiry.expiresAt.toLocal(),
+                  ),
+                ),
+                subtitle: sessionExpiry.daysLeft == null
+                    ? null
+                    : Text(
+                        l10n.settingsSessionRenewSoon(sessionExpiry.daysLeft!),
+                      ),
               ),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -147,6 +179,7 @@ class SettingsScreen extends ConsumerWidget {
             onTap: changeAppliance,
           ),
           SectionHeader(l10n.settingsAppSection),
+          const LanguageTile(),
           const _AppVersionTile(),
           ListTile(
             key: const ValueKey('settings-licenses'),

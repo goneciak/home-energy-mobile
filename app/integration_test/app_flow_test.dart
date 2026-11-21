@@ -65,9 +65,13 @@ void main() {
 
   Future<void> tapWhenVisible(WidgetTester tester, Finder finder) async {
     await waitFor(tester, finder);
-    await tester.ensureVisible(finder);
+    // Centred, not scrolled to the edge: a pinned app bar would cover it.
+    await Scrollable.ensureVisible(
+      tester.element(finder.first),
+      alignment: 0.5,
+    );
     await tester.pump();
-    await tester.tap(finder);
+    await tester.tap(finder.first);
     await tester.pump();
   }
 

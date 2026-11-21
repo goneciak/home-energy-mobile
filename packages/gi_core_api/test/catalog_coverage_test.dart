@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 
 import 'contract/appliance_fingerprint_contract_test.dart' as fingerprint;
 import 'contract/auth_flow_contract_test.dart' as auth_flow;
+import 'contract/control_contract_test.dart' as control;
 import 'contract/core_quirks_contract_test.dart' as core_quirks;
 import 'contract/devices_contract_test.dart' as devices;
 import 'contract/session_rotation_contract_test.dart' as session_rotation;
@@ -16,6 +17,7 @@ import 'support/fixtures.dart';
 final Map<String, List<Endpoint>> liveCoverageByFile = {
   'appliance_fingerprint_contract_test.dart': fingerprint.liveCoverage,
   'auth_flow_contract_test.dart': auth_flow.liveCoverage,
+  'control_contract_test.dart': control.liveCoverage,
   'core_quirks_contract_test.dart': core_quirks.liveCoverage,
   'devices_contract_test.dart': devices.liveCoverage,
   'session_rotation_contract_test.dart': session_rotation.liveCoverage,

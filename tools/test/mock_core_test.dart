@@ -190,7 +190,180 @@ void main() {
     expect(result.serverSessionEnded, isTrue);
     expect(core.activeSessions, 0);
   });
+
+  group('M2 writes (plan §12)', () {
+    final fake =
+        fixtures.json['DevicesController_get']!['fake_esphome']!
+            as Map<String, Object?>;
+    final deviceId = fake['id']! as String;
+    final relayId = fake['heatingRelayEntityId']! as String;
+    final sensorId = fake['controlTemperatureEntityId']! as String;
+    final statePath = '/devices/$deviceId/entities/$relayId/state';
+
+    setUp(() => client.login(email: 'dev@gihome.test', password: 'x'));
+
+    Future<Response<Object?>> write(String method, String path, Object data) =>
+        _authorized(client, raw(), method, path, data);
+
+    /// Restarts the server on [detail] as the only recorded details.
+    Future<void> serveOnly(Map<String, Object?> detail) async {
+      await client.close();
+      await server.close();
+      core = MockCore(
+        fixtures: MockCoreFixtures(fixtures.ref, {
+          ...fixtures.json,
+          'DevicesController_get': {'fake_esphome': detail},
+        }, fixtures.text),
+        now: () => now,
+      );
+      server = await MockCoreServer.start(core: core, port: 0);
+      client = newClient();
+      await client.login(email: 'dev@gihome.test', password: 'x');
+    }
+
+    test('a legacy switch is confirmed and shows in the details', () async {
+      final on = await client.setSwitchState(deviceId, relayId, state: true);
+
+      expect(on.state, isTrue);
+      expect(on.confirmedAt, now);
+      final relay = (await client.device(deviceId)).entities
+          .firstWhere((e) => e.id == relayId);
+      expect(relay.value, const EntityValue.boolean(true));
+    });
+
+    test('guards and validation answer Core codes', () async {
+      final cases = <(String, Object, String)>[
+        (
+          '/devices/$deviceId/entities/nope/state',
+          {'state': true},
+          'DEVICE_ENTITY_NOT_FOUND',
+        ),
+        (
+          '/devices/$deviceId/entities/$sensorId/state',
+          {'state': true},
+          'ENTITY_NOT_WRITABLE',
+        ),
+        (statePath, {'state': 'on'}, 'VALIDATION_FAILED'),
+        (statePath, {'state': true, 'x': 1}, 'VALIDATION_FAILED'),
+        (statePath, <String, Object>{}, 'VALIDATION_FAILED'),
+        (
+          '/devices/00000000-0000-4000-8000-000000000000/entities/a/state',
+          {'state': true},
+          'DEVICE_NOT_FOUND',
+        ),
+      ];
+      for (final (path, data, code) in cases) {
+        expect(_code(await write('PUT', path, data)), code, reason: path);
+      }
+    });
+
+    test('suspend: ON refused, OFF allowed, effective mode OFF; resume '
+        'restores the base mode', () async {
+      final suspended = await client.setHeatingSuspended(
+        deviceId,
+        suspended: true,
+      );
+      expect(suspended.heatingSuspended, isTrue);
+      final refused = await write('PUT', statePath, {'state': true});
+      expect(refused.statusCode, 409);
+      expect(_code(refused), 'HEATING_SUSPENDED');
+      expect(
+        (await client.setSwitchState(deviceId, relayId, state: false)).state,
+        isFalse,
+      );
+      final whileSuspended = await client.device(deviceId);
+      expect(whileSuspended.controlStrategy?.mode, ControlStrategyMode.off);
+      expect(
+        whileSuspended.baseControlStrategy?.mode,
+        ControlStrategyMode.manual,
+      );
+
+      await client.setHeatingSuspended(deviceId, suspended: false);
+      final resumed = await client.device(deviceId);
+      expect(resumed.heatingSuspended, isFalse);
+      expect(resumed.controlStrategy, resumed.baseControlStrategy);
+    });
+
+    test('control strategy: validated, effective follows base, version '
+        'increases', () async {
+      final before = (await client.device(deviceId)).configurationVersion;
+      final result = await client.updateControlStrategy(
+        deviceId,
+        targetTemperatureCelsius: 60,
+        hysteresisCelsius: 5,
+        mode: ControlStrategyMode.auto,
+      );
+
+      expect(result.controlStrategy, result.baseControlStrategy);
+      expect(result.baseControlStrategy?.targetTemperatureCelsius, 60);
+      expect(result.configurationVersion, before + 1);
+      final invalid = await write(
+        'PATCH',
+        '/devices/$deviceId/control-strategy',
+        {'targetTemperatureCelsius': 60, 'hysteresisCelsius': 0, 'mode': 'X'},
+      );
+      expect(invalid.statusCode, 400);
+      expect((invalid.data! as Map)['details'], hasLength(2));
+    });
+
+    test('an injected legacy failure answers with its status', () async {
+      for (final MapEntry(key: code, value: status)
+          in MockCore.switchFailures.entries) {
+        core.switchFailure = code;
+        final response = await write('PUT', statePath, {'state': true});
+        expect(response.statusCode, status);
+        expect(_code(response), code);
+      }
+    });
+
+    test('GI Edge: a dry run answers the OLD state and writes nothing; '
+        'otherwise the write is optimistic', () async {
+      await serveOnly({
+        ...fake,
+        'communicationMode': 'GI_EDGE_V1',
+        'dryRun': true,
+      });
+
+      final dry = await client.setSwitchState(deviceId, relayId, state: true);
+      expect(dry.state, isFalse);
+      final relay = (await client.device(deviceId)).entities
+          .firstWhere((e) => e.id == relayId);
+      expect(relay.value, const EntityValue.boolean(false));
+
+      final live = await write('PATCH', '/devices/$deviceId', {
+        'dryRun': false,
+      });
+      expect(live.statusCode, 200);
+      expect(
+        (await client.setSwitchState(deviceId, relayId, state: true)).state,
+        isTrue,
+      );
+    });
+
+    test('an offline device answers 503 DEVICE_OFFLINE', () async {
+      await serveOnly({...fake, 'status': 'offline'});
+
+      final response = await write('PUT', statePath, {'state': false});
+      expect(response.statusCode, 503);
+      expect(_code(response), 'DEVICE_OFFLINE');
+    });
+  });
 }
+
+Future<Response<Object?>> _authorized(
+  GiCoreClient client,
+  Dio dio,
+  String method,
+  String path,
+  Object data,
+) async => await dio.request<Object?>(
+  path,
+  data: data,
+  options: Options(
+    method: method,
+    headers: {'authorization': 'Bearer ${await client.session.accessToken()}'},
+  ),
+);
 
 bool _isRefresh(String line) => line.contains('/api/v1/auth/refresh');
 

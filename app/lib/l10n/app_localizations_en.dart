@@ -227,6 +227,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorGeneric => 'Something went wrong. Please try again.';
 
   @override
+  String get errorDeviceEntityNotFound =>
+      'This item is no longer part of the device. Refresh the view.';
+
+  @override
+  String get errorDeviceNotFound =>
+      'The device was removed or changed. Refresh the view.';
+
+  @override
+  String get errorHeatingSuspended =>
+      'Heating is suspended, so nothing can be turned on. Resume heating first.';
+
+  @override
+  String get errorEntityDisabled =>
+      'This item is disabled in the device configuration.';
+
+  @override
+  String get errorEntityNotWritable =>
+      'This item cannot be controlled from the app.';
+
+  @override
+  String get errorDeviceOffline =>
+      'The device is offline. The command was not sent.';
+
+  @override
+  String get errorDeviceUnreachable =>
+      'GI Home does not know the controller\'s address. The command was not sent.';
+
+  @override
+  String get errorCommandUnconfirmed =>
+      'The controller did not confirm the command. The state is unknown – refresh the view and check it before trying again.';
+
+  @override
+  String get errorCommandTimeout =>
+      'The controller did not respond in time. It is not known whether the command was carried out – refresh the view before trying again.';
+
+  @override
+  String get errorDeviceHostForbidden =>
+      'The controller\'s address is outside the home network, so GI Home blocked it. Check the device configuration in the GI Home web panel.';
+
+  @override
   String errorRequestId(String requestId) {
     return 'Request ID: $requestId';
   }
@@ -1087,4 +1127,477 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get staleAppDismiss => 'Hide message';
+
+  @override
+  String get heatingViewOnlyHint => 'Heating changes can be made by the owner.';
+
+  @override
+  String get heatingDryRunBanner =>
+      'Test mode: commands are recorded but outputs stay off.';
+
+  @override
+  String get lockNotOwnerAdmin =>
+      'Heating changes can be made by the owner or an administrator. Ask them to make the change.';
+
+  @override
+  String get lockHeatingOrPumpRelay =>
+      'The boiler and pump relays are driven by the controller. The app shows them read-only.';
+
+  @override
+  String get lockEntityMissing =>
+      'This item is no longer part of the device. Refresh the view.';
+
+  @override
+  String get lockNotWritableSwitch =>
+      'This item cannot be switched from the app.';
+
+  @override
+  String get lockEntityDisabled =>
+      'This item is disabled. Enable it in the GI Home panel to control it.';
+
+  @override
+  String get lockEntityUnavailable =>
+      'This item is unavailable. Check the device connection and try again.';
+
+  @override
+  String get lockStaleData =>
+      'The data is out of date, so controls are locked. Wait for a refresh. Suspending heating still works.';
+
+  @override
+  String get lockSuspendedOnRequest =>
+      'Heating is suspended. Resume it to turn switches on.';
+
+  @override
+  String get lockFaultLatched =>
+      'The controller reports a fault or safe mode. It needs an authorized manual reset on the device; in an emergency call a technician.';
+
+  @override
+  String get consequenceStopsHeating =>
+      'GI Home will turn heating off. You can resume it later.';
+
+  @override
+  String get consequenceBoilerMayStartSoon =>
+      'The boiler may start within ~30 s.';
+
+  @override
+  String get consequenceRestoresBaseOrSchedule =>
+      'The default setting or the active schedule applies again.';
+
+  @override
+  String get consequenceCommandNotPhysicallyVerified =>
+      'The command will be sent, but the app does not confirm that the relay physically switched.';
+
+  @override
+  String get consequenceLargeTargetRaise =>
+      'The target temperature rises by more than 10 °C.';
+
+  @override
+  String get consequenceLeavesOffMode =>
+      'GI Home will control the boiler again and may turn it on.';
+
+  @override
+  String get consequenceAboveSafeMax =>
+      'The target temperature is above the safe maximum set for PV surplus.';
+
+  @override
+  String get consequenceDryRunOutputsStayOff =>
+      'Test mode: the command will be recorded but outputs stay off.';
+
+  @override
+  String get switchCommandSending => 'Sending…';
+
+  @override
+  String switchCommandLegacyConfirmed(String state, String time) {
+    return 'The device confirmed the command: $state, $time. The physical relay state is not verified.';
+  }
+
+  @override
+  String get switchCommandAwaitingHeartbeat =>
+      'Requested · waiting for the controller to report back';
+
+  @override
+  String switchCommandHeartbeatObserved(String commanded, String output) {
+    return 'After the command the controller reported: commanded $commanded, output $output – this does not confirm the physical relay state.';
+  }
+
+  @override
+  String switchCommandDryRunRecorded(String commanded) {
+    return 'Recorded in test mode: commanded $commanded, the output stays off.';
+  }
+
+  @override
+  String get switchCommandTimedOut =>
+      'The controller did not report back within 45 s – the state is unknown. Refresh before trying again.';
+
+  @override
+  String get entitySwitchAwaitingReport => 'awaiting controller report';
+
+  @override
+  String switchControllerCommanded(String state) {
+    return 'Controller command: $state';
+  }
+
+  @override
+  String switchDryRunWouldSet(String state) {
+    return 'Controller would set: $state';
+  }
+
+  @override
+  String get switchCommandNotReported => 'not reported';
+
+  @override
+  String switchConfirmOnTitle(String name) {
+    return 'Send the turn-on command to $name?';
+  }
+
+  @override
+  String get switchConfirmSend => 'Send command';
+
+  @override
+  String get actionRefresh => 'Refresh';
+
+  @override
+  String heatingStrategyTarget(String temperature, String hysteresis) {
+    return 'Target $temperature °C, hysteresis $hysteresis °C';
+  }
+
+  @override
+  String get heatingStrategyModeAuto => 'GI Home controls the boiler';
+
+  @override
+  String get heatingStrategyModeOff =>
+      'Control off – GI Home will not turn the boiler on';
+
+  @override
+  String get heatingStrategyModeManual =>
+      'GI Home does not control automatically';
+
+  @override
+  String get heatingStrategyModeUnknown => 'Unknown control mode';
+
+  @override
+  String get heatingStrategyNone =>
+      'No control settings – set them up in the GI Home web panel';
+
+  @override
+  String get heatingScheduleActive => 'Schedule active';
+
+  @override
+  String heatingStrategyDefault(String temperature, String hysteresis) {
+    return 'Default: $temperature °C, hysteresis $hysteresis °C';
+  }
+
+  @override
+  String get heatingSuspendedTitle => 'Heating suspended';
+
+  @override
+  String get heatingSuspendedEffect =>
+      'GI Home will not turn the boiler on until heating is resumed.';
+
+  @override
+  String get heatingSuspendedResumeHint =>
+      'To resume heating, open the device details.';
+
+  @override
+  String get heatingSuspendedAskOwner =>
+      'Only the owner or an administrator can resume heating.';
+
+  @override
+  String get heatingResumeAction => 'Resume heating';
+
+  @override
+  String heatingPvBoost(String temperature) {
+    return 'PV boost: heating to $temperature °C';
+  }
+
+  @override
+  String get heatingPvBoostDerived => 'Target derived from the PV safety limit';
+
+  @override
+  String get heatingPvBoostUnknownTarget => 'PV boost active – target unknown';
+
+  @override
+  String heatingStrategySource(String time) {
+    return 'According to GI Core · data from $time';
+  }
+
+  @override
+  String get heatingControlSection => 'Heating control';
+
+  @override
+  String get strategyEditAction => 'Change control settings';
+
+  @override
+  String get strategyEditorTitle => 'Control settings';
+
+  @override
+  String get strategyEditorIntro =>
+      'You are changing the default setting. An active schedule may replace it for a while.';
+
+  @override
+  String get strategyTargetLabel => 'Target temperature (°C)';
+
+  @override
+  String get strategyHysteresisLabel => 'Hysteresis (°C)';
+
+  @override
+  String get strategyModeLabel => 'Control mode';
+
+  @override
+  String get strategyModeAutoShort => 'Auto';
+
+  @override
+  String get strategyModeOffShort => 'Off';
+
+  @override
+  String get strategyModeManualShort => 'Manual';
+
+  @override
+  String get strategyErrorNotANumber => 'Enter a number';
+
+  @override
+  String strategyErrorRange(String min, String max) {
+    return 'Allowed range: $min–$max °C';
+  }
+
+  @override
+  String strategyErrorStep(String step) {
+    return 'Use steps of $step °C';
+  }
+
+  @override
+  String strategyAboveSafeMaxWarning(String temperature) {
+    return 'This is above the safe maximum for PV surplus ($temperature °C).';
+  }
+
+  @override
+  String get strategySuspendedNote =>
+      'Heating is suspended. The saved setting applies once heating is resumed – until then the effective mode stays Off.';
+
+  @override
+  String get strategySave => 'Save';
+
+  @override
+  String get strategyChecking => 'Checking the current settings…';
+
+  @override
+  String get strategySaving => 'Saving…';
+
+  @override
+  String get strategyConflictTitle =>
+      'Someone changed the settings in the meantime';
+
+  @override
+  String get strategyConflictBody =>
+      'Nothing was saved. Check what changed and decide what to do.';
+
+  @override
+  String strategyConflictRow(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String get strategyFieldTarget => 'Target temperature';
+
+  @override
+  String get strategyFieldHysteresis => 'Hysteresis';
+
+  @override
+  String get strategyFieldMode => 'Mode';
+
+  @override
+  String get strategyFieldSuspended => 'Heating';
+
+  @override
+  String get strategyValueNone => 'none';
+
+  @override
+  String get strategyValueSuspended => 'suspended';
+
+  @override
+  String get strategyValueActive => 'active';
+
+  @override
+  String get strategyConflictReapply => 'Save my changes anyway';
+
+  @override
+  String get strategyConflictDiscard => 'Discard my changes';
+
+  @override
+  String get strategySavedTitle => 'Saved in GI Core';
+
+  @override
+  String strategySavedBase(String value) {
+    return 'Default setting: $value';
+  }
+
+  @override
+  String strategySavedEffective(String value) {
+    return 'In effect now: $value';
+  }
+
+  @override
+  String get strategySavedSuspended =>
+      'Heating is suspended, so the effective mode stays Off until heating is resumed.';
+
+  @override
+  String strategyValue(String target, String hysteresis, String mode) {
+    return '$target °C, hysteresis $hysteresis °C, $mode';
+  }
+
+  @override
+  String get strategyConfirmTitle => 'Confirm the settings change';
+
+  @override
+  String get strategyConfirmSave => 'Save changes';
+
+  @override
+  String get suspendHoldAction => 'Hold to suspend heating';
+
+  @override
+  String get suspendHoldHint =>
+      'Press and hold the button – a short tap changes nothing.';
+
+  @override
+  String get suspendA11yHint => 'opens the suspend confirmation';
+
+  @override
+  String get suspendConfirmTitle => 'Suspend heating?';
+
+  @override
+  String get suspendConfirmAction => 'Suspend heating';
+
+  @override
+  String get suspendAwaiting =>
+      'Sent · waiting for GI Core to confirm the suspension';
+
+  @override
+  String get resumeAwaiting =>
+      'Sent · waiting for GI Core to confirm the resume';
+
+  @override
+  String get suspendAppliedAwaitingHeartbeat =>
+      'Heating suspended. Relays commanded off · waiting for the controller report';
+
+  @override
+  String suspendAppliedOutputsOff(String time) {
+    return 'Heating suspended. Controller report at $time: relay outputs off. This does not confirm the physical relay state.';
+  }
+
+  @override
+  String suspendAppliedOutputOn(String time) {
+    return 'Heating suspended, but the controller report at $time still shows an output on. Refresh in a moment and, if in danger, switch the boiler off by hand.';
+  }
+
+  @override
+  String get suspendAppliedNotReported =>
+      'Heating suspended. Relays were commanded off, but the controller does not report its outputs.';
+
+  @override
+  String get suspendAppliedNoHeartbeat =>
+      'Heating suspended. Relays were commanded off, but the controller did not report within 45 s – the relay state is unknown.';
+
+  @override
+  String get suspendAppliedLegacy =>
+      'Heating suspended in GI Core. This ESPHome device gets no relay-off commands – GI Home simply will not turn the boiler on.';
+
+  @override
+  String get resumeApplied =>
+      'Heating resumed. The default setting or the schedule applies again.';
+
+  @override
+  String get resumeAppliedPending =>
+      'Heating resumed. GI Core has not restored the control mode yet – refresh in a moment.';
+
+  @override
+  String get suspendTimedOut =>
+      'GI Core did not confirm the suspension within 30 s. Refresh and check the state.';
+
+  @override
+  String get resumeTimedOut =>
+      'GI Core did not confirm the resume within 30 s. Refresh and check the state.';
+
+  @override
+  String get resumeSheetTitle => 'Resume heating?';
+
+  @override
+  String resumeSheetWillApply(String value) {
+    return 'Will apply: $value';
+  }
+
+  @override
+  String resumeSheetTemperature(String value, String time) {
+    return 'Control temperature: $value · data from $time';
+  }
+
+  @override
+  String get resumeSheetTemperatureMissing =>
+      'No current control temperature reading.';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsLanguageAutomatic => 'Automatic';
+
+  @override
+  String get settingsLanguageAutomaticSubtitle =>
+      'The language of your GI Home profile, otherwise the phone language';
+
+  @override
+  String get settingsLanguagePolish => 'Polski';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
+
+  @override
+  String get settingsLanguageDialogTitle => 'App language';
+
+  @override
+  String get settingsCoreVersion => 'GI Home software version';
+
+  @override
+  String settingsCoreVersionSubtitle(String version) {
+    return '$version (as of the last update check)';
+  }
+
+  @override
+  String get settingsTimezone => 'Device time zone';
+
+  @override
+  String settingsSessionRenewSoon(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'You will need to log in again in $days days',
+      one: 'You will need to log in again in 1 day',
+      zero: 'Your session has expired – log in again',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get demoEntryTitle => 'Don\'t have GI Home yet?';
+
+  @override
+  String get demoEntryBody =>
+      'See the app with a sample home. The data is made up and stays on this phone, and no command reaches any device.';
+
+  @override
+  String get demoEnter => 'Try the demo';
+
+  @override
+  String get demoStartFailed => 'The demo could not be started. Try again.';
+
+  @override
+  String get demoBadge => 'DEMO';
+
+  @override
+  String get demoBadgeSemantics => 'Demo version';
+
+  @override
+  String get demoBannerMessage => 'Sample data – nothing is really controlled.';
+
+  @override
+  String get demoExit => 'Exit demo';
 }

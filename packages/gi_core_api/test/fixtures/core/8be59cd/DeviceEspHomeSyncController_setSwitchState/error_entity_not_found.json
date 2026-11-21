@@ -1,0 +1,8 @@
+{
+  "statusCode": 404,
+  "code": "DEVICE_ENTITY_NOT_FOUND",
+  "message": "Switch entity was not found on this device.",
+  "path": "/api/v1/devices/ed430911-765c-493f-bc58-e9a648c5d057/entities/no-such-entity/state",
+  "requestId": "87f8147f-3747-4fb2-bd4e-3195c3f3b318",
+  "timestamp": "2026-11-21T18:20:17.300Z"
+}

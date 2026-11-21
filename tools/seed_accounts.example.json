@@ -14,6 +14,13 @@
       "lastName": "Domownik",
       "email": "user@gihome.test",
       "password": "UserTest-2026"
+    },
+    {
+      "role": "SERVICE",
+      "firstName": "Serwis",
+      "lastName": "Testowy",
+      "email": "service@gihome.test",
+      "password": "ServiceTest-2026"
     }
   ]
 }

@@ -8,5 +8,14 @@ import 'package:gi_core_api/gi_core_api.dart';
 /// all. `tools/gen_backend_contract.dart` prints the reasons in
 /// `docs/backend-contract.md`.
 ///
-/// Every MVP entry is covered today, so the list is empty.
-const liveCoverageExemptions = <Endpoint, String>{};
+/// The M2 entries below are decoded from recorded fixtures until their live
+/// contract tests land; drop each exemption together with adding its test.
+/// The M2 write endpoints are covered by `control_contract_test.dart`.
+const liveCoverageExemptions = <Endpoint, String>{
+  GiEndpoints.settingsSystem:
+      'M2: live contract test not written yet; decoded from a recorded '
+      'fixture.',
+  GiEndpoints.applianceUpdatesStatus:
+      'M2: live contract test not written yet; the contract stack has no '
+      'Supervisor, so only the unconfigured status is reachable there.',
+};

@@ -60,6 +60,8 @@ flutter:
     - assets/fonts/OFL-Fraunces.txt
     - assets/fonts/OFL-Manrope.txt
     - assets/fonts/OFL-JetBrainsMono.txt
+    # Demo mode's appliance (plan §19.5): sanitized fixtures, in memory.
+    - assets/demo_fixtures/demo_core.json
   # Variable fonts (plan §14): one file per style, no `weight:` entries — the
   # engine maps FontWeight onto the `wght` axis itself.
   fonts:

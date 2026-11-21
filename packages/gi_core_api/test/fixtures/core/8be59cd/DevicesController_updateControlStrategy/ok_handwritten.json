@@ -1,0 +1,13 @@
+{
+  "controlStrategy": {
+    "targetTemperatureCelsius": 55,
+    "hysteresisCelsius": 4,
+    "mode": "MANUAL"
+  },
+  "baseControlStrategy": {
+    "targetTemperatureCelsius": 55,
+    "hysteresisCelsius": 4,
+    "mode": "MANUAL"
+  },
+  "configurationVersion": 7
+}

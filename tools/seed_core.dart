@@ -12,7 +12,7 @@
 //   1. POST /setup/initialize        only with --init and only on initialized:false;
 //                                     asks y/N first unless --yes
 //   2. POST /auth/login               owner from tools/backend/dev.env
-//   3. POST /users                    ADMIN and USER from tools/seed_accounts.json
+//   3. POST /users                    ADMIN, USER, SERVICE from tools/seed_accounts.json
 //                                     (else tools/seed_accounts.example.json)
 //   4. POST /rooms, POST /devices     demo rooms and devices (by name)
 //   5. discover/claim/complete        the fake-esphome device (contract stack only:
@@ -547,6 +547,7 @@ Future<void> _recordFixtures(
       'DevicesController_get/fake_esphome.json',
       () async => (await api.get('/devices/${fake['id']}')).body,
     );
+    await _recordWriteFixtures(api, recorder, fake['id'] as String);
   }
 
   // Refresh, change password and logout, recorded on the seeded USER so the
@@ -623,6 +624,74 @@ Future<void> _recordFixtures(
     () async => (await anonymous.post('/auth/login', {
       'email': 'nobody@gihome.test',
       'password': 'WrongPass123',
+    })).body,
+  );
+}
+
+/// The M2 write endpoints on the fake device (LEGACY_ESPHOME, contract stack
+/// only: the device exists nowhere else). Every write leaves the device as
+/// the seeder configured it: relay OFF, not suspended, the seeded strategy.
+Future<void> _recordWriteFixtures(
+  _Api api,
+  _Recorder recorder,
+  String deviceId,
+) async {
+  final detail = jsonDecode((await api.get('/devices/$deviceId')).body);
+  if (detail is! Map<String, dynamic>) return;
+  final relayId = detail['heatingRelayEntityId'] as String?;
+  final sensorId = detail['controlTemperatureEntityId'] as String?;
+  if (relayId == null || sensorId == null) return;
+  final state = '/devices/$deviceId/entities/$relayId/state';
+
+  const put = 'DeviceEspHomeSyncController_setSwitchState';
+  if (recorder.wants('$put/legacy_on.json') ||
+      recorder.wants('$put/legacy_off.json')) {
+    final on = await api.put(state, {'state': true});
+    final off = await api.put(state, {'state': false});
+    _expect(on, 200);
+    _expect(off, 200);
+    recorder
+      ..save('$put/legacy_on.json', on.body)
+      ..save('$put/legacy_off.json', off.body);
+  }
+  await recorder.record(
+    '$put/error_entity_not_writable.json',
+    () async => (await api.put('/devices/$deviceId/entities/$sensorId/state', {
+      'state': false,
+    })).body,
+  );
+  await recorder.record(
+    '$put/error_entity_not_found.json',
+    () async => (await api.put(
+      '/devices/$deviceId/entities/no-such-entity/state',
+      {'state': false},
+    )).body,
+  );
+  await recorder.record(
+    '$put/error_validation.json',
+    () async => (await api.put(state, {'state': 'on'})).body,
+  );
+
+  // Not suspended after the seeder, so this PATCH changes nothing.
+  await recorder.record(
+    'DevicesController_update/resumed.json',
+    () async => (await api.patch('/devices/$deviceId', {
+      'heatingSuspended': false,
+    })).body,
+  );
+  const strategy = 'DevicesController_updateControlStrategy';
+  await recorder.record(
+    '$strategy/seeded.json',
+    () async => (await api.patch(
+      '/devices/$deviceId/control-strategy',
+      _controlStrategy,
+    )).body,
+  );
+  await recorder.record(
+    '$strategy/error_validation.json',
+    () async => (await api.patch('/devices/$deviceId/control-strategy', {
+      ..._controlStrategy,
+      'hysteresisCelsius': 0,
     })).body,
   );
 }

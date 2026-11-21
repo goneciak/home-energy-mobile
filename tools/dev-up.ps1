@@ -204,7 +204,7 @@ if ($Contract) {
   Write-Host "FAKE_ESPHOME_URL=$fakeUrl"
   Write-Host ''
   Write-Host 'Contract tests (packages\gi_core_api):'
-  Write-Host "  `$env:GI_CORE_URL='$coreUrl'; `$env:FAKE_ESPHOME_URL='$fakeUrl'; dart test -t contract"
+  Write-Host "  `$env:GI_CORE_URL='$coreUrl'; `$env:FAKE_ESPHOME_URL='$fakeUrl'; dart test -t contract -j 1"
   Write-Host "Remove: .\tools\dev-up.ps1 -Contract -RunId $RunId -Down"
   return
 }

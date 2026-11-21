@@ -76,7 +76,10 @@ void main() {
 
   Future<void> tapVersion(WidgetTester tester, int times) async {
     final version = find.byKey(const ValueKey('settings-app-version'));
-    await tester.ensureVisible(version);
+    // Centred, so the navigation bar never covers it.
+    await tester.scrollUntilVisible(version, 100);
+    await Scrollable.ensureVisible(tester.element(version), alignment: 0.5);
+    await tester.pumpAndSettle();
     for (var i = 0; i < times; i++) {
       await tester.tap(version);
       await tester.pump(const Duration(milliseconds: 100));

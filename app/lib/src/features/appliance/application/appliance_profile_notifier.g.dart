@@ -58,14 +58,23 @@ String _$applianceProfileStoreHash() =>
     r'd06f50a0489329bc0241c9cb2e4ac5e02babc334';
 
 /// The saved appliance profile; `null` until the user connects.
+///
+/// In demo mode it is the demo appliance's profile, held in memory: changes
+/// are never stored, and the saved profile is left as it was.
 
 @ProviderFor(ApplianceProfileNotifier)
 final applianceProfileProvider = ApplianceProfileNotifierProvider._();
 
 /// The saved appliance profile; `null` until the user connects.
+///
+/// In demo mode it is the demo appliance's profile, held in memory: changes
+/// are never stored, and the saved profile is left as it was.
 final class ApplianceProfileNotifierProvider
     extends $NotifierProvider<ApplianceProfileNotifier, ApplianceProfile?> {
   /// The saved appliance profile; `null` until the user connects.
+  ///
+  /// In demo mode it is the demo appliance's profile, held in memory: changes
+  /// are never stored, and the saved profile is left as it was.
   ApplianceProfileNotifierProvider._()
     : super(
         from: null,
@@ -94,9 +103,12 @@ final class ApplianceProfileNotifierProvider
 }
 
 String _$applianceProfileNotifierHash() =>
-    r'25cf01762a0a9efb6d6e1a999efb47f78e576216';
+    r'd690fbf2e456723e92a4aa77b2977cca4d9ca964';
 
 /// The saved appliance profile; `null` until the user connects.
+///
+/// In demo mode it is the demo appliance's profile, held in memory: changes
+/// are never stored, and the saved profile is left as it was.
 
 abstract class _$ApplianceProfileNotifier extends $Notifier<ApplianceProfile?> {
   ApplianceProfile? build();

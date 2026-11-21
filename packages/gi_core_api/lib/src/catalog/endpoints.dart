@@ -9,6 +9,10 @@ const Set<UserRole> _anyRole = {
   UserRole.service,
 };
 
+/// Device control and appliance administration (`WRITE_ROLES` in
+/// `devices.controller.ts`).
+const Set<UserRole> _writeRoles = {UserRole.owner, UserRole.admin};
+
 /// MVP endpoint catalog (plan §4.1, §6.2). Paths are relative to `/api/v1`.
 abstract final class GiEndpoints {
   static const healthLive = Endpoint(
@@ -131,6 +135,67 @@ abstract final class GiEndpoints {
     maxRetries: 2,
   );
 
+  /// `GET /settings/system`: device name, locale and timezone.
+  static const settingsSystem = Endpoint(
+    id: 'SettingsController_getSystem',
+    method: HttpMethod.get,
+    path: '/settings/system',
+    roles: {UserRole.owner, UserRole.admin, UserRole.service},
+    timeout: TimeoutClass.read,
+    milestone: Milestone.m2,
+    feature: 'settings',
+    maxRetries: 2,
+  );
+
+  /// `GET /appliance/updates/status`: last update check, the source of the
+  /// best-effort running version (plan §16).
+  static const applianceUpdatesStatus = Endpoint(
+    id: 'ApplianceUpdateController_getStatus',
+    method: HttpMethod.get,
+    path: '/appliance/updates/status',
+    roles: _writeRoles,
+    timeout: TimeoutClass.read,
+    milestone: Milestone.m2,
+    feature: 'settings',
+    maxRetries: 2,
+  );
+
+  /// `PUT /devices/:id/entities/:entityId/state` with `{"state": bool}`
+  /// (plan §12.2). Not idempotent from the user's point of view: never
+  /// retried, never queued.
+  static const setSwitchState = Endpoint(
+    id: 'DeviceEspHomeSyncController_setSwitchState',
+    method: HttpMethod.put,
+    path: '/devices/{id}/entities/{entityId}/state',
+    roles: _writeRoles,
+    timeout: TimeoutClass.write,
+    milestone: Milestone.m2,
+    feature: 'device',
+  );
+
+  /// `PATCH /devices/:id`; the app only sends `{"heatingSuspended": bool}`
+  /// (plan §12.1).
+  static const updateDevice = Endpoint(
+    id: 'DevicesController_update',
+    method: HttpMethod.patch,
+    path: '/devices/{id}',
+    roles: _writeRoles,
+    timeout: TimeoutClass.write,
+    milestone: Milestone.m2,
+    feature: 'device',
+  );
+
+  /// `PATCH /devices/:id/control-strategy` (plan §12.5).
+  static const updateControlStrategy = Endpoint(
+    id: 'DevicesController_updateControlStrategy',
+    method: HttpMethod.patch,
+    path: '/devices/{id}/control-strategy',
+    roles: _writeRoles,
+    timeout: TimeoutClass.write,
+    milestone: Milestone.m2,
+    feature: 'device',
+  );
+
   static const all = <Endpoint>[
     healthLive,
     setupStatus,
@@ -143,5 +208,10 @@ abstract final class GiEndpoints {
     roomsList,
     devicesList,
     devicesDetail,
+    settingsSystem,
+    applianceUpdatesStatus,
+    setSwitchState,
+    updateDevice,
+    updateControlStrategy,
   ];
 }

@@ -226,6 +226,46 @@ class AppLocalizationsPl extends AppLocalizations {
   String get errorGeneric => 'Coś poszło nie tak. Spróbuj ponownie.';
 
   @override
+  String get errorDeviceEntityNotFound =>
+      'Ten element nie należy już do urządzenia. Odśwież widok.';
+
+  @override
+  String get errorDeviceNotFound =>
+      'Urządzenie zostało usunięte lub zmienione. Odśwież widok.';
+
+  @override
+  String get errorHeatingSuspended =>
+      'Ogrzewanie jest wstrzymane, więc nie można niczego włączyć. Najpierw wznów ogrzewanie.';
+
+  @override
+  String get errorEntityDisabled =>
+      'Ten element jest wyłączony w konfiguracji urządzenia.';
+
+  @override
+  String get errorEntityNotWritable =>
+      'Tym elementem nie można sterować z aplikacji.';
+
+  @override
+  String get errorDeviceOffline =>
+      'Urządzenie jest offline. Polecenie nie zostało wysłane.';
+
+  @override
+  String get errorDeviceUnreachable =>
+      'GI Home nie zna adresu sterownika. Polecenie nie zostało wysłane.';
+
+  @override
+  String get errorCommandUnconfirmed =>
+      'Sterownik nie potwierdził polecenia. Stan jest nieznany – odśwież widok i sprawdź go przed kolejną próbą.';
+
+  @override
+  String get errorCommandTimeout =>
+      'Sterownik nie odpowiedział na czas. Nie wiadomo, czy polecenie zostało wykonane – odśwież widok przed kolejną próbą.';
+
+  @override
+  String get errorDeviceHostForbidden =>
+      'Adres sterownika jest poza siecią domową, więc GI Home go zablokował. Sprawdź konfigurację urządzenia w panelu GI Home.';
+
+  @override
   String errorRequestId(String requestId) {
     return 'Identyfikator zgłoszenia: $requestId';
   }
@@ -1097,4 +1137,481 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get staleAppDismiss => 'Ukryj komunikat';
+
+  @override
+  String get heatingViewOnlyHint =>
+      'Zmiany ogrzewania może wprowadzić właściciel.';
+
+  @override
+  String get heatingDryRunBanner =>
+      'Tryb testowy: polecenia są zapisywane, ale przekaźniki pozostają wyłączone.';
+
+  @override
+  String get lockNotOwnerAdmin =>
+      'Zmiany ogrzewania może wprowadzić właściciel lub administrator. Poproś go o zmianę.';
+
+  @override
+  String get lockHeatingOrPumpRelay =>
+      'Przekaźnikiem kotła i pompy steruje sterownik. W aplikacji jest tylko podgląd.';
+
+  @override
+  String get lockEntityMissing =>
+      'Tego elementu nie ma już w urządzeniu. Odśwież widok.';
+
+  @override
+  String get lockNotWritableSwitch =>
+      'Tego elementu nie da się przełączać z aplikacji.';
+
+  @override
+  String get lockEntityDisabled =>
+      'Element jest wyłączony. Włącz go w panelu GI Home, aby nim sterować.';
+
+  @override
+  String get lockEntityUnavailable =>
+      'Element jest niedostępny. Sprawdź połączenie urządzenia i spróbuj ponownie.';
+
+  @override
+  String get lockStaleData =>
+      'Dane są nieaktualne, więc sterowanie jest zablokowane. Poczekaj na odświeżenie. Wstrzymanie ogrzewania działa nadal.';
+
+  @override
+  String get lockSuspendedOnRequest =>
+      'Ogrzewanie jest wstrzymane. Wznów je, aby móc włączać przełączniki.';
+
+  @override
+  String get lockFaultLatched =>
+      'Sterownik zgłasza usterkę lub tryb bezpieczny. Wymaga to autoryzowanego, ręcznego resetu na urządzeniu – w razie zagrożenia wezwij serwis.';
+
+  @override
+  String get consequenceStopsHeating =>
+      'GI Home wyłączy ogrzewanie. Możesz je później wznowić.';
+
+  @override
+  String get consequenceBoilerMayStartSoon =>
+      'Kocioł może się włączyć w ciągu ~30 s.';
+
+  @override
+  String get consequenceRestoresBaseOrSchedule =>
+      'Wróci ustawienie domyślne lub aktywny harmonogram.';
+
+  @override
+  String get consequenceCommandNotPhysicallyVerified =>
+      'Polecenie zostanie wysłane, ale aplikacja nie potwierdza fizycznego przełączenia przekaźnika.';
+
+  @override
+  String get consequenceLargeTargetRaise =>
+      'Temperatura docelowa wzrośnie o ponad 10 °C.';
+
+  @override
+  String get consequenceLeavesOffMode =>
+      'GI Home znów zacznie sterować kotłem i może go włączyć.';
+
+  @override
+  String get consequenceAboveSafeMax =>
+      'Temperatura docelowa przekracza bezpieczne maksimum ustawione dla nadwyżki PV.';
+
+  @override
+  String get consequenceDryRunOutputsStayOff =>
+      'Tryb testowy: polecenie zostanie zapisane, ale przekaźniki pozostaną wyłączone.';
+
+  @override
+  String get switchCommandSending => 'Wysyłanie…';
+
+  @override
+  String switchCommandLegacyConfirmed(String state, String time) {
+    return 'Urządzenie potwierdziło polecenie: $state, $time. Fizyczny stan przekaźnika nie jest weryfikowany.';
+  }
+
+  @override
+  String get switchCommandAwaitingHeartbeat =>
+      'Zlecono · czeka na raport sterownika';
+
+  @override
+  String switchCommandHeartbeatObserved(String commanded, String output) {
+    return 'Po poleceniu sterownik zgłosił: polecenie $commanded, wyjście $output – to nie potwierdza fizycznego stanu przekaźnika.';
+  }
+
+  @override
+  String switchCommandDryRunRecorded(String commanded) {
+    return 'Zapisano w trybie testowym: polecenie $commanded, wyjście pozostaje wyłączone.';
+  }
+
+  @override
+  String get switchCommandTimedOut =>
+      'Sterownik nie zgłosił się w ciągu 45 s – stan jest nieznany. Odśwież widok przed kolejną próbą.';
+
+  @override
+  String get entitySwitchAwaitingReport => 'czeka na raport sterownika';
+
+  @override
+  String switchControllerCommanded(String state) {
+    return 'Polecenie sterownika: $state';
+  }
+
+  @override
+  String switchDryRunWouldSet(String state) {
+    return 'Sterownik chciałby: $state';
+  }
+
+  @override
+  String get switchCommandNotReported => 'nie zgłoszono';
+
+  @override
+  String switchConfirmOnTitle(String name) {
+    return 'Wysłać polecenie włączenia: $name?';
+  }
+
+  @override
+  String get switchConfirmSend => 'Wyślij polecenie';
+
+  @override
+  String get actionRefresh => 'Odśwież';
+
+  @override
+  String heatingStrategyTarget(String temperature, String hysteresis) {
+    return 'Cel $temperature °C, histereza $hysteresis °C';
+  }
+
+  @override
+  String get heatingStrategyModeAuto => 'GI Home steruje kotłem';
+
+  @override
+  String get heatingStrategyModeOff =>
+      'Sterowanie wyłączone – GI Home nie będzie włączać kotła';
+
+  @override
+  String get heatingStrategyModeManual => 'GI Home nie steruje automatycznie';
+
+  @override
+  String get heatingStrategyModeUnknown => 'Nieznany tryb sterowania';
+
+  @override
+  String get heatingStrategyNone =>
+      'Brak ustawień sterowania – skonfiguruj je w panelu web GI Home';
+
+  @override
+  String get heatingScheduleActive => 'Harmonogram aktywny';
+
+  @override
+  String heatingStrategyDefault(String temperature, String hysteresis) {
+    return 'Ustawienie domyślne: $temperature °C, histereza $hysteresis °C';
+  }
+
+  @override
+  String get heatingSuspendedTitle => 'Ogrzewanie wstrzymane';
+
+  @override
+  String get heatingSuspendedEffect =>
+      'GI Home nie włączy kotła, dopóki ogrzewanie nie zostanie wznowione.';
+
+  @override
+  String get heatingSuspendedResumeHint =>
+      'Aby wznowić ogrzewanie, otwórz szczegóły urządzenia.';
+
+  @override
+  String get heatingSuspendedAskOwner =>
+      'Wznowić ogrzewanie może właściciel lub administrator.';
+
+  @override
+  String get heatingResumeAction => 'Wznów ogrzewanie';
+
+  @override
+  String heatingPvBoost(String temperature) {
+    return 'PV boost: grzanie do $temperature °C';
+  }
+
+  @override
+  String get heatingPvBoostDerived =>
+      'Cel wyliczony z limitu bezpieczeństwa PV';
+
+  @override
+  String get heatingPvBoostUnknownTarget => 'PV boost aktywny – cel nieznany';
+
+  @override
+  String heatingStrategySource(String time) {
+    return 'Według GI Core · dane z $time';
+  }
+
+  @override
+  String get heatingControlSection => 'Sterowanie ogrzewaniem';
+
+  @override
+  String get strategyEditAction => 'Zmień ustawienia sterowania';
+
+  @override
+  String get strategyEditorTitle => 'Ustawienia sterowania';
+
+  @override
+  String get strategyEditorIntro =>
+      'Zmieniasz ustawienie domyślne. Aktywny harmonogram może je czasowo zastąpić.';
+
+  @override
+  String get strategyTargetLabel => 'Temperatura docelowa (°C)';
+
+  @override
+  String get strategyHysteresisLabel => 'Histereza (°C)';
+
+  @override
+  String get strategyModeLabel => 'Tryb sterowania';
+
+  @override
+  String get strategyModeAutoShort => 'Auto';
+
+  @override
+  String get strategyModeOffShort => 'Wył.';
+
+  @override
+  String get strategyModeManualShort => 'Ręczny';
+
+  @override
+  String get strategyErrorNotANumber => 'Wpisz liczbę';
+
+  @override
+  String strategyErrorRange(String min, String max) {
+    return 'Dozwolony zakres: $min–$max °C';
+  }
+
+  @override
+  String strategyErrorStep(String step) {
+    return 'Podaj wartość co $step °C';
+  }
+
+  @override
+  String strategyAboveSafeMaxWarning(String temperature) {
+    return 'To więcej niż bezpieczne maksimum dla nadwyżki PV ($temperature °C).';
+  }
+
+  @override
+  String get strategySuspendedNote =>
+      'Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu tryb efektywny to Wył.';
+
+  @override
+  String get strategySave => 'Zapisz';
+
+  @override
+  String get strategyChecking => 'Sprawdzanie aktualnych ustawień…';
+
+  @override
+  String get strategySaving => 'Zapisywanie…';
+
+  @override
+  String get strategyConflictTitle => 'Ktoś zmienił ustawienia w międzyczasie';
+
+  @override
+  String get strategyConflictBody =>
+      'Nic nie zostało zapisane. Sprawdź, co się zmieniło, i zdecyduj, co dalej.';
+
+  @override
+  String strategyConflictRow(String field, String before, String after) {
+    return '$field: $before → $after';
+  }
+
+  @override
+  String get strategyFieldTarget => 'Temperatura docelowa';
+
+  @override
+  String get strategyFieldHysteresis => 'Histereza';
+
+  @override
+  String get strategyFieldMode => 'Tryb';
+
+  @override
+  String get strategyFieldSuspended => 'Ogrzewanie';
+
+  @override
+  String get strategyValueNone => 'brak';
+
+  @override
+  String get strategyValueSuspended => 'wstrzymane';
+
+  @override
+  String get strategyValueActive => 'aktywne';
+
+  @override
+  String get strategyConflictReapply => 'Zapisz moje zmiany mimo to';
+
+  @override
+  String get strategyConflictDiscard => 'Odrzuć moje zmiany';
+
+  @override
+  String get strategySavedTitle => 'Zapisano w GI Core';
+
+  @override
+  String strategySavedBase(String value) {
+    return 'Ustawienie domyślne: $value';
+  }
+
+  @override
+  String strategySavedEffective(String value) {
+    return 'Obowiązuje teraz: $value';
+  }
+
+  @override
+  String get strategySavedSuspended =>
+      'Ogrzewanie jest wstrzymane, więc tryb efektywny pozostaje Wył. do czasu wznowienia.';
+
+  @override
+  String strategyValue(String target, String hysteresis, String mode) {
+    return '$target °C, histereza $hysteresis °C, $mode';
+  }
+
+  @override
+  String get strategyConfirmTitle => 'Potwierdź zmianę ustawień';
+
+  @override
+  String get strategyConfirmSave => 'Zapisz zmiany';
+
+  @override
+  String get suspendHoldAction => 'Przytrzymaj, aby wstrzymać ogrzewanie';
+
+  @override
+  String get suspendHoldHint =>
+      'Przytrzymaj przycisk – zwykłe dotknięcie niczego nie zmienia.';
+
+  @override
+  String get suspendA11yHint => 'otwiera potwierdzenie wstrzymania';
+
+  @override
+  String get suspendConfirmTitle => 'Wstrzymać ogrzewanie?';
+
+  @override
+  String get suspendConfirmAction => 'Wstrzymaj ogrzewanie';
+
+  @override
+  String get suspendAwaiting =>
+      'Wysłano · czekamy, aż GI Core potwierdzi wstrzymanie';
+
+  @override
+  String get resumeAwaiting =>
+      'Wysłano · czekamy, aż GI Core potwierdzi wznowienie';
+
+  @override
+  String get suspendAppliedAwaitingHeartbeat =>
+      'Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników · czeka na raport sterownika';
+
+  @override
+  String suspendAppliedOutputsOff(String time) {
+    return 'Ogrzewanie wstrzymane. Raport sterownika z $time: wyjścia przekaźników wyłączone. To nie potwierdza fizycznego stanu przekaźników.';
+  }
+
+  @override
+  String suspendAppliedOutputOn(String time) {
+    return 'Ogrzewanie wstrzymane, ale raport sterownika z $time wciąż pokazuje włączone wyjście. Odśwież za chwilę, a w razie zagrożenia wyłącz kocioł ręcznie.';
+  }
+
+  @override
+  String get suspendAppliedNotReported =>
+      'Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie raportuje stanu wyjść.';
+
+  @override
+  String get suspendAppliedNoHeartbeat =>
+      'Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie zgłosił się w ciągu 45 s – stan przekaźników jest nieznany.';
+
+  @override
+  String get suspendAppliedLegacy =>
+      'Ogrzewanie wstrzymane w GI Core. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.';
+
+  @override
+  String get resumeApplied =>
+      'Ogrzewanie wznowione. Znów obowiązuje ustawienie domyślne lub harmonogram.';
+
+  @override
+  String get resumeAppliedPending =>
+      'Ogrzewanie wznowione. GI Core nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.';
+
+  @override
+  String get suspendTimedOut =>
+      'GI Core nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.';
+
+  @override
+  String get resumeTimedOut =>
+      'GI Core nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.';
+
+  @override
+  String get resumeSheetTitle => 'Wznowić ogrzewanie?';
+
+  @override
+  String resumeSheetWillApply(String value) {
+    return 'Zacznie obowiązywać: $value';
+  }
+
+  @override
+  String resumeSheetTemperature(String value, String time) {
+    return 'Temperatura sterująca: $value · dane z $time';
+  }
+
+  @override
+  String get resumeSheetTemperatureMissing =>
+      'Brak aktualnego odczytu temperatury sterującej.';
+
+  @override
+  String get settingsLanguage => 'Język';
+
+  @override
+  String get settingsLanguageAutomatic => 'Automatycznie';
+
+  @override
+  String get settingsLanguageAutomaticSubtitle =>
+      'Język z profilu GI Home, a bez niego język telefonu';
+
+  @override
+  String get settingsLanguagePolish => 'Polski';
+
+  @override
+  String get settingsLanguageEnglish => 'English';
+
+  @override
+  String get settingsLanguageDialogTitle => 'Język aplikacji';
+
+  @override
+  String get settingsCoreVersion => 'Wersja oprogramowania GI Home';
+
+  @override
+  String settingsCoreVersionSubtitle(String version) {
+    return '$version (według ostatniego sprawdzenia aktualizacji)';
+  }
+
+  @override
+  String get settingsTimezone => 'Strefa czasowa urządzenia';
+
+  @override
+  String settingsSessionRenewSoon(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Za $days dnia trzeba będzie zalogować się ponownie',
+      many: 'Za $days dni trzeba będzie zalogować się ponownie',
+      few: 'Za $days dni trzeba będzie zalogować się ponownie',
+      one: 'Za 1 dzień trzeba będzie zalogować się ponownie',
+      zero: 'Sesja wygasła – zaloguj się ponownie',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get demoEntryTitle => 'Nie masz jeszcze GI Home?';
+
+  @override
+  String get demoEntryBody =>
+      'Zobacz aplikację na przykładowym domu. Dane są zmyślone i zostają w pamięci telefonu, a polecenia nie trafiają do żadnego urządzenia.';
+
+  @override
+  String get demoEnter => 'Wypróbuj wersję demonstracyjną';
+
+  @override
+  String get demoStartFailed =>
+      'Nie udało się uruchomić wersji demonstracyjnej. Spróbuj ponownie.';
+
+  @override
+  String get demoBadge => 'DEMO';
+
+  @override
+  String get demoBadgeSemantics => 'Wersja demonstracyjna';
+
+  @override
+  String get demoBannerMessage =>
+      'Przykładowe dane – nic nie jest naprawdę sterowane.';
+
+  @override
+  String get demoExit => 'Zakończ demo';
 }

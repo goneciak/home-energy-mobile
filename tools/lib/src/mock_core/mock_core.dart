@@ -131,6 +131,17 @@ final class _Access {
 ///   without a recorded detail gets one built from the list item. With
 ///   [freshLastSeen], a device's non-null `lastSeenAt` is the request time,
 ///   so the app sees it online.
+/// * The M2 writes act on an in-memory copy of the recorded details (plan
+///   §12), checked in GI Core's order: `PUT .../entities/{entityId}/state`
+///   (`{"state": bool}`; 404 `DEVICE_ENTITY_NOT_FOUND`, 409
+///   `HEATING_SUSPENDED` for ON while suspended, 422 `ENTITY_NOT_WRITABLE`,
+///   409 `ENTITY_DISABLED`, 503 `DEVICE_OFFLINE`, then [switchFailure] on a
+///   legacy device). A legacy device is confirmed at once; a GI_EDGE_V1
+///   device is written optimistically, or not at all in dry-run, where the
+///   answer carries the OLD state. `PATCH /devices/{id}` takes
+///   `heatingSuspended` and `dryRun` (suspending turns every switch OFF and
+///   the effective mode to OFF); `PATCH .../control-strategy` takes all
+///   three fields within Core's ranges.
 /// * Anything else is Core's `404 HTTP_404` envelope.
 final class MockCore {
   new({
@@ -151,6 +162,22 @@ final class MockCore {
   final bool freshLastSeen;
   final DateTime Function() _now;
   final Random _random;
+
+  /// A failure the legacy switch commands answer with instead of switching:
+  /// a key of [switchFailures]. Null switches normally.
+  String? switchFailure;
+
+  /// The legacy-path failures of `PUT .../state` and their HTTP status
+  /// (`esphome-switch-command.service.ts`).
+  static const switchFailures = <String, int>{
+    'ESPHOME_DEVICE_UNREACHABLE': 503,
+    'ESPHOME_COMMAND_REJECTED': 502,
+    'ESPHOME_COMMAND_UNCONFIRMED': 502,
+    'ESPHOME_COMMAND_TIMEOUT': 504,
+  };
+
+  /// Device details changed by the M2 writes, by device id.
+  final Map<String, Map<String, Object?>> _changed = {};
 
   final Map<String, _Session> _sessionsByRefresh = {};
   final Map<String, _Access> _accessTokens = {};
@@ -229,6 +256,17 @@ final class MockCore {
         return await _changePassword(request, requestId, access!.session);
       case 'DevicesController_get':
         return _device(request, requestId, params['id']!);
+      case 'DeviceEspHomeSyncController_setSwitchState':
+        return await _setSwitchState(
+          request,
+          requestId,
+          params['id']!,
+          params['entityId']!,
+        );
+      case 'DevicesController_update':
+        return await _updateDevice(request, requestId, params['id']!);
+      case 'DevicesController_updateControlStrategy':
+        return await _updateControlStrategy(request, requestId, params['id']!);
     }
 
     if (endpoint.method != HttpMethod.get) {
@@ -440,6 +478,7 @@ final class MockCore {
   }
 
   Response _device(Request request, String requestId, String id) {
+    if (_changed[id] case final changed?) return _json(_freshen(changed));
     const detailId = 'DevicesController_get';
     for (final detail in fixtures.successCases(detailId)) {
       if (detail is Map<String, Object?> && detail['id'] == id) {
@@ -475,6 +514,238 @@ final class MockCore {
       'DEVICE_NOT_FOUND',
       'Device not found.',
     );
+  }
+
+  /// The device's details as the writes see them, or a 404 reply.
+  Future<Map<String, Object?>> _mutableDevice(
+    Request request,
+    String requestId,
+    String id,
+  ) async {
+    if (_changed[id] case final changed?) return changed;
+    final response = _device(request, requestId, id);
+    final body = jsonDecode(await response.readAsString());
+    if (response.statusCode != 200) {
+      throw _Reply(_json(body, status: response.statusCode));
+    }
+    return _changed[id] = body as Map<String, Object?>;
+  }
+
+  /// Reads a JSON object body whose fields all pass [valid] (name -> check
+  /// returning an error or null), with every [required] name present and
+  /// no other.
+  Future<Map<String, Object?>> _typedBody(
+    Request request,
+    String requestId, {
+    required Map<String, String? Function(Object? value)> valid,
+    List<String> required = const [],
+  }) async {
+    Object? json;
+    try {
+      json = jsonDecode(await request.readAsString());
+    } on FormatException {
+      json = null;
+    }
+    final details = <String, List<String>>{};
+    if (json is! Map<String, Object?>) {
+      details['body'] = ['body must be a JSON object'];
+    } else {
+      for (final name in required) {
+        if (!json.containsKey(name)) details[name] = ['$name is required'];
+      }
+      for (final MapEntry(:key, :value) in json.entries) {
+        final check = valid[key];
+        final error = check == null
+            ? 'property $key should not exist'
+            : check(value);
+        if (error != null) details[key] = [error];
+      }
+    }
+    if (details.isNotEmpty) {
+      throw _Reply(
+        _error(
+          request,
+          requestId,
+          400,
+          'VALIDATION_FAILED',
+          'Validation failed.',
+          details: details,
+        ),
+      );
+    }
+    return json! as Map<String, Object?>;
+  }
+
+  static String? Function(Object?) _boolean(String name) =>
+      (value) => value is bool ? null : '$name must be a boolean value';
+
+  static String? Function(Object?) _number(String name, num min, num max) =>
+      (value) => value is num && value >= min && value <= max
+      ? null
+      : '$name must be a number within $min and $max';
+
+  Future<Response> _setSwitchState(
+    Request request,
+    String requestId,
+    String deviceId,
+    String entityId,
+  ) async {
+    final body = await _typedBody(
+      request,
+      requestId,
+      valid: {'state': _boolean('state')},
+      required: const ['state'],
+    );
+    final requested = body['state']! as bool;
+    final device = await _mutableDevice(request, requestId, deviceId);
+    Response fail(int status, String code, String message) =>
+        _error(request, requestId, status, code, message);
+
+    final entity = (device['entities'] as List? ?? const [])
+        .whereType<Map<String, Object?>>()
+        .where((e) => e['id'] == entityId)
+        .firstOrNull;
+    if (entity == null) {
+      return fail(
+        404,
+        'DEVICE_ENTITY_NOT_FOUND',
+        'Switch entity was not found on this device.',
+      );
+    }
+    final isSwitch = entity['domain'] == 'switch';
+    if (requested && device['heatingSuspended'] == true && isSwitch) {
+      return fail(409, 'HEATING_SUSPENDED', 'Heating is suspended.');
+    }
+    if (!isSwitch || entity['writable'] != true) {
+      return fail(
+        422,
+        'ENTITY_NOT_WRITABLE',
+        'Entity is not a writable switch.',
+      );
+    }
+    if (entity['enabled'] != true) {
+      return fail(409, 'ENTITY_DISABLED', 'Entity is disabled.');
+    }
+    if (device['status'] != 'online' || entity['availability'] != true) {
+      return fail(503, 'DEVICE_OFFLINE', 'Device is offline.');
+    }
+
+    final at = _now().toUtc().toIso8601String();
+    if (device['communicationMode'] == 'GI_EDGE_V1') {
+      // Fire and forget: a dry run writes nothing and answers the OLD
+      // value; otherwise the entity is written before the controller acts.
+      final dryRun = device['dryRun'] == true;
+      final old = entity['value'];
+      if (!dryRun) {
+        entity
+          ..['value'] = requested
+          ..['lastSeenAt'] = at;
+      }
+      return _json({
+        'entityId': entityId,
+        'state': dryRun ? old : requested,
+        'availability': entity['availability'],
+        'confirmedAt': at,
+      });
+    }
+    if (switchFailure case final code?) {
+      return fail(switchFailures[code] ?? 502, code, 'Command failed: $code');
+    }
+    entity
+      ..['value'] = requested
+      ..['availability'] = true
+      ..['lastSeenAt'] = at;
+    return _json({
+      'entityId': entityId,
+      'state': requested,
+      'availability': true,
+      'confirmedAt': at,
+    });
+  }
+
+  Future<Response> _updateDevice(
+    Request request,
+    String requestId,
+    String deviceId,
+  ) async {
+    final body = await _typedBody(
+      request,
+      requestId,
+      valid: {
+        'heatingSuspended': _boolean('heatingSuspended'),
+        'dryRun': _boolean('dryRun'),
+      },
+    );
+    final device = await _mutableDevice(request, requestId, deviceId);
+    device.addAll(body);
+    _reconcile(device);
+    if (device['heatingSuspended'] == true) {
+      for (final entity in device['entities'] as List? ?? const []) {
+        if (entity is Map<String, Object?> && entity['domain'] == 'switch') {
+          entity['value'] = false;
+        }
+      }
+    }
+
+    // The list-item shape (DeviceResponseDto), not the details.
+    final list = fixtures.success('DevicesController_list');
+    final items = list is Map<String, Object?> ? list['items'] : null;
+    final listed = (items is List ? items : const <Object?>[])
+        .whereType<Map<String, Object?>>()
+        .where((i) => i['id'] == deviceId)
+        .firstOrNull;
+    final item =
+        listed ??
+        fixtures.success('DevicesController_update')! as Map<String, Object?>;
+    return _json(
+      _freshen({
+        ...item,
+        'id': deviceId,
+        'heatingSuspended': device['heatingSuspended'],
+        'dryRun': device['dryRun'],
+      }),
+    );
+  }
+
+  Future<Response> _updateControlStrategy(
+    Request request,
+    String requestId,
+    String deviceId,
+  ) async {
+    final body = await _typedBody(
+      request,
+      requestId,
+      valid: {
+        'targetTemperatureCelsius': _number('targetTemperatureCelsius', 0, 100),
+        'hysteresisCelsius': _number('hysteresisCelsius', 1, 20),
+        'mode': (value) => const ['AUTO', 'OFF', 'MANUAL'].contains(value)
+            ? null
+            : 'mode must be one of the following values: AUTO, OFF, MANUAL',
+      },
+      required: const ['targetTemperatureCelsius', 'hysteresisCelsius', 'mode'],
+    );
+    final device = await _mutableDevice(request, requestId, deviceId);
+    device['baseControlStrategy'] = body;
+    _reconcile(device);
+    return _json({
+      'controlStrategy': device['controlStrategy'],
+      'baseControlStrategy': device['baseControlStrategy'],
+      'configurationVersion': device['configurationVersion'],
+    });
+  }
+
+  /// GI Core's reconcile without schedules: the effective strategy is the
+  /// base, with mode OFF while suspended; every pass bumps the version.
+  static void _reconcile(Map<String, Object?> device) {
+    final base = device['baseControlStrategy'];
+    if (base is Map<String, Object?>) {
+      device['controlStrategy'] = {
+        ...base,
+        if (device['heatingSuspended'] == true) 'mode': 'OFF',
+      };
+    }
+    final version = device['configurationVersion'];
+    device['configurationVersion'] = (version is int ? version : 0) + 1;
   }
 
   /// Reads a JSON body with exactly the [required] string fields.

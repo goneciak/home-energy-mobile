@@ -22,10 +22,16 @@ Wpisy katalogu `GiEndpoints.all` (`packages/gi_core_api/lib/src/catalog/endpoint
 | `RoomsController_list` | GET | `/rooms` | Bearer, każda rola | M1 | `home` | `read`, 2 ponowienia | `seeded` | `auth_flow_contract_test.dart` |
 | `DevicesController_list` | GET | `/devices` | Bearer, każda rola | M1 | `home` | `read`, 2 ponowienia | `seeded` | `auth_flow_contract_test.dart`, `core_quirks_contract_test.dart`, `devices_contract_test.dart` |
 | `DevicesController_get` | GET | `/devices/{id}` | Bearer, każda rola | M1 | `device` | `read`, 2 ponowienia | `fake_esphome`, `no_room_no_entities` | `auth_flow_contract_test.dart`, `core_quirks_contract_test.dart`, `devices_contract_test.dart` |
+| `SettingsController_getSystem` | GET | `/settings/system` | Bearer: OWNER, ADMIN, SERVICE | M2 | `settings` | `read`, 2 ponowienia | `ok` | zwolniony (niżej) |
+| `ApplianceUpdateController_getStatus` | GET | `/appliance/updates/status` | Bearer: OWNER, ADMIN | M2 | `settings` | `read`, 2 ponowienia | `checked_handwritten`, `unconfigured_handwritten` | zwolniony (niżej) |
+| `DeviceEspHomeSyncController_setSwitchState` | PUT | `/devices/{id}/entities/{entityId}/state` | Bearer: OWNER, ADMIN | M2 | `device` | `write` | `error_entity_not_found`, `error_entity_not_writable`, `error_validation`, `gi_edge_dry_run_handwritten`, `gi_edge_requested_handwritten`, `legacy_off`, `legacy_ok_handwritten`, `legacy_on` | `control_contract_test.dart` |
+| `DevicesController_update` | PATCH | `/devices/{id}` | Bearer: OWNER, ADMIN | M2 | `device` | `write` | `resumed`, `suspended_handwritten` | `control_contract_test.dart` |
+| `DevicesController_updateControlStrategy` | PATCH | `/devices/{id}/control-strategy` | Bearer: OWNER, ADMIN | M2 | `device` | `write` | `error_validation`, `null_base_handwritten`, `ok_handwritten`, `seeded`, `suspended_handwritten` | `control_contract_test.dart` |
 
 ## Zwolnienia z testu na żywo
 
-Brak: każdy wpis ma test kontraktowy na żywo.
+- `SettingsController_getSystem`: M2: live contract test not written yet; decoded from a recorded fixture.
+- `ApplianceUpdateController_getStatus`: M2: live contract test not written yet; the contract stack has no Supervisor, so only the unconfigured status is reachable there.
 
 ## Legenda
 

@@ -1968,4 +1968,271 @@ as Map<String, Object?>,
 
 }
 
+/// @nodoc
+mixin _$RelayDiagnostics {
+
+ bool? get output; bool? get commanded;
+/// Create a copy of RelayDiagnostics
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RelayDiagnosticsCopyWith<RelayDiagnostics> get copyWith => _$RelayDiagnosticsCopyWithImpl<RelayDiagnostics>(this as RelayDiagnostics, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as RelayDiagnostics;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RelayDiagnostics&&(identical(other.output, _this.output) || other.output == _this.output)&&(identical(other.commanded, _this.commanded) || other.commanded == _this.commanded));
+}
+
+
+@override
+int get hashCode {
+  final _this = this as RelayDiagnostics;
+  return Object.hash(runtimeType,_this.output,_this.commanded);
+}
+
+@override
+String toString() {
+  final _this = this as RelayDiagnostics;
+  return 'RelayDiagnostics(output: ${_this.output}, commanded: ${_this.commanded})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $RelayDiagnosticsCopyWith<$Res>  {
+  factory $RelayDiagnosticsCopyWith(RelayDiagnostics value, $Res Function(RelayDiagnostics) _then) = _$RelayDiagnosticsCopyWithImpl;
+@useResult
+$Res call({
+ bool? output, bool? commanded
+});
+
+
+
+
+}
+/// @nodoc
+class _$RelayDiagnosticsCopyWithImpl<$Res>
+    implements $RelayDiagnosticsCopyWith<$Res> {
+  _$RelayDiagnosticsCopyWithImpl(this._self, this._then);
+
+  final RelayDiagnostics _self;
+  final $Res Function(RelayDiagnostics) _then;
+
+/// Create a copy of RelayDiagnostics
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? output = freezed,Object? commanded = freezed,}) {
+  return _then(RelayDiagnostics(
+output: freezed == output ? _self.output : output // ignore: cast_nullable_to_non_nullable
+as bool?,commanded: freezed == commanded ? _self.commanded : commanded // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [RelayDiagnostics].
+extension RelayDiagnosticsPatterns on RelayDiagnostics {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _RelayDiagnostics value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _RelayDiagnostics() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _RelayDiagnostics value)  $default,){
+final _that = this;
+switch (_that) {
+case _RelayDiagnostics():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _RelayDiagnostics value)?  $default,){
+final _that = this;
+switch (_that) {
+case _RelayDiagnostics() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool? output,  bool? commanded)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _RelayDiagnostics() when $default != null:
+return $default(_that.output,_that.commanded);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool? output,  bool? commanded)  $default,) {final _that = this;
+switch (_that) {
+case _RelayDiagnostics():
+return $default(_that.output,_that.commanded);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool? output,  bool? commanded)?  $default,) {final _that = this;
+switch (_that) {
+case _RelayDiagnostics() when $default != null:
+return $default(_that.output,_that.commanded);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _RelayDiagnostics implements RelayDiagnostics {
+  const _RelayDiagnostics({this.output, this.commanded});
+  
+
+@override final  bool? output;
+@override final  bool? commanded;
+
+/// Create a copy of RelayDiagnostics
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$RelayDiagnosticsCopyWith<_RelayDiagnostics> get copyWith => __$RelayDiagnosticsCopyWithImpl<_RelayDiagnostics>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RelayDiagnostics&&(identical(other.output, output) || other.output == output)&&(identical(other.commanded, commanded) || other.commanded == commanded));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,output,commanded);
+}
+
+@override
+String toString() {
+    return 'RelayDiagnostics(output: $output, commanded: $commanded)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$RelayDiagnosticsCopyWith<$Res> implements $RelayDiagnosticsCopyWith<$Res> {
+  factory _$RelayDiagnosticsCopyWith(_RelayDiagnostics value, $Res Function(_RelayDiagnostics) _then) = __$RelayDiagnosticsCopyWithImpl;
+@override @useResult
+$Res call({
+ bool? output, bool? commanded
+});
+
+
+
+
+}
+/// @nodoc
+class __$RelayDiagnosticsCopyWithImpl<$Res>
+    implements _$RelayDiagnosticsCopyWith<$Res> {
+  __$RelayDiagnosticsCopyWithImpl(this._self, this._then);
+
+  final _RelayDiagnostics _self;
+  final $Res Function(_RelayDiagnostics) _then;
+
+/// Create a copy of RelayDiagnostics
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? output = freezed,Object? commanded = freezed,}) {
+  return _then(_RelayDiagnostics(
+output: freezed == output ? _self.output : output // ignore: cast_nullable_to_non_nullable
+as bool?,commanded: freezed == commanded ? _self.commanded : commanded // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
+}
+
+
+}
+
 // dart format on

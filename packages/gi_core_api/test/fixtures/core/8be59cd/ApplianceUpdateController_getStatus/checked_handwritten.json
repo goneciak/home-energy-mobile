@@ -1,0 +1,28 @@
+{
+  "lastCheck": {
+    "checkedAt": "2026-11-20T03:00:00.000Z",
+    "channel": "stable",
+    "updateAvailable": true,
+    "services": [
+      {
+        "service": "gi-core",
+        "channel": "stable",
+        "runningImageId": "sha256:aaa",
+        "availableImageId": "sha256:bbb",
+        "runningVersion": "1.4.2",
+        "availableVersion": "1.5.0",
+        "updateAvailable": true
+      }
+    ]
+  },
+  "lastInstall": {
+    "startedAt": "2026-11-10T03:05:00.000Z",
+    "finishedAt": "2026-11-10T03:07:12.000Z",
+    "channel": "stable",
+    "services": [
+      "gi-core"
+    ]
+  },
+  "lastError": null,
+  "configured": true
+}

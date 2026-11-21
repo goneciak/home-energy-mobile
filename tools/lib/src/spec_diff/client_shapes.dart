@@ -78,6 +78,26 @@ final Map<String, ClientDecoder> clientDecoders = {
     (json) => DeviceDetail.fromJson(_object(json)),
     (value) => (value! as DeviceDetail).toJson(),
   ),
+  GiEndpoints.settingsSystem.id: ClientDecoder(
+    (json) => SystemSettings.fromJson(_object(json)),
+    (value) => (value! as SystemSettings).toJson(),
+  ),
+  GiEndpoints.applianceUpdatesStatus.id: ClientDecoder(
+    (json) => ApplianceUpdateStatus.fromJson(_object(json)),
+    (value) => (value! as ApplianceUpdateStatus).toJson(),
+  ),
+  GiEndpoints.setSwitchState.id: ClientDecoder(
+    (json) => SwitchCommandResult.fromJson(_object(json)),
+    (value) => (value! as SwitchCommandResult).toJson(),
+  ),
+  GiEndpoints.updateDevice.id: ClientDecoder(
+    (json) => DeviceListItem.fromJson(_object(json)),
+    (value) => (value! as DeviceListItem).toJson(),
+  ),
+  GiEndpoints.updateControlStrategy.id: ClientDecoder(
+    (json) => ControlStrategyUpdateResult.fromJson(_object(json)),
+    (value) => (value! as ControlStrategyUpdateResult).toJson(),
+  ),
 };
 
 /// Catalog entries whose response body the client ignores (204 or unread).
