@@ -1,0 +1,89 @@
+name: gi_home
+description: GI Home mobile app for the local GI Core appliance.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: ^3.14.0
+resolution: workspace
+
+dependencies:
+  device_info_plus: ^13.3.0
+  dio: ^5.11.1
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.5.0
+  flutter_secure_storage: ^11.2.0
+  freezed_annotation: ^3.1.0
+  gi_core_api:
+    path: ../packages/gi_core_api
+  go_router: ^18.1.4
+  intl: ^0.20.3
+  json_annotation: ^4.12.0
+  # Material widgets left the framework in Flutter 3.47
+  # (package:flutter/material.dart is deprecated).
+  material_ui: ^1.11.1
+  meta: ^1.17.0
+  package_info_plus: ^10.2.2
+  path_provider: ^2.1.6
+  riverpod_annotation: ^4.0.8
+  share_plus: ^13.3.1
+  shared_preferences: ^2.5.6
+  url_launcher: ^6.3.3
+
+dev_dependencies:
+  alchemist: ^0.15.0
+  build_runner: ^2.17.1
+  fake_async: ^1.3.3
+  flutter_driver:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+  flutter_test:
+    sdk: flutter
+  freezed: ^4.0.3
+  # tool/make_flavor_icons.dart (the dev and beta icon ribbons).
+  image: ^4.13.1
+  integration_test:
+    sdk: flutter
+  json_serializable: ^6.15.2
+  mocktail: ^1.0.5
+  riverpod_generator: ^4.0.10
+  shared_preferences_platform_interface: ^2.4.2
+  very_good_analysis: ^11.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    # SIL OFL 1.1 texts, registered with LicenseRegistry at startup.
+    - assets/fonts/OFL-Fraunces.txt
+    - assets/fonts/OFL-Manrope.txt
+    - assets/fonts/OFL-JetBrainsMono.txt
+  # Variable fonts (plan §14): one file per style, no `weight:` entries — the
+  # engine maps FontWeight onto the `wght` axis itself.
+  fonts:
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces.ttf
+        - asset: assets/fonts/Fraunces-Italic.ttf
+          style: italic
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope.ttf
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono.ttf
+
+# Launcher icons: `dart run flutter_launcher_icons` (plan §14). Sources in
+# assets/icon/ are rasterised from icon.svg, a copy of the web panel's icon.
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/icon.png
+  remove_alpha_ios: true
+  adaptive_icon_background: "#0a0908"
+  adaptive_icon_foreground: assets/icon/icon_foreground.png
+  # icon_foreground.png already keeps the flame inside the 66% safe zone.
+  adaptive_icon_foreground_inset: 0
+  min_sdk_android: 26

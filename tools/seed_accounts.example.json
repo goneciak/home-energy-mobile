@@ -1,0 +1,19 @@
+{
+  "comment": "TEST-ONLY accounts created by tools/seed_core.dart --init (POST /users) on a local dev or contract GI Core. Documented on purpose and never real credentials: do not reuse them anywhere else. To use other values locally, copy this file to tools/seed_accounts.json (gitignored). Passwords follow GI Core's rule: 8-256 characters with a lowercase letter, an uppercase letter and a digit.",
+  "accounts": [
+    {
+      "role": "ADMIN",
+      "firstName": "Anna",
+      "lastName": "Admin",
+      "email": "admin@gihome.test",
+      "password": "AdminTest-2026"
+    },
+    {
+      "role": "USER",
+      "firstName": "Jan",
+      "lastName": "Domownik",
+      "email": "user@gihome.test",
+      "password": "UserTest-2026"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+# The repository-wide gates every workflow carries (plan G5, §19.1): the code
+# is formatted and nothing waits for a backend change (`TODO(backend)` is
+# banned). ci.yml, contract.yml, e2e.yml and build.yml all run it, so a
+# nightly or release run cannot bypass them. Needs setup-flutter first.
+name: Repository gates
+description: Format check and the TODO(backend) ban (plan G5).
+runs:
+  using: composite
+  steps:
+    - name: Format
+      shell: bash
+      run: dart format --output=none --set-exit-if-changed app packages tools
+
+    - name: No TODO(backend)
+      shell: bash
+      run: |
+        if git grep -n 'TODO(backend)' -- . ':(exclude)docs' ':(exclude).github'; then
+          echo '::error::TODO(backend) is not allowed (plan G5, §19.1).'
+          exit 1
+        fi

@@ -1,0 +1,12 @@
+{
+  "accessToken": "<redacted-jwt>",
+  "expiresIn": 900,
+  "user": {
+    "id": "cmwl8s1se000680n2ryr54481",
+    "email": "owner@gihome.test",
+    "firstName": "Dev",
+    "lastName": "Owner",
+    "role": "OWNER",
+    "mustChangePassword": false
+  }
+}

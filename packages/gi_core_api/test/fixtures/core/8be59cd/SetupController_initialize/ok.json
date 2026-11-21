@@ -1,0 +1,18 @@
+{
+  "setup": {
+    "initialized": true,
+    "initializedAt": "2026-11-17T22:06:20.184Z",
+    "deviceName": "GI Home Dev",
+    "locale": "pl-PL",
+    "timezone": "Europe/Warsaw"
+  },
+  "owner": {
+    "id": "cmwl8s1se000680n2ryr54481",
+    "email": "owner@gihome.test",
+    "firstName": "Dev",
+    "lastName": "Owner",
+    "role": "OWNER",
+    "createdAt": "2026-11-17T22:06:20.174Z"
+  },
+  "recoveryCode": "XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
+}

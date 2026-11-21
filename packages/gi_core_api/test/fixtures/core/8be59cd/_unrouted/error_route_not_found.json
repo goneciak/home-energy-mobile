@@ -1,0 +1,8 @@
+{
+  "statusCode": 404,
+  "code": "HTTP_404",
+  "message": "Cannot GET /api/v1/definitely-not-a-route",
+  "path": "/api/v1/definitely-not-a-route",
+  "requestId": "71687d21-8eb0-4fbd-ba2f-bf0c386094b5",
+  "timestamp": "2026-11-17T22:06:20.793Z"
+}

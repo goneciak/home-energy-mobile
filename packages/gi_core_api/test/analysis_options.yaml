@@ -1,0 +1,6 @@
+include: ../analysis_options.yaml
+
+linter:
+  rules:
+    # Tests read as one setup or action per statement.
+    cascade_invocations: false

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "15a6de6e-f36c-4741-9775-53cd03413ccb",
+    "name": "Kotłownia",
+    "description": null,
+    "sortOrder": 0,
+    "createdAt": "2026-11-17T22:06:20.443Z",
+    "updatedAt": "2026-11-17T22:06:20.443Z"
+  },
+  {
+    "id": "875e2b40-bc93-4257-bee2-fa1c1e0b84fc",
+    "name": "Salon",
+    "description": null,
+    "sortOrder": 0,
+    "createdAt": "2026-11-17T22:06:20.430Z",
+    "updatedAt": "2026-11-17T22:06:20.430Z"
+  }
+]

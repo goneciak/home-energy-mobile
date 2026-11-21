@@ -1,0 +1,183 @@
+# Live contract tests against the UNMODIFIED GI Core in Docker (plan §17.3,
+# §17.5, §19.1 step 2, G5). Builds the backend from a temporary checkout of the
+# ref pinned in contract/backend.lock, starts the throwaway contract stack
+# (contract/compose.contract.yml via tools/dev-up.sh --contract), seeds it
+# through the public API, runs `dart test -t contract` and the spec drift
+# check, uploads the recorded fixtures and logs, and always tears the stack
+# down (down -v).
+#
+# Nightly it also runs a canary against the backend's latest `main` (plan
+# G5, §17.5); that leg may fail without blocking anything: it is the early
+# warning that the next backend pin needs work.
+#
+# Backend repository access (plan §24.1, still open: public or token?):
+#   vars.GI_BACKEND_REPO     owner/name of the backend repo (repository
+#                            variable). Default: the `repository=` URL of
+#                            contract/backend.lock.
+#   secrets.GI_BACKEND_TOKEN read-only token (fine-grained PAT or GitHub App
+#                            token with Contents: read on that repo). Needed
+#                            only if the backend repo is private; without it
+#                            the workflow's own GITHUB_TOKEN is used, which can
+#                            read public repos only.
+# Nothing is ever pushed to the backend; the checkout is a read-only build
+# context.
+name: Contract
+
+on:
+  schedule:
+    - cron: "30 2 * * *" # nightly, 02:30 UTC
+  workflow_dispatch:
+    inputs:
+      backend_ref:
+        description: Backend ref to test instead of the pinned SHA (e.g. main). Empty = contract/backend.lock.
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - packages/gi_core_api/**
+      - contract/**
+      - tools/**
+      - .github/workflows/contract.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contract-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  gates:
+    name: Format and TODO(backend)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-flutter
+      - uses: ./.github/actions/repo-gates
+
+  contract:
+    name: Contract (${{ matrix.backend }})
+    needs: gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # pinned: the SHA of contract/backend.lock (or the dispatch input);
+        # main: the nightly canary.
+        backend: ${{ fromJSON(github.event_name == 'schedule' && '["pinned", "main"]' || '["pinned"]') }}
+    continue-on-error: ${{ matrix.backend == 'main' }}
+    env:
+      RUN_ID: gh-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.backend }}
+      ARTIFACTS: ${{ github.workspace }}/.ci-artifacts
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve the backend ref
+        id: backend
+        env:
+          REPO_VAR: ${{ vars.GI_BACKEND_REPO }}
+          INPUT_REF: ${{ inputs.backend_ref }}
+          LEG: ${{ matrix.backend }}
+        run: |
+          lock=contract/backend.lock
+          repo="$REPO_VAR"
+          if [[ -z "$repo" ]]; then
+            url="$(sed -n 's/^repository=//p' "$lock")"
+            repo="$(sed -E 's#^https://github.com/##; s#\.git$##' <<<"$url")"
+          fi
+          if [[ "$LEG" == main ]]; then
+            ref=main
+          elif [[ -n "$INPUT_REF" ]]; then
+            ref="$INPUT_REF"
+          else
+            ref="$(sed -n 's/^sha=//p' "$lock")"
+          fi
+          [[ -n "$repo" && -n "$ref" ]] || { echo '::error::contract/backend.lock has no repository= or sha='; exit 1; }
+          echo "Backend: $repo @ $ref"
+          echo "repository=$repo" >> "$GITHUB_OUTPUT"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      # actions/checkout can only write inside the workspace, so the backend
+      # lands in .ci-backend/ (plan §17.3 says $RUNNER_TEMP/backend; same
+      # role: a temporary, read-only build context, never committed).
+      - name: Check out the backend (read-only build context)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.backend.outputs.repository }}
+          ref: ${{ steps.backend.outputs.ref }}
+          token: ${{ secrets.GI_BACKEND_TOKEN || github.token }}
+          path: .ci-backend
+          persist-credentials: false
+
+      - name: Record the backend commit
+        run: |
+          mkdir -p "$ARTIFACTS"
+          git -C .ci-backend rev-parse HEAD | tee "$ARTIFACTS/backend-sha.txt"
+
+      - uses: ./.github/actions/setup-flutter
+
+      # Builds GI Core (targets migrator and production) and the fake
+      # ESPHome device, waits for health and prints GI_CORE_URL and
+      # FAKE_ESPHOME_URL (ephemeral 127.0.0.1 ports).
+      - name: Start the contract stack
+        run: |
+          bash tools/dev-up.sh --contract --run-id "$RUN_ID" \
+            --backend-dir "$GITHUB_WORKSPACE/.ci-backend" --timeout 900 \
+            | tee "$ARTIFACTS/dev-up.log"
+          grep -E '^(GI_CONTRACT_PROJECT|GI_CORE_URL|FAKE_ESPHOME_URL)=' "$ARTIFACTS/dev-up.log" >> "$GITHUB_ENV"
+
+      # Plan §17.3 seeder: initialize, owner login, ADMIN/USER, rooms, the fake
+      # device, control strategy. --fixtures records responses that have no
+      # committed fixture yet (uploaded below). The owner's credentials are
+      # generated into tools/backend/dev.env (gitignored, test-only).
+      - name: Seed
+        run: |
+          dart run tools/seed_core.dart --base-url "$GI_CORE_URL" --init --yes --fixtures \
+            | tee "$ARTIFACTS/seed.log"
+          password="$(sed -n 's/^GI_DEV_PASSWORD=//p' tools/backend/dev.env)"
+          [[ -z "$password" ]] || echo "::add-mask::$password"
+
+      - name: Contract tests
+        working-directory: packages/gi_core_api
+        run: |
+          dart test -t contract --reporter expanded \
+            --file-reporter "json:$ARTIFACTS/contract-tests.json"
+
+      - name: Spec drift (spec_diff against contract/openapi)
+        if: ${{ !cancelled() && env.GI_CORE_URL != '' }}
+        run: |
+          dart run tools/spec_diff.dart --base-url "$GI_CORE_URL" --write-snapshot "$ARTIFACTS/openapi-live.json"
+          dart run tools/spec_diff.dart --base-url "$GI_CORE_URL" | tee "$ARTIFACTS/spec-diff.txt"
+
+      - name: Collect fixtures and logs
+        if: always()
+        run: |
+          mkdir -p "$ARTIFACTS/fixtures"
+          # New (uncommitted) fixtures recorded by the seeder.
+          git ls-files --others --exclude-standard -- packages/gi_core_api/test/fixtures \
+            | tee "$ARTIFACTS/fixtures/new-files.txt" \
+            | while read -r f; do mkdir -p "$ARTIFACTS/fixtures/$(dirname "$f")"; cp "$f" "$ARTIFACTS/fixtures/$f"; done
+          if [[ -n "${GI_CONTRACT_PROJECT:-}" ]]; then
+            docker compose -p "$GI_CONTRACT_PROJECT" -f contract/compose.contract.yml ps -a > "$ARTIFACTS/compose-ps.txt" 2>&1 || true
+            docker compose -p "$GI_CONTRACT_PROJECT" -f contract/compose.contract.yml logs --no-color --timestamps > "$ARTIFACTS/compose.log" 2>&1 || true
+          fi
+
+      - name: Upload fixtures and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-${{ matrix.backend }}
+          # Never tools/backend/dev.env (the generated owner credentials).
+          path: .ci-artifacts/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Remove the contract stack
+        if: always()
+        run: bash tools/dev-up.sh --contract --run-id "$RUN_ID" --down

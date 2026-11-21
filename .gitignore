@@ -1,0 +1,40 @@
+tools/backend/dev.env
+.dart_tool/
+build/
+*.iml
+.idea/
+
+# FVM: SDK cache and the .fvm/flutter_sdk link. .fvmrc (the pinned version)
+# and .vscode/settings.json stay tracked.
+.fvm/
+
+# Golden tests (app/test/flutter_test_config.dart): only the platform-agnostic
+# CI goldens are committed; platform previews and failure diffs stay local.
+app/test/**/goldens/*/
+!app/test/**/goldens/ci/
+app/test/**/failures/
+
+# Local overrides of tools/seed_accounts.example.json (test-only accounts).
+tools/seed_accounts.json
+
+# Proposals written by tools (e.g. tools/import_web_messages.dart).
+tools/out/
+
+# Test coverage (tools/check_coverage.dart reads it; CI uploads it).
+coverage/
+
+# Release signing (plan §19.4): the upload keystore and its properties never
+# enter the repo. CI and Codemagic pass them as secrets (README, "CI/CD").
+key.properties
+*.jks
+*.keystore
+# Store API credentials (fastlane, codemagic): read from the environment only.
+*.p8
+play-service-account*.json
+fastlane/report.xml
+fastlane/README.md
+
+# CI scratch folders (contract.yml, e2e.yml): the temporary backend checkout
+# and the collected logs; created only on runners or when replaying CI locally.
+.ci-backend/
+.ci-artifacts/

@@ -1,0 +1,153 @@
+# Codemagic: internal distribution of the prod app (plan D12, §19.3, §19.4,
+# M1 item 7). Configuration only; nothing here has been run yet.
+#
+#   ios-testflight-internal   v* tag → signed IPA → App Store Connect
+#                             (TestFlight, internal testers only)
+#   android-play-internal     v* tag → AAB signed with the upload key → Google
+#                             Play internal testing track
+#
+# Credentials live ONLY in Codemagic environment variable groups (Team or App
+# settings → Environment variables), referenced here by group name. Mark every
+# value "Secure". Group names and the variables they must hold:
+#
+#   app_store_connect
+#     APP_STORE_CONNECT_ISSUER_ID       App Store Connect API key issuer ID
+#     APP_STORE_CONNECT_KEY_IDENTIFIER  API key ID
+#     APP_STORE_CONNECT_PRIVATE_KEY     the .p8 key contents
+#     CERTIFICATE_PRIVATE_KEY           RSA private key for the distribution
+#                                       certificate (Codemagic fetch-signing-files)
+#   gi_home_ios
+#     GI_IOS_BUNDLE_ID                  App Store bundle ID (pending D5)
+#   google_play
+#     GCLOUD_SERVICE_ACCOUNT_CREDENTIALS  Play Console service account JSON
+#   gi_home_android_signing
+#     GI_UPLOAD_KEYSTORE_BASE64         upload keystore (.jks), base64
+#     GI_UPLOAD_KEYSTORE_PASSWORD
+#     GI_UPLOAD_KEY_ALIAS
+#     GI_UPLOAD_KEY_PASSWORD
+#
+# Bundle IDs are not decided (plan D5): the Android applicationId in
+# app/android/app/build.gradle.kts and the iOS PRODUCT_BUNDLE_IDENTIFIER are
+# placeholders until the owner decides, and GI_IOS_BUNDLE_ID must match the
+# iOS one. Release procedure: docs/release-runbook.md.
+
+definitions:
+  # Same SDK as .fvmrc (FVM). Keep the two in sync.
+  flutter_version: &flutter_version 3.50.0
+  release_tag: &release_tag
+    events: [tag]
+    tag_patterns:
+      - pattern: "v*"
+        include: true
+  scripts:
+    - &pub_get
+      name: Pub get (workspace)
+      script: flutter pub get
+    - &record_backend_ref
+      name: Record the backend ref (plan §19.4)
+      script: |
+        mkdir -p "$CM_BUILD_DIR/release-info"
+        cp contract/backend.lock "$CM_BUILD_DIR/release-info/backend.lock"
+        git rev-parse HEAD > "$CM_BUILD_DIR/release-info/app-commit.txt"
+
+workflows:
+  ios-testflight-internal:
+    name: iOS → TestFlight (internal)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    triggering: *release_tag
+    environment:
+      flutter: *flutter_version
+      xcode: latest
+      cocoapods: default
+      groups:
+        - app_store_connect
+        - gi_home_ios
+    scripts:
+      - *pub_get
+      - *record_backend_ref
+      - name: Check the configuration
+        script: |
+          : "${GI_IOS_BUNDLE_ID:?Set GI_IOS_BUNDLE_ID in the gi_home_ios group (plan D5)}"
+          : "${APP_STORE_CONNECT_ISSUER_ID:?missing in the app_store_connect group}"
+          : "${APP_STORE_CONNECT_KEY_IDENTIFIER:?missing in the app_store_connect group}"
+          : "${APP_STORE_CONNECT_PRIVATE_KEY:?missing in the app_store_connect group}"
+          : "${CERTIFICATE_PRIVATE_KEY:?missing in the app_store_connect group}"
+      - name: Signing (App Store Connect API key)
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$GI_IOS_BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+      # The Runner scheme is the prod app (no per-flavor iOS schemes yet).
+      # Testers get prod, not the beta flavor of plan §19.2: a recorded
+      # deviation (docs/decisions/store-and-product-decisions.md).
+      # Build number: one above the latest TestFlight build.
+      - name: Build IPA (prod)
+        working_directory: app
+        script: |
+          latest="$(app-store-connect get-latest-testflight-build-number "$GI_IOS_BUNDLE_ID" || echo 0)"
+          flutter build ipa --release -t lib/main.dart \
+            --dart-define-from-file=config/prod.json \
+            --build-number=$((latest + 1)) \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - app/build/ios/ipa/*.ipa
+      - release-info/*
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        # Internal testers only: no Beta App Review. The internal group with
+        # automatic distribution in App Store Connect gets the build.
+        submit_to_testflight: false
+        submit_to_app_store: false
+
+  android-play-internal:
+    name: Android → Play (internal testing)
+    instance_type: linux_x2
+    max_build_duration: 60
+    triggering: *release_tag
+    environment:
+      flutter: *flutter_version
+      java: 17
+      groups:
+        - google_play
+        - gi_home_android_signing
+    scripts:
+      - *pub_get
+      - *record_backend_ref
+      # app/android/app/build.gradle.kts reads the GI_UPLOAD_* variables;
+      # GI_REQUIRE_RELEASE_SIGNING=true makes a missing one fail the build
+      # instead of falling back to the debug key.
+      - name: Upload key
+        script: |
+          : "${GI_UPLOAD_KEYSTORE_BASE64:?missing in the gi_home_android_signing group}"
+          echo "$GI_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$CM_BUILD_DIR/upload-keystore.jks"
+          echo "GI_UPLOAD_KEYSTORE_PATH=$CM_BUILD_DIR/upload-keystore.jks" >> "$CM_ENV"
+          echo "GI_REQUIRE_RELEASE_SIGNING=true" >> "$CM_ENV"
+      # prod, not beta (plan §19.2): the .beta applicationId would need its
+      # own Play listing; see docs/decisions/store-and-product-decisions.md.
+      - name: Build AAB (prod)
+        working_directory: app
+        script: |
+          flutter build appbundle --release --flavor prod -t lib/main.dart \
+            --dart-define-from-file=config/prod.json \
+            --build-number="$BUILD_NUMBER"
+      - name: 16 KB page alignment
+        script: bash tools/ci/check-16kb-alignment.sh app/build/app/outputs/bundle/prodRelease/app-prod-release.aab
+      - name: Remove the keystore
+        script: rm -f "$CM_BUILD_DIR/upload-keystore.jks"
+    artifacts:
+      - app/build/app/outputs/bundle/prodRelease/*.aab
+      - app/build/app/outputs/mapping/prodRelease/mapping.txt
+      - release-info/*
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        # The first upload of a new app must be a draft until the Play
+        # listing is complete; switch to false afterwards.
+        submit_as_draft: true

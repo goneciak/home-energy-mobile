@@ -1,0 +1,22 @@
+name: gi_tools
+description: >-
+  Developer and CI tools of the mobile repo (pure Dart, no Flutter): spec drift
+  check, backend contract docs, LAN forwarder, mock GI Core, ARB vocabulary
+  import, seeder, fake ESPHome device.
+publish_to: none
+environment:
+  sdk: ^3.14.0
+resolution: workspace
+
+dependencies:
+  args: ^2.7.0
+  gi_core_api:
+    path: ../packages/gi_core_api
+  shelf: 1.4.2
+
+dev_dependencies:
+  dio: ^5.11.1
+  test: ^1.31.2
+  very_good_analysis: ^11.0.0
+  # tools/test/ci_config_test.dart parses the CI and release YAML.
+  yaml: ^3.1.3

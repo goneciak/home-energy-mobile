@@ -1,0 +1,19 @@
+# Flutter from .fvmrc (FVM pins 3.50.0 / Dart 3.14, the same SDK as locally)
+# and `flutter pub get` for the whole pub workspace. Every workflow uses it, so
+# there is one place to change the SDK setup.
+name: Set up Flutter
+description: Installs the Flutter SDK pinned in .fvmrc and resolves the pub workspace.
+runs:
+  using: composite
+  steps:
+    # Third-party code that runs before release signing: pinned to a commit,
+    # never to a movable tag.
+    - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+      with:
+        channel: stable
+        flutter-version-file: .fvmrc
+        cache: true
+
+    - name: Pub get (workspace)
+      shell: bash
+      run: flutter pub get

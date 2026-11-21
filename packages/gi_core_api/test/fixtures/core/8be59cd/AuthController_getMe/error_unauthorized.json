@@ -1,0 +1,8 @@
+{
+  "statusCode": 401,
+  "code": "AUTH_UNAUTHORIZED",
+  "message": "Authentication required.",
+  "path": "/api/v1/auth/me",
+  "requestId": "0b84d547-1aac-40ad-bdc8-cca5586ece39",
+  "timestamp": "2026-11-17T22:06:20.787Z"
+}

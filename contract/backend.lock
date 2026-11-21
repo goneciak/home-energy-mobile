@@ -1,0 +1,23 @@
+# Pinned GI Core backend (plan D15, §17.4, §24.1).
+#
+# The contract stack (contract/compose.contract.yml) builds GI Core from this
+# ref, and the recorded fixtures live under
+# packages/gi_core_api/test/fixtures/core/<shortSha>/. Tools and tests read
+# `shortSha` from here; change the ref only in a PR that re-records the fixtures.
+#
+# Repository path convention: the backend is a sibling checkout of this repo,
+# ../home-energy-poc (C:\home-energy-poc on the reference Windows PC). Override
+# with GI_BACKEND_DIR (dev-up scripts, compose build context). The backend is
+# never modified; it is only a read-only build context. In CI it is a temporary
+# checkout of `sha` ($RUNNER_TEMP/backend).
+#
+# Provenance: the local checkout at C:\home-energy-poc has no git metadata, so
+# the SHA cannot be read from it. It is the commit the implementation plan was
+# written against (docs/flutter-app-plan.md §24.1), i.e. the local tree is
+# assumed to be that commit.
+repository=https://github.com/biQte/home-energy-poc.git
+branch=main
+sha=8be59cd907df1af964a817331edbcf8e1597d3e2
+shortSha=8be59cd
+path=../home-energy-poc
+pinnedAt=2026-11-19

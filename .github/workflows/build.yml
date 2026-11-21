@@ -1,0 +1,159 @@
+# Release builds of the prod flavor (plan §19.1 step 4, §19.4).
+#
+#   android  Linux: `flutter build appbundle --flavor prod`, the 16 KB page
+#            alignment check of the native libraries, AAB uploaded as an
+#            artifact. On PRs and main it is signed with the debug key (no
+#            secrets, "bez podpisu na PR"); on v* tags it MUST be signed with
+#            the Play upload key (GI_REQUIRE_RELEASE_SIGNING=true makes Gradle
+#            fail when a secret is missing).
+#   ios      macOS: `flutter build ios --no-codesign`. Not verifiable on the
+#            Windows dev PC; signing and TestFlight live in codemagic.yaml
+#            (D12) or fastlane/.
+#
+# On v* tags the full CI gate set (ci.yml) runs first; every run carries the
+# Format and TODO(backend) gates (plan G5).
+#
+# Secrets (tags only; see README "CI/CD"):
+#   GI_UPLOAD_KEYSTORE_BASE64    the upload keystore (.jks), base64
+#   GI_UPLOAD_KEYSTORE_PASSWORD  its store password
+#   GI_UPLOAD_KEY_ALIAS          the key alias
+#   GI_UPLOAD_KEY_PASSWORD       the key password
+# Nothing is uploaded to a store here (codemagic.yaml / fastlane do that).
+name: Build
+
+on:
+  pull_request:
+    paths:
+      - app/**
+      - packages/**
+      - .github/workflows/build.yml
+      - .github/actions/**
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  gates:
+    name: Format and TODO(backend)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-flutter
+      - uses: ./.github/actions/repo-gates
+
+  # A release cannot skip analyze, tests, coverage and goldens.
+  ci:
+    name: CI gates (release)
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/ci.yml
+
+  android:
+    name: Android App Bundle (prod)
+    needs: [gates, ci]
+    # `ci` is skipped outside tags; run unless something failed.
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: ./.github/actions/setup-flutter
+
+      # Tags only. The keystore is written to the runner's temp folder and
+      # removed at the end of the job; the passwords stay in the environment.
+      - name: Upload key (release)
+        if: env.RELEASE == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.GI_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          echo "GI_REQUIRE_RELEASE_SIGNING=true" >> "$GITHUB_ENV"
+          if [[ -n "$KEYSTORE_BASE64" ]]; then
+            base64 --decode <<<"$KEYSTORE_BASE64" > "$RUNNER_TEMP/upload-keystore.jks"
+            echo "GI_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/upload-keystore.jks" >> "$GITHUB_ENV"
+          else
+            echo '::error::GI_UPLOAD_KEYSTORE_BASE64 is not set; a release AAB must be signed with the upload key.'
+          fi
+
+      # On tags the build number is the run number (Play needs a new
+      # versionCode per upload); elsewhere pubspec.yaml's.
+      - name: Build AAB (prod)
+        working-directory: app
+        env:
+          GI_UPLOAD_KEYSTORE_PASSWORD: ${{ env.RELEASE == 'true' && secrets.GI_UPLOAD_KEYSTORE_PASSWORD || '' }}
+          GI_UPLOAD_KEY_ALIAS: ${{ env.RELEASE == 'true' && secrets.GI_UPLOAD_KEY_ALIAS || '' }}
+          GI_UPLOAD_KEY_PASSWORD: ${{ env.RELEASE == 'true' && secrets.GI_UPLOAD_KEY_PASSWORD || '' }}
+          BUILD_NUMBER_ARG: ${{ env.RELEASE == 'true' && format('--build-number={0}', github.run_number) || '' }}
+        run: |
+          flutter build appbundle --release --flavor prod -t lib/main.dart \
+            --dart-define-from-file=config/prod.json $BUILD_NUMBER_ARG
+
+      # Plan §19.1 step 4: Play requires 16 KB page-size compatible native
+      # libraries (ELF LOAD segments aligned to >= 16 KB) for targetSdk 35+.
+      - name: 16 KB page alignment
+        run: bash tools/ci/check-16kb-alignment.sh app/build/app/outputs/bundle/prodRelease/app-prod-release.aab
+
+      - name: Record the backend ref
+        run: cp contract/backend.lock app/build/app/outputs/bundle/prodRelease/backend.lock
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-prod-release-aab
+          path: |
+            app/build/app/outputs/bundle/prodRelease/
+            app/build/app/outputs/mapping/prodRelease/
+          if-no-files-found: error
+          retention-days: ${{ env.RELEASE == 'true' && 90 || 14 }}
+
+      - name: Remove the keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload-keystore.jks"
+
+  ios:
+    name: iOS (prod, no codesign)
+    needs: [gates, ci]
+    if: ${{ !failure() && !cancelled() }}
+    # NOT verifiable locally: needs macOS and Xcode (the dev PC is Windows).
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-flutter
+
+      # No --flavor yet: the Xcode project has only the Runner scheme, which
+      # is the prod app (bundle ID without a suffix). Per-flavor schemes
+      # (dev/beta) need macOS to create (app/README.md).
+      - name: Build iOS (prod, unsigned)
+        working-directory: app
+        run: |
+          flutter build ios --release --no-codesign -t lib/main.dart \
+            --dart-define-from-file=config/prod.json
+
+      - name: Upload Runner.app
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-prod-unsigned
+          path: app/build/ios/iphoneos/Runner.app
+          if-no-files-found: error
+          retention-days: 14

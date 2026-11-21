@@ -1,0 +1,5 @@
+# App identifiers for fastlane (plan §19.4). Placeholders: the bundle IDs are
+# not decided yet (plan D5), so they come from the environment and nothing is
+# hard-coded. See fastlane/Fastfile for every variable.
+app_identifier(ENV["GI_IOS_BUNDLE_ID"])           # e.g. the iOS PRODUCT_BUNDLE_IDENTIFIER
+package_name(ENV["GI_ANDROID_PACKAGE_NAME"])      # the prod applicationId

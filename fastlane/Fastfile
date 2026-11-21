@@ -1,0 +1,146 @@
+# fastlane lanes for internal distribution of the prod app (plan §19.3,
+# §19.4). The same flows as codemagic.yaml (plan D12), for a macOS runner or a
+# release manager's Mac. Configuration only; no lane has been run yet.
+# Testers get the prod flavor, not beta (plan §19.2): a recorded deviation,
+# see docs/decisions/store-and-product-decisions.md.
+#
+#   bundle exec fastlane ios internal_ios          → TestFlight, internal testers
+#   bundle exec fastlane android internal_android  → Play internal testing track
+#
+# Every credential comes from the environment; nothing secret is in the repo.
+#
+# Both lanes
+#   GI_IOS_BUNDLE_ID / GI_ANDROID_PACKAGE_NAME  bundle IDs (placeholders until
+#                                               plan D5 is decided)
+# internal_ios
+#   APP_STORE_CONNECT_API_KEY_ID        App Store Connect API key ID
+#   APP_STORE_CONNECT_API_ISSUER_ID     its issuer ID
+#   APP_STORE_CONNECT_API_KEY_CONTENT   the .p8 contents, base64
+#   MATCH_GIT_URL, MATCH_PASSWORD       fastlane match certificate repo and its
+#                                       passphrase (read-only use here)
+# internal_android
+#   GI_PLAY_SERVICE_ACCOUNT_JSON        Play Console service account JSON
+#   GI_UPLOAD_KEYSTORE_PATH, GI_UPLOAD_KEYSTORE_PASSWORD,
+#   GI_UPLOAD_KEY_ALIAS, GI_UPLOAD_KEY_PASSWORD
+#                                       the upload key (read by
+#                                       app/android/app/build.gradle.kts)
+#
+# Release procedure (tags, backend ref, phased / staged rollout):
+# docs/release-runbook.md.
+
+default_platform(:android)
+
+REPO_ROOT = File.expand_path("..", __dir__)
+APP_DIR = File.join(REPO_ROOT, "app")
+
+def require_env!(*names)
+  missing = names.select { |name| ENV[name].to_s.strip.empty? }
+  return if missing.empty?
+
+  UI.user_error!("Missing environment variables: #{missing.join(', ')} (see fastlane/Fastfile)")
+end
+
+# Plan §19.4: every release records the backend ref it was tested against.
+def record_backend_ref!
+  out = File.join(REPO_ROOT, "build", "release-info")
+  FileUtils.mkdir_p(out)
+  FileUtils.cp(File.join(REPO_ROOT, "contract", "backend.lock"), out)
+  File.write(File.join(out, "app-commit.txt"), sh("git", "-C", REPO_ROOT, "rev-parse", "HEAD"))
+end
+
+platform :ios do
+  desc "Build the prod app and upload it to TestFlight for internal testers"
+  lane :internal_ios do
+    require_env!(
+      "GI_IOS_BUNDLE_ID",
+      "APP_STORE_CONNECT_API_KEY_ID",
+      "APP_STORE_CONNECT_API_ISSUER_ID",
+      "APP_STORE_CONNECT_API_KEY_CONTENT",
+      "MATCH_GIT_URL",
+      "MATCH_PASSWORD"
+    )
+    setup_ci if ENV["CI"]
+    record_backend_ref!
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
+      is_key_content_base64: true
+    )
+    match(
+      type: "appstore",
+      app_identifier: ENV["GI_IOS_BUNDLE_ID"],
+      api_key: api_key,
+      readonly: true
+    )
+
+    build_number = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: ENV["GI_IOS_BUNDLE_ID"],
+      initial_build_number: 0
+    ) + 1
+
+    # Dart side first (prod entrypoint and defines); the Runner scheme is the
+    # prod app (no per-flavor iOS schemes yet).
+    Dir.chdir(APP_DIR) do
+      sh(
+        "flutter", "build", "ios", "--release", "--no-codesign",
+        "-t", "lib/main.dart", "--dart-define-from-file=config/prod.json",
+        "--build-number=#{build_number}"
+      )
+    end
+    build_app(
+      workspace: File.join(APP_DIR, "ios", "Runner.xcworkspace"),
+      scheme: "Runner",
+      export_method: "app-store",
+      output_directory: File.join(REPO_ROOT, "build", "ios")
+    )
+    upload_to_testflight(
+      api_key: api_key,
+      # Internal testers only: no Beta App Review, no external groups.
+      distribute_external: false,
+      skip_waiting_for_build_processing: true
+    )
+  end
+end
+
+platform :android do
+  desc "Build the prod AAB with the upload key and upload it to the Play internal track"
+  lane :internal_android do
+    require_env!(
+      "GI_ANDROID_PACKAGE_NAME",
+      "GI_PLAY_SERVICE_ACCOUNT_JSON",
+      "GI_UPLOAD_KEYSTORE_PATH",
+      "GI_UPLOAD_KEYSTORE_PASSWORD",
+      "GI_UPLOAD_KEY_ALIAS",
+      "GI_UPLOAD_KEY_PASSWORD"
+    )
+    record_backend_ref!
+    # Never fall back to the debug key for an upload.
+    ENV["GI_REQUIRE_RELEASE_SIGNING"] = "true"
+
+    aab = File.join(APP_DIR, "build", "app", "outputs", "bundle", "prodRelease", "app-prod-release.aab")
+    Dir.chdir(APP_DIR) do
+      build_number = (ENV["BUILD_NUMBER"] || Time.now.utc.strftime("%y%m%d%H%M")).to_s
+      sh(
+        "flutter", "build", "appbundle", "--release", "--flavor", "prod",
+        "-t", "lib/main.dart", "--dart-define-from-file=config/prod.json",
+        "--build-number=#{build_number}"
+      )
+    end
+    sh("bash", File.join(REPO_ROOT, "tools", "ci", "check-16kb-alignment.sh"), aab)
+
+    upload_to_play_store(
+      package_name: ENV["GI_ANDROID_PACKAGE_NAME"],
+      json_key_data: ENV["GI_PLAY_SERVICE_ACCOUNT_JSON"],
+      track: "internal",
+      aab: aab,
+      # A brand-new app accepts only drafts until its listing is complete.
+      release_status: ENV.fetch("GI_PLAY_RELEASE_STATUS", "draft"),
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end

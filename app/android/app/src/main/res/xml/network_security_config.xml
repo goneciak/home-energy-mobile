@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  GI Home talks to an appliance in the home network over plain HTTP
+  (http://gi-home.local, http://192.168.x.y, http://10.0.2.2:3000 in the
+  emulator). Android cannot scope cleartext to IP ranges, so cleartext is
+  allowed in the base config. The Dart TransportPolicy in gi_core_api is the
+  real guard: it refuses http:// to anything outside RFC 1918, loopback,
+  link-local, ULA and *.local hosts (plan section 9.4).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

@@ -1,0 +1,13 @@
+# Launcher icons of the beta flavor (plan §14), written to
+# android/app/src/beta/res by `dart run flutter_launcher_icons` (from app/).
+# The ribboned sources come from tool/make_flavor_icons.dart. iOS needs
+# per-flavor Xcode schemes (macOS), so it keeps the main icon.
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/icon/icon_beta.png
+  adaptive_icon_background: "#0a0908"
+  adaptive_icon_foreground: assets/icon/icon_foreground_beta.png
+  # The ribbon stays inside the visible area of the adaptive icon.
+  adaptive_icon_foreground_inset: 0
+  min_sdk_android: 26

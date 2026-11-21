@@ -1,0 +1,2 @@
+/* Shown by iOS when asking for local network access. */
+"NSLocalNetworkUsageDescription" = "GI Home łączy się z Twoim urządzeniem GI Home w sieci domowej, aby pokazać stan domu i urządzeń.";

@@ -1,0 +1,86 @@
+{
+  "id": "ae3f5c68-a02b-4f20-a2b4-cf6323063a1b",
+  "name": "Fake kotłownia",
+  "description": null,
+  "manufacturer": "GI Contract Fakes",
+  "model": "fake-esphome",
+  "firmwareVersion": "0.1.0-fake",
+  "status": "online",
+  "roomId": "cc72d811-c636-405a-9bc2-11c92f10711c",
+  "enabled": true,
+  "lastSeenAt": "2026-11-19T00:32:30.528Z",
+  "entities": [
+    {
+      "id": "cmwmtarpv000a01mss325pyco",
+      "displayName": "Przekaźnik grzania",
+      "sourceName": "Przekaźnik grzania",
+      "domain": "switch",
+      "deviceClass": null,
+      "value": false,
+      "unit": null,
+      "readable": true,
+      "writable": true,
+      "availability": true,
+      "lastSeenAt": "2026-11-19T00:32:30.546Z",
+      "assignedFunction": null,
+      "assignedRole": {
+        "code": "boiler",
+        "name": "Boiler"
+      },
+      "enabled": true
+    },
+    {
+      "id": "cmwmtarq6000b01mskxhw664o",
+      "displayName": "Temperatura zasilania",
+      "sourceName": "Temperatura zasilania",
+      "domain": "sensor",
+      "deviceClass": "temperature",
+      "value": 45.5,
+      "unit": "°C",
+      "readable": true,
+      "writable": false,
+      "availability": true,
+      "lastSeenAt": "2026-11-19T00:32:30.546Z",
+      "assignedFunction": null,
+      "assignedRole": {
+        "code": "co_supply",
+        "name": "CO Supply"
+      },
+      "enabled": true
+    }
+  ],
+  "communicationMode": "LEGACY_ESPHOME",
+  "inverterIntegrationMode": "DISABLED",
+  "inverterVendorProfileId": null,
+  "heatingRelayEntityId": "cmwmtarpv000a01mss325pyco",
+  "controlTemperatureEntityId": "cmwmtarq6000b01mskxhw664o",
+  "heatingSuspended": false,
+  "fallbackThresholdMs": 120000,
+  "boilerEstimateWindowMinutes": 10,
+  "localControlTemperatureSource": "SUPPLY",
+  "dryRun": false,
+  "pumpRelayEntityId": null,
+  "pumpComparisonEntityId": null,
+  "connectivityState": "ONLINE",
+  "lastConnectionError": null,
+  "lastConnectionAttemptAt": "2026-11-19T00:32:30.520Z",
+  "lastKnownIp": "fake-esphome",
+  "hostname": "fake-esphome",
+  "mac": "02:00:00:00:00:01",
+  "diagnostics": null,
+  "controlStrategy": {
+    "mode": "MANUAL",
+    "hysteresisCelsius": 4,
+    "targetTemperatureCelsius": 55
+  },
+  "baseControlStrategy": {
+    "mode": "MANUAL",
+    "hysteresisCelsius": 4,
+    "targetTemperatureCelsius": 55
+  },
+  "configurationVersion": 13,
+  "pvHeatingConfig": null,
+  "pvProductionEntityId": null,
+  "pvConsumptionEntityId": null,
+  "pvBoostActive": false
+}

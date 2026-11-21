@@ -1,0 +1,124 @@
+# Contract stack: the UNMODIFIED GI Core built from the backend checkout, on a
+# throwaway database, next to (never instead of) the dev stack (plan §17.3, S8).
+#
+# Self-contained: it does NOT include the backend's infrastructure/compose.yml,
+# whose fixed container names, fixed network name and fixed host ports would
+# collide with the running dev stack. Here there are no container_name entries,
+# the default per-project network and only ephemeral host ports, so any number of
+# projects can run side by side:
+#
+#   docker compose -p gi-mobile-contract-<runId> -f contract/compose.contract.yml up -d --build --wait
+#   docker compose -p gi-mobile-contract-<runId> port mosquitto 3000      # -> 127.0.0.1:<port>
+#   docker compose -p gi-mobile-contract-<runId> -f contract/compose.contract.yml down -v
+#
+# tools/dev-up.ps1 -Contract / tools/dev-up.sh --contract wrap exactly this.
+#
+# The backend checkout (GI_BACKEND_DIR, default ../home-energy-poc next to this
+# repo; relative paths resolve from this file's folder) is only a read-only build
+# context: no bind mounts, nothing is written there.
+name: gi-mobile-contract
+
+x-gi-core-build: &gi-core-build
+  context: ${GI_BACKEND_DIR:-../../home-energy-poc}/apps/gi-core
+  dockerfile: Dockerfile
+
+services:
+  postgres:
+    # Same image as the backend's compose (timescale/timescaledb:latest-pg17),
+    # pinned by digest.
+    image: timescale/timescaledb:latest-pg17@sha256:6a6b7d7a346d7c6be03a310c240706f3bbc6d7adbdf3fbc07823570b34337f5e
+    command: ["postgres", "-c", "shared_preload_libraries=timescaledb"]
+    environment:
+      # Test-only; DATABASE_URL in contract.env must match.
+      POSTGRES_USER: gi
+      POSTGRES_PASSWORD: contract-only-db-password
+      POSTGRES_DB: gi_home
+    # Throwaway data: gone with the container, nothing for `down -v` to leave behind.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gi -d gi_home"]
+      interval: 10s
+      start_interval: 1s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+  mosquitto:
+    image: eclipse-mosquitto:2@sha256:fa12172a051310efe5bcb7a6a11b77bd5faacb82cbacd7742aa758bf024fd8e4
+    command: ["mosquitto", "-c", "/mosquitto/config/contract.conf"]
+    configs:
+      - source: mosquitto-conf
+        target: /mosquitto/config/contract.conf
+    # GI Core shares this container's network namespace (see gi-core), so the
+    # Core's HTTP port is published here. Ephemeral host port on loopback only.
+    ports:
+      - "127.0.0.1::3000"
+    healthcheck:
+      test: ["CMD", "mosquitto_pub", "-h", "127.0.0.1", "-p", "1883", "-t", "contract/health", "-m", "ok"]
+      interval: 10s
+      start_interval: 1s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+  gi-migrate:
+    build:
+      <<: *gi-core-build
+      target: migrator
+    image: gi-mobile-contract/gi-core-migrator:local
+    restart: "no"
+    env_file: contract.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  gi-core:
+    build:
+      <<: *gi-core-build
+      target: production
+    image: gi-mobile-contract/gi-core:local
+    # GI Core dials MQTT at a hard-coded mqtt://127.0.0.1:1883
+    # (apps/gi-core/src/main.ts): in its own namespace nothing listens there and
+    # start-up hangs before HTTP. Same pattern as tools/backend/compose.override.yml.
+    network_mode: "service:mosquitto"
+    env_file: contract.env
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      gi-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/v1/health/live').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      start_interval: 1s
+      timeout: 5s
+      retries: 3
+      start_period: 300s
+
+  fake-esphome:
+    build:
+      context: ../tools/fake_esphome
+    image: gi-mobile-contract/fake-esphome:local
+    # GI Core reaches it as http://fake-esphome:80 (Docker DNS -> a private IPv4
+    # on the project network, which esphome-http.client.ts accepts). The
+    # ephemeral loopback port is only for tests and humans (GET /fake/state).
+    ports:
+      - "127.0.0.1::80"
+    healthcheck:
+      test: ["CMD", "/app/fake_esphome", "--healthcheck"]
+      interval: 10s
+      start_interval: 1s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+configs:
+  mosquitto-conf:
+    # Local only: the broker is reachable from its own namespace (GI Core
+    # included), never from the project network or the host.
+    content: |
+      listener 1883 127.0.0.1
+      allow_anonymous true
+      persistence false
+      log_dest stdout

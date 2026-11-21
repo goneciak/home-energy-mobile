@@ -1,0 +1,132 @@
+# PR pipeline (plan §19.1, step 1): format, the TODO(backend) ban, l10n
+# (with the pl/en completeness test), codegen and its freshness, analyze,
+# unit/widget tests with the coverage gate (plan §17.2) and the golden tests
+# for every workspace member. No secrets, no deployment. Live contract tests
+# (tag `contract`, contract.yml) and e2e (e2e.yml) need a backend and run in
+# their own workflows.
+#
+# Also a reusable workflow (`workflow_call`): build.yml runs it before a
+# release build, so a tagged release cannot skip these gates.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  # In a called run github.workflow is the caller's name; callers use
+  # groups that do not start with `ci-`, so the two never block each other.
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      # The same SDK as locally: FVM pins it in .fvmrc (Flutter 3.50.0,
+      # Dart 3.14). Includes `flutter pub get` for the workspace.
+      - uses: ./.github/actions/setup-flutter
+
+      # Format and No TODO(backend) (plan G5, §19.1), shared by every
+      # workflow: .github/actions/repo-gates.
+      - uses: ./.github/actions/repo-gates
+
+      # pl/en completeness (plan §13.1) is enforced by
+      # app/test/l10n/arb_completeness_test.dart in the app tests below:
+      # gen-l10n only warns about a missing translation.
+      - name: Localizations
+        working-directory: app
+        run: flutter gen-l10n
+
+      - name: Codegen (gi_core_api)
+        working-directory: packages/gi_core_api
+        run: dart run build_runner build -d
+
+      - name: Codegen (app)
+        working-directory: app
+        run: dart run build_runner build -d
+
+      # Plan §17.2 "build_runner aktualny". Needs the generated files
+      # (*.g.dart, *.freezed.dart, app/lib/l10n/app_localizations*.dart)
+      # committed: it fails on any diff against them (git diff --exit-code)
+      # and on any untracked file the generators wrote.
+      - name: Generated code is up to date
+        # `bash`: the executable bit may be lost on a Windows commit.
+        run: bash tools/ci/check-generated.sh
+
+      # Analyze per member: a workspace-root `dart analyze` is not used.
+      - name: Analyze (gi_core_api)
+        working-directory: packages/gi_core_api
+        run: dart analyze --fatal-infos
+
+      # Includes the riverpod_lint analysis server plugin (app/analysis_options.yaml).
+      - name: Analyze (app)
+        working-directory: app
+        run: flutter analyze
+
+      - name: Analyze (tools)
+        working-directory: tools
+        run: dart analyze --fatal-infos
+
+      # Includes the catalog coverage rule (test/catalog_coverage_test.dart,
+      # plan §6.2, §19.1): every catalog entry has a fixture test and a live
+      # contract test. Writes lcov with branch data for the coverage gate.
+      - name: Unit tests (gi_core_api, contract excluded)
+        working-directory: packages/gi_core_api
+        run: dart test -x contract --coverage-path=coverage/lcov.info --branch-coverage
+
+      # spec_diff rules, dev_lan_proxy, mock_core, the ARB import, the
+      # coverage gate, the workflow files and the staleness check of
+      # docs/backend-contract.md.
+      - name: Tool tests
+        working-directory: tools
+        run: dart test
+
+      # Goldens run in their own step below, so a golden failure is reported
+      # as one. Writes app/coverage/lcov.info (with branch data).
+      - name: Unit and widget tests (app)
+        working-directory: app
+        run: flutter test -x golden --branch-coverage
+
+      # Plan §17.2: >= 90% of lines in gi_core_api/lib and in
+      # app/lib/**/domain/**, 100% of lines and branches in TransportPolicy
+      # (and SafetyPolicy/ConfirmationPolicy once they exist). Generated code
+      # is excluded. The numbers also go to the job summary.
+      - name: Coverage gate
+        run: dart run tools/check_coverage.dart
+
+      # CI goldens (alchemist, app/test/golden/goldens/ci); platform goldens
+      # are skipped because GitHub sets CI=true.
+      - name: Golden tests (app)
+        working-directory: app
+        run: flutter test --tags golden
+
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: app/test/**/failures/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: |
+            packages/gi_core_api/coverage/lcov.info
+            app/coverage/lcov.info
+          if-no-files-found: ignore
+          retention-days: 14

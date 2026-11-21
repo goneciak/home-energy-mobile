@@ -1,0 +1,189 @@
+# End-to-end test on an Android emulator (plan §17.1 E2E, §19.1 step 3):
+# app/integration_test/app_flow_test.dart (connect → login → Home → device
+# details → Settings → logout) in the dev flavor.
+#
+#   e2e-android-mock  PRs touching app/** (and on demand): against the app's
+#                     in-process mock GI Core (FF_MOCK_CORE, dev flavor only),
+#                     no backend.
+#   e2e-android       nightly and on demand: against the real GI Core of the
+#                     contract stack (contract/compose.contract.yml), seeded
+#                     with tools/seed_core.dart. The emulator reaches the
+#                     host's 127.0.0.1:<port> as 10.0.2.2:<port>.
+#
+# Backend access: the same GI_BACKEND_REPO variable and GI_BACKEND_TOKEN secret
+# as contract.yml (plan §24.1).
+name: E2E
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # nightly, 03:00 UTC (after contract.yml)
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - app/**
+      - .github/workflows/e2e.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # x86_64 system image with Google APIs; hardware acceleration via KVM.
+  EMULATOR_API_LEVEL: "34"
+
+jobs:
+  gates:
+    name: Format and TODO(backend)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-flutter
+      - uses: ./.github/actions/repo-gates
+
+  e2e-android-mock:
+    name: E2E Android (mock Core)
+    needs: gates
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: ./.github/actions/setup-flutter
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # A later --dart-define-from-file overrides the same key of an earlier
+      # one, so this switches config/dev.json's FF_MOCK_CORE on. The mock
+      # signs in any e-mail and password (app/lib/src/core/dev/
+      # mock_core_adapter.dart); these are not credentials of anything.
+      - name: Mock defines
+        run: |
+          cat > "$RUNNER_TEMP/e2e-mock.json" <<'EOF'
+          {
+            "FF_MOCK_CORE": true,
+            "GI_DEV_EMAIL": "owner@gihome.test",
+            "GI_DEV_PASSWORD": "mock-core-accepts-any-password"
+          }
+          EOF
+
+      - name: Integration test (emulator, mock Core)
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: ${{ env.EMULATOR_API_LEVEL }}
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          working-directory: app
+          # One line: the runner executes each script line in its own shell.
+          script: flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/app_flow_test.dart --dart-define-from-file=config/dev.json --dart-define-from-file=$RUNNER_TEMP/e2e-mock.json
+
+  e2e-android:
+    name: E2E Android (contract stack)
+    needs: gates
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RUN_ID: gh-${{ github.run_id }}-${{ github.run_attempt }}-e2e
+      ARTIFACTS: ${{ github.workspace }}/.ci-artifacts
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve the backend ref
+        id: backend
+        env:
+          REPO_VAR: ${{ vars.GI_BACKEND_REPO }}
+        run: |
+          lock=contract/backend.lock
+          repo="$REPO_VAR"
+          if [[ -z "$repo" ]]; then
+            repo="$(sed -n 's/^repository=//p' "$lock" | sed -E 's#^https://github.com/##; s#\.git$##')"
+          fi
+          echo "repository=$repo" >> "$GITHUB_OUTPUT"
+          echo "ref=$(sed -n 's/^sha=//p' "$lock")" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the backend (read-only build context)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.backend.outputs.repository }}
+          ref: ${{ steps.backend.outputs.ref }}
+          token: ${{ secrets.GI_BACKEND_TOKEN || github.token }}
+          path: .ci-backend
+          persist-credentials: false
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: ./.github/actions/setup-flutter
+
+      - name: Start and seed the contract stack
+        run: |
+          mkdir -p "$ARTIFACTS"
+          bash tools/dev-up.sh --contract --run-id "$RUN_ID" --seed \
+            --backend-dir "$GITHUB_WORKSPACE/.ci-backend" --timeout 900 \
+            | tee "$ARTIFACTS/dev-up.log"
+          grep -E '^(GI_CONTRACT_PROJECT|GI_CORE_URL)=' "$ARTIFACTS/dev-up.log" >> "$GITHUB_ENV"
+          # GI_CORE_URL is http://127.0.0.1:<port>; the emulator sees the host as 10.0.2.2.
+          port="$(sed -n 's#^GI_CORE_URL=http://127.0.0.1:##p' "$ARTIFACTS/dev-up.log")"
+          echo "GI_CORE_ADDRESS=10.0.2.2:$port" >> "$GITHUB_ENV"
+          password="$(sed -n 's/^GI_DEV_PASSWORD=//p' tools/backend/dev.env)"
+          [[ -z "$password" ]] || echo "::add-mask::$password"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Credentials: GI_DEV_EMAIL and GI_DEV_PASSWORD straight from the
+      # seeder's tools/backend/dev.env (generated per run, test-only).
+      - name: Integration test (emulator, real GI Core)
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: ${{ env.EMULATOR_API_LEVEL }}
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          working-directory: app
+          script: flutter drive --profile -d emulator-5554 --flavor dev --driver=test_driver/integration_test.dart --target=integration_test/app_flow_test.dart --dart-define-from-file=config/dev.json --dart-define-from-file=../tools/backend/dev.env --dart-define=GI_CORE_ADDRESS=$GI_CORE_ADDRESS
+
+      - name: Collect logs
+        if: always()
+        run: |
+          mkdir -p "$ARTIFACTS"
+          if [[ -n "${GI_CONTRACT_PROJECT:-}" ]]; then
+            docker compose -p "$GI_CONTRACT_PROJECT" -f contract/compose.contract.yml logs --no-color --timestamps > "$ARTIFACTS/compose.log" 2>&1 || true
+          fi
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-android-logs
+          path: .ci-artifacts/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Remove the contract stack
+        if: always()
+        run: bash tools/dev-up.sh --contract --run-id "$RUN_ID" --down

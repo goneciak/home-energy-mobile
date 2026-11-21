@@ -1,0 +1,9 @@
+tags:
+  contract:
+    # Live contract tests (the plan calls the tag `live`, §17.3; it is
+    # `contract` here because CI excludes it by that name). They hit the Core
+    # at GI_CORE_URL (default http://localhost:3000), ideally a contract stack
+    # (tools/dev-up.ps1 -Contract -Seed). Run with `dart test -t contract`;
+    # excluded from the unit run with `-x contract`. 3x: a login may wait out
+    # GI Core's login rate limit (5/min, Retry-After up to 60 s) once.
+    timeout: 3x

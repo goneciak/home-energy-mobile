@@ -1,0 +1,616 @@
+{
+  "@@locale": "pl",
+  "appTitle": "GI Home",
+  "@appTitle": {
+    "description": "Application name."
+  },
+  "actionRetry": "Spróbuj ponownie",
+  "actionCancel": "Anuluj",
+  "actionClose": "Zamknij",
+  "actionChangeAppliance": "Zmień urządzenie",
+  "actionOpenSettings": "Otwórz ustawienia",
+  "@actionOpenSettings": {
+    "description": "Opens this app's page in the phone's system settings, e.g. to allow local network access."
+  },
+  "actionFindAppliance": "Znajdź GI Home",
+  "@actionFindAppliance": {
+    "description": "Opens the connect screen, which searches the home network for GI Home appliances."
+  },
+  "commonLoading": "Ładowanie…",
+  "commonNoData": "Brak danych",
+  "commonNoDataValue": "—",
+  "@commonNoDataValue": {
+    "description": "Shown in place of a missing value; pair it with the commonNoData semantics label."
+  },
+  "navHome": "Dom",
+  "navSettings": "Ustawienia",
+  "connectTitle": "Połącz z GI Home",
+  "connectIntro": "Telefon musi być w tej samej sieci Wi-Fi co GI Home. Wybierz znalezione urządzenie albo wpisz jego adres.",
+  "connectAddressLabel": "Adres GI Home",
+  "connectAddressHint": "np. gi-home.local lub 192.168.1.20",
+  "connectAddressRequired": "Wpisz adres GI Home",
+  "connectSearchTitle": "Znajdź GI Home",
+  "connectSearching": "Szukam GI Home…",
+  "connectSearchNoneFound": "Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej.",
+  "connectSearchAgain": "Szukaj ponownie",
+  "connectCandidateCurrent": "Obecne urządzenie",
+  "@connectCandidateCurrent": {
+    "description": "Marks the found appliance that is the one already saved on this phone."
+  },
+  "connectCandidateNotSetUp": "Nieskonfigurowane",
+  "@connectCandidateNotSetUp": {
+    "description": "Marks a found appliance that has not been set up yet."
+  },
+  "connectManualTitle": "Albo wpisz adres",
+  "connectHintsTitle": "Podpowiedzi",
+  "connectHintAndroidEmulator": "Emulator Androida",
+  "connectHintIosSimulator": "Symulator iOS",
+  "connectHintAndroidUsb": "Android przez USB",
+  "connectHintLanPhone": "Telefon w LAN",
+  "connectHintLanProxy": "Przez dev_lan_proxy",
+  "connectHintComputerIp": "IP-komputera",
+  "@connectHintComputerIp": {
+    "description": "Placeholder shown in a dev address preset where the developer types the computer's LAN IP address."
+  },
+  "connectHintUsbNote": "Android przez USB: najpierw uruchom na komputerze {command}, a potem połącz się z localhost:3000.",
+  "@connectHintUsbNote": {
+    "placeholders": {
+      "command": {
+        "type": "String",
+        "example": "adb reverse tcp:3000 tcp:3000"
+      }
+    }
+  },
+  "connectHintProxyNote": "Przez dev_lan_proxy: gdy GI Core zostaje na loopbacku, forwarder na komputerze przekazuje port 8080 do 127.0.0.1:3000. Wpisz IP komputera przed :8080.",
+  "connectHintLan": "Telefon w sieci Wi-Fi: wpisz adres IP komputera w sieci LAN przed :3000. Backend musi działać z GI_CORE_BIND_ADDRESS=0.0.0.0 (dev-up -Lan), a port 3000 musi być otwarty w zaporze.",
+  "connectSubmit": "Sprawdź",
+  "connectProbing": "Sprawdzam adres…",
+  "connectConfirmTitle": "Czy to Twój GI Home?",
+  "connectConfirmSubtitle": "{deviceName} · {host}",
+  "@connectConfirmSubtitle": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String",
+        "example": "GI Home Dev"
+      },
+      "host": {
+        "type": "String",
+        "example": "192.168.1.20:3000"
+      }
+    }
+  },
+  "connectNotInitializedNote": "To urządzenie nie jest jeszcze skonfigurowane.",
+  "connectCleartextNote": "Połączenie w sieci domowej nie jest szyfrowane. Używaj tylko w zaufanej sieci Wi-Fi.",
+  "connectConfirmYes": "Tak, połącz",
+  "connectConfirmNo": "Nie, wpisz inny adres",
+  "connectErrorInvalidAddress": "To nie wygląda na poprawny adres. Wpisz nazwę, adres IP lub URL GI Home.",
+  "connectErrorNotGiHome": "Pod tym adresem odpowiada inne urządzenie, nie GI Home.",
+  "errorUnreachable": "Nie można połączyć się z GI Home. Sprawdź, czy telefon jest w tej samej sieci Wi-Fi.",
+  "errorTimeout": "GI Home nie odpowiedział na czas. Spróbuj ponownie.",
+  "errorTlsUntrusted": "Certyfikat serwera nie jest zaufany – użyj http:// w sieci domowej lub certyfikatu z publicznego CA.",
+  "errorLocalNetworkDenied": "GI Home nie ma dostępu do sieci lokalnej. Zezwól na dostęp w Ustawieniach telefonu.",
+  "errorInsecureTransport": "Połączenie nieszyfrowane (http://) jest dozwolone tylko w sieci domowej. Dla innych adresów użyj https://.",
+  "errorForbidden": "Nie masz uprawnień do tej operacji.",
+  "errorNotFound": "Element został usunięty lub zmieniony.",
+  "errorRouteAbsent": "Funkcja niedostępna w tej wersji GI Home.",
+  "errorValidation": "Sprawdź wprowadzone dane.",
+  "errorRateLimited": "Zbyt wiele prób. Spróbuj ponownie za chwilę.",
+  "errorServer": "Wystąpił błąd po stronie GI Home. Spróbuj ponownie.",
+  "errorUnexpectedResponse": "GI Home zwrócił nieoczekiwaną odpowiedź. Sprawdź adres urządzenia.",
+  "errorUnexpectedShape": "Nie udało się odczytać odpowiedzi GI Home. Aplikacja może wymagać aktualizacji.",
+  "errorUnauthorized": "GI Home odrzucił żądanie. Spróbuj ponownie.",
+  "errorRefreshCookieMissing": "GI Home nie przekazał danych sesji. Spróbuj zalogować się ponownie.",
+  "errorVaultUnavailable": "Nie można odczytać danych logowania – spróbuj ponownie.",
+  "errorDifferentAppliance": "Pod zapamiętanym adresem działa inny GI Home. Połącz się ponownie z właściwym urządzeniem.",
+  "errorApplianceReset": "GI Home został zresetowany. Dokończ jego konfigurację, a potem zaloguj się ponownie.",
+  "errorCancelled": "Operacja została przerwana.",
+  "errorGeneric": "Coś poszło nie tak. Spróbuj ponownie.",
+  "errorRequestId": "Identyfikator zgłoszenia: {requestId}",
+  "@errorRequestId": {
+    "placeholders": {
+      "requestId": {
+        "type": "String",
+        "example": "m-0123abcd"
+      }
+    }
+  },
+  "setupRequiredTitle": "Dokończ konfigurację",
+  "setupRequiredBody": "GI Home pod adresem {host} nie jest jeszcze skonfigurowany. Dokończ konfigurację w przeglądarce, w panelu GI Home, a potem wróć do aplikacji.",
+  "@setupRequiredBody": {
+    "placeholders": {
+      "host": {
+        "type": "String",
+        "example": "gi-home.local"
+      }
+    }
+  },
+  "setupRequiredOpenPanel": "Dokończ konfigurację w przeglądarce",
+  "setupRequiredOpenFailed": "Nie udało się otworzyć przeglądarki.",
+  "setupRequiredCheckAgain": "Sprawdź ponownie",
+  "setupRequiredStillNotInitialized": "GI Home nadal nie jest skonfigurowany.",
+  "setupRequiredDevHint": "Tryb deweloperski: panel web nie działa ze stosem dev. Zainicjalizuj backend poleceniem {command}.",
+  "@setupRequiredDevHint": {
+    "placeholders": {
+      "command": {
+        "type": "String",
+        "example": "dart run tools/seed_core.dart --init"
+      }
+    }
+  },
+  "restoreConnecting": "Łączenie z GI Home…",
+  "restoreFailedTitle": "Nie udało się połączyć z GI Home",
+  "restoreVaultUnavailableTitle": "Dane logowania są chwilowo niedostępne",
+  "restoreVaultUnavailableHint": "Spróbujemy ponownie, gdy wrócisz do aplikacji.",
+  "loginTitle": "Zaloguj się",
+  "loginSubtitle": "do {deviceName}",
+  "@loginSubtitle": {
+    "placeholders": {
+      "deviceName": {
+        "type": "String",
+        "example": "GI Home Dev"
+      }
+    }
+  },
+  "loginEmailLabel": "E-mail",
+  "loginEmailInvalid": "Wpisz poprawny adres e-mail.",
+  "loginPasswordLabel": "Hasło",
+  "loginPasswordRequired": "Wpisz hasło.",
+  "loginShowPassword": "Pokaż hasło",
+  "loginHidePassword": "Ukryj hasło",
+  "loginSubmit": "Zaloguj",
+  "loginErrorInvalidCredentials": "Nieprawidłowy e-mail lub hasło.",
+  "loginErrorUserDisabled": "To konto jest wyłączone. Skontaktuj się z właścicielem GI Home.",
+  "loginErrorRateLimited": "Zbyt wiele prób logowania.",
+  "loginRetryCountdown": "{seconds, plural, one{Spróbuj ponownie za 1 sekundę.} few{Spróbuj ponownie za {seconds} sekundy.} many{Spróbuj ponownie za {seconds} sekund.} other{Spróbuj ponownie za {seconds} sekundy.}}",
+  "@loginRetryCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "sessionLostRevoked": "Sesja wygasła lub została zakończona na innym urządzeniu (np. limit 10 zalogowanych urządzeń).",
+  "sessionLostExpired": "Sesja wygasła po 30 dniach. Zaloguj się ponownie.",
+  "sessionLostUserDisabled": "To konto zostało wyłączone.",
+  "sessionLostProtocol": "Sesja została przerwana. Zaloguj się ponownie.",
+  "sessionLostVaultWiped": "Nie udało się odczytać zapisanych danych logowania, więc zostały usunięte. Zaloguj się ponownie.",
+  "changePasswordTitle": "Zmień hasło",
+  "changePasswordIntro": "Ze względów bezpieczeństwa ustaw nowe hasło, zanim zaczniesz korzystać z aplikacji.",
+  "changePasswordCurrentLabel": "Obecne hasło",
+  "changePasswordNewLabel": "Nowe hasło",
+  "changePasswordRepeatLabel": "Powtórz nowe hasło",
+  "changePasswordRules": "Od 8 do 256 znaków, w tym mała i wielka litera oraz cyfra.",
+  "changePasswordSubmit": "Zmień hasło i kontynuuj",
+  "changePasswordCurrentInvalid": "Obecne hasło jest nieprawidłowe.",
+  "changePasswordSameAsCurrent": "Nowe hasło musi różnić się od obecnego.",
+  "changePasswordOtherSessionsEnded": "{count, plural, =0{Hasło zostało zmienione.} one{Hasło zostało zmienione. Wylogowano 1 inne urządzenie.} few{Hasło zostało zmienione. Wylogowano {count} inne urządzenia.} many{Hasło zostało zmienione. Wylogowano {count} innych urządzeń.} other{Hasło zostało zmienione. Wylogowano {count} innego urządzenia.}}",
+  "@changePasswordOtherSessionsEnded": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "passwordRequired": "Wpisz hasło.",
+  "passwordTooShort": "Hasło musi mieć co najmniej 8 znaków.",
+  "passwordTooLong": "Hasło może mieć najwyżej 256 znaków.",
+  "passwordNeedsLowercase": "Hasło musi zawierać małą literę.",
+  "passwordNeedsUppercase": "Hasło musi zawierać wielką literę.",
+  "passwordNeedsDigit": "Hasło musi zawierać cyfrę.",
+  "passwordMismatch": "Hasła nie są takie same.",
+  "settingsTitle": "Ustawienia",
+  "settingsApplianceSection": "Urządzenie GI Home",
+  "settingsApplianceName": "Nazwa",
+  "settingsApplianceAddress": "Adres",
+  "settingsCleartext": "HTTP – połączenie nieszyfrowane w sieci lokalnej",
+  "settingsEncrypted": "HTTPS – połączenie szyfrowane",
+  "settingsLanOnly": "Dostęp tylko w sieci domowej",
+  "settingsAccountSection": "Konto",
+  "settingsUserName": "Użytkownik",
+  "settingsUserEmail": "E-mail",
+  "settingsUserRole": "Rola",
+  "settingsSessionValidUntil": "Sesja ważna do {date}",
+  "@settingsSessionValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "settingsLogout": "Wyloguj",
+  "settingsLogoutLocalOnly": "Wylogowano z telefonu. Sesja na urządzeniu wygaśnie w ciągu 30 dni lub możesz ją usunąć w panelu web GI Home (Profil → Sesje).",
+  "settingsSwitchUser": "Zmień użytkownika",
+  "settingsSwitchUserSubtitle": "Wyloguj się i zaloguj na inne konto",
+  "settingsSwitchUserConfirmTitle": "Zmienić użytkownika?",
+  "settingsSwitchUserConfirmBody": "Konto {email} zostanie wylogowane, a jego dane usunięte z tego telefonu. Potem zalogujesz się na inne konto.",
+  "@settingsSwitchUserConfirmBody": {
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "owner@gihome.test"
+      }
+    }
+  },
+  "settingsChangeAppliance": "Zmień urządzenie",
+  "settingsChangeApplianceConfirmTitle": "Zmienić urządzenie?",
+  "settingsChangeApplianceConfirmBody": "Spowoduje wylogowanie i usunięcie danych GI Home „{name}” z tego telefonu.",
+  "@settingsChangeApplianceConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "GI Home Dev"
+      }
+    }
+  },
+  "settingsChangeApplianceConfirmBodyNoLogout": "Dane GI Home „{name}” zostaną usunięte z tego telefonu. Teraz nie da się wylogować na urządzeniu, więc sesja pozostanie tam aktywna, dopóki nie wygaśnie (najpóźniej po 30 dniach).",
+  "@settingsChangeApplianceConfirmBodyNoLogout": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "GI Home Dev"
+      }
+    }
+  },
+  "settingsLicenses": "Licencje open source",
+  "settingsLicensesSubtitle": "Biblioteki i fonty użyte w aplikacji",
+  "settingsDiagnosticReport": "Wyślij raport diagnostyczny",
+  "settingsDiagnosticReportSubtitle": "Błędy i liczniki techniczne, bez danych logowania",
+  "diagnosticReportTitle": "Raport diagnostyczny",
+  "diagnosticReportIntro": "Raport to plik JSON, który sam wysyłasz wybraną aplikacją. Nic nie jest wysyłane automatycznie.",
+  "diagnosticReportContains": "Zawiera wersję aplikacji i systemu, język, liczniki (przyczyny wylogowań, błędy połączenia i odpowiedzi GI Home, czas uruchamiania) oraz ostatnie błędy aplikacji.",
+  "diagnosticReportExcludes": "Hasła, tokeny, ciasteczka, adresy e-mail, kody odzyskiwania i adresy IP są usuwane przed zapisem. Raport nie zawiera danych z Twoich urządzeń.",
+  "diagnosticReportShare": "Udostępnij",
+  "diagnosticReportSubject": "Raport diagnostyczny GI Home",
+  "diagnosticReportFailed": "Nie udało się przygotować raportu. Spróbuj ponownie.",
+  "settingsAppSection": "Aplikacja",
+  "settingsAppVersion": "Wersja aplikacji",
+  "settingsAppVersionValue": "{version} ({build})",
+  "@settingsAppVersionValue": {
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "0.1.0"
+      },
+      "build": {
+        "type": "String",
+        "example": "1"
+      }
+    }
+  },
+  "roleOwner": "Właściciel",
+  "roleAdmin": "Administrator",
+  "roleUser": "Domownik",
+  "roleService": "Serwis",
+  "roleUnknown": "Nieznana rola",
+  "homeTitle": "Dom",
+  "homeNoRoom": "Bez pokoju",
+  "homeEmptyTitle": "Brak urządzeń",
+  "homeEmptyBody": "Dodaj urządzenia w panelu web GI Home, a pojawią się tutaj.",
+  "homeConditionGood": "Wszystko w porządku",
+  "homeConditionNeedsAttention": "Wymaga uwagi",
+  "homeConditionActionRequired": "Wymaga działania",
+  "homeConditionLimitedData": "Ograniczone dane",
+  "homeDevicesSection": "Urządzenia",
+  "staleDataBanner": "Dane mogą być nieaktualne (ostatnia aktualizacja {time})",
+  "@staleDataBanner": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "lastSeen": "Ostatnio widziane {time}",
+  "@lastSeen": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "lastSeenNever": "Jeszcze nie połączone",
+  "faultsCount": "{count, plural, =0{Brak usterek} one{1 usterka} few{{count} usterki} many{{count} usterek} other{{count} usterki}}",
+  "@faultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "badgeHeatingSuspended": "Ogrzewanie wstrzymane",
+  "badgeDryRun": "Tryb testowy",
+  "dryRunBanner": "Tryb testowy: przekaźniki nie przełączają się fizycznie",
+  "heatingSuspendedBanner": "Ogrzewanie jest wstrzymane.",
+  "connectivityLostLocalControl": "Brak łączności – lokalne sterowanie działa nadal",
+  "productStatusOnline": "Działa",
+  "productStatusOffline": "Offline",
+  "productStatusConnecting": "Łączenie…",
+  "productStatusNeedsConfiguration": "Wymaga konfiguracji",
+  "productStatusError": "Błąd",
+  "productStatusUnknown": "Nieznany stan",
+  "connectivityOnline": "Połączone",
+  "connectivityStale": "Brak świeżych danych",
+  "connectivityOffline": "Brak łączności",
+  "connectivityProvisioning": "Konfigurowanie",
+  "connectivityError": "Błąd połączenia",
+  "connectivityUnknown": "Nieznany stan łączności",
+  "deviceDetailsTitle": "Szczegóły urządzenia",
+  "deviceNotFound": "Urządzenie zostało usunięte lub zmienione.",
+  "deviceEntitiesSection": "Elementy",
+  "deviceEntitiesEmpty": "To urządzenie nie ma jeszcze elementów.",
+  "deviceDiagnosticsSection": "Diagnostyka",
+  "deviceControllerState": "Stan sterownika",
+  "deviceValueFromList": "Z listy urządzeń · {time}",
+  "@deviceValueFromList": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "entityValueOn": "Wł.",
+  "entityValueOff": "Wył.",
+  "entityUnavailable": "Niedostępny",
+  "entityDisabled": "Wyłączony",
+  "entityDomainSensor": "Czujnik",
+  "entityDomainSwitch": "Przełącznik",
+  "entityDomainBinarySensor": "Czujnik dwustanowy",
+  "entityDomainNumber": "Wartość liczbowa",
+  "entityDomainSelect": "Wybór",
+  "entityDomainClimate": "Termostat",
+  "entityDomainTextSensor": "Czujnik tekstowy",
+  "entityDomainButton": "Przycisk",
+  "entityDomainUnknown": "Inny element",
+  "timeJustNow": "przed chwilą",
+  "timeMinutesAgo": "{minutes} min temu",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "timeHoursAgo": "{hours} godz. temu",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "commonYes": "Tak",
+  "commonNo": "Nie",
+  "homeConditionGoodBody": "Wszystkie urządzenia działają prawidłowo.",
+  "homeConditionUpdated": "Aktualizacja: {time}",
+  "@homeConditionUpdated": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "homeLimitedRefreshFailed": "Nie udało się pobrać aktualnych danych.",
+  "homeLimitedOutdated": "Dane są starsze niż 2 minuty.",
+  "homeLimitedNoDevices": "GI Home nie ma jeszcze włączonych urządzeń.",
+  "homeAttentionSection": "Wymaga sprawdzenia",
+  "homeAttentionMore": "{count, plural, one{i 1 inna sprawa} few{i {count} inne sprawy} many{i {count} innych spraw} other{i {count} innej sprawy}}",
+  "@homeAttentionMore": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "attentionFirmwareFault": "Sterownik zgłasza awarię",
+  "attentionConnectivityError": "Błąd połączenia z urządzeniem",
+  "attentionHeatingFaults": "{count, plural, one{1 usterka ogrzewania} few{{count} usterki ogrzewania} many{{count} usterek ogrzewania} other{{count} usterki ogrzewania}}",
+  "@attentionHeatingFaults": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "attentionStale": "Brak świeżych danych z urządzenia",
+  "attentionNoData": "Urządzenie nie przesłało jeszcze danych",
+  "homeHeatingDevice": "Urządzenie grzewcze",
+  "homeDeviceDisabled": "Wyłączone w panelu",
+  "offlineBannerSince": "Brak połączenia z GI Home · dane z {time}",
+  "@offlineBannerSince": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "refreshFailedBanner": "Nie udało się odświeżyć · dane z {time}",
+  "@refreshFailedBanner": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "roomsUnavailableBanner": "Nie udało się pobrać pokoi – urządzenia pokazujemy razem.",
+  "deviceInfoSection": "Informacje",
+  "deviceStatusSection": "Stan",
+  "deviceConnectivity": "Łączność",
+  "deviceProductStatus": "Stan urządzenia",
+  "deviceManufacturer": "Producent",
+  "deviceModel": "Model",
+  "deviceFirmware": "Wersja oprogramowania",
+  "deviceRoom": "Pokój",
+  "deviceFaults": "Aktywne usterki",
+  "deviceNeedsAttention": "Wymaga uwagi – sprawdź urządzenie w panelu web.",
+  "deviceValueFromDiagnostics": "Z diagnostyki urządzenia · {time}",
+  "@deviceValueFromDiagnostics": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "deviceFlagsSection": "Tryby pracy",
+  "deviceFlagHeatingSuspended": "Ogrzewanie wstrzymane",
+  "deviceFlagDryRun": "Tryb testowy (bez przełączania przekaźników)",
+  "deviceFlagPvBoost": "Dogrzewanie z nadwyżki PV",
+  "deviceDisabledBanner": "To urządzenie jest wyłączone w panelu GI Home.",
+  "deviceDiagnosticsEmpty": "Urządzenie nie przesłało jeszcze diagnostyki.",
+  "deviceDiagUptime": "Czas pracy od uruchomienia",
+  "deviceDiagWifiRssi": "Sygnał Wi-Fi",
+  "deviceDiagBootCount": "Liczba uruchomień",
+  "deviceDiagRebootLoop": "Wykryto pętlę restartów",
+  "deviceDiagSafetyInterlock": "Blokada bezpieczeństwa aktywna",
+  "deviceDiagActiveFaults": "Usterki w diagnostyce",
+  "signalDbm": "{value} dBm",
+  "@signalDbm": {
+    "placeholders": {
+      "value": {
+        "type": "int",
+        "example": "-60"
+      }
+    }
+  },
+  "durationDaysHours": "{days} d {hours} godz.",
+  "@durationDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "1"
+      },
+      "hours": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours} godz. {minutes} min",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int",
+        "example": "2"
+      },
+      "minutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "entityRoleHeatingRelay": "Przekaźnik kotła",
+  "entityRolePumpRelay": "Przekaźnik pompy",
+  "entityRoleControlTemperature": "Temperatura sterująca",
+  "firmwareStateBoot": "Uruchamianie",
+  "firmwareStateSelfTest": "Autotest",
+  "firmwareStateReady": "Gotowy",
+  "firmwareStateIdle": "Czuwanie",
+  "firmwareStateHeatingRequested": "Żądanie grzania",
+  "firmwareStateHeatingVerifying": "Weryfikacja grzania",
+  "firmwareStateHeating": "Grzanie",
+  "firmwareStateStopping": "Zatrzymywanie",
+  "firmwareStateFault": "Awaria",
+  "firmwareStateSafeMode": "Tryb awaryjny",
+  "firmwareStateUnknown": "Nieznany stan",
+  "heatingCardSubtitle": "Urządzenie grzewcze · {room}",
+  "@heatingCardSubtitle": {
+    "placeholders": {
+      "room": {
+        "type": "String",
+        "example": "Kotłownia"
+      }
+    }
+  },
+  "heatingCardBoiler": "Kocioł",
+  "heatingCardBoilerOn": "Grzeje",
+  "heatingCardBoilerOff": "Nie grzeje",
+  "heatingCardPump": "Pompa",
+  "heatingCardPumpOn": "Pracuje",
+  "heatingCardPumpOff": "Zatrzymana",
+  "heatingCardRelayNote": "Stan przekaźników według polecenia sterownika",
+  "heatingCardControllerUnknown": "Sterownik: brak danych",
+  "heatingCardLoading": "Pobieranie szczegółów…",
+  "heatingCardDataFrom": "Dane z {time}",
+  "@heatingCardDataFrom": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "heatingCardFailedSince": "Nie udało się pobrać szczegółów · dane z {time}",
+  "@heatingCardFailedSince": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "heatingCardFailed": "Nie udało się pobrać szczegółów ogrzewania",
+  "attentionNeedsConfiguration": "Wymaga konfiguracji w panelu web GI Home",
+  "homeLimitedHeatingDetailsFailed": "Nie udało się pobrać szczegółów ogrzewania.",
+  "experimentalTitle": "Funkcje eksperymentalne",
+  "experimentalIntro": "Dla testerów. Zmienione flagi zostają na tym telefonie, dopóki nie przywrócisz wartości domyślnych.",
+  "experimentalFlagsSection": "Flagi funkcji",
+  "experimentalConfigSection": "Konfiguracja",
+  "experimentalFlavor": "Wariant aplikacji",
+  "experimentalNoDefines": "Zbudowano bez pliku konfiguracji: wszystkie flagi są domyślnie wyłączone.",
+  "experimentalReset": "Przywróć domyślne",
+  "experimentalResetDone": "Przywrócono domyślne wartości flag.",
+  "experimentalChanged": "Zmieniono na tym telefonie",
+  "experimentalDevOnly": "Dostępne tylko w wariancie dev",
+  "flagMockCoreTitle": "Atrapa GI Core",
+  "flagMockCoreDescription": "Aplikacja rozmawia z wbudowaną atrapą zamiast z GI Core w sieci. Przełączenie tworzy połączenie od nowa.",
+  "flagScheduleClockConversionTitle": "Przeliczanie godzin harmonogramów",
+  "flagScheduleClockConversionDescription": "Godziny harmonogramów można edytować w czasie domu; aplikacja przelicza je na zegar GI Core.",
+  "flagSwitchControlByIntegrationTitle": "Sterowanie przełącznikami według integracji",
+  "flagSwitchControlByIntegrationDescription": "Przełącznikami można sterować zależnie od typu integracji urządzenia.",
+  "flagAndroidLocalNetworkPermissionRequestTitle": "Prośba o dostęp do sieci lokalnej (Android)",
+  "flagAndroidLocalNetworkPermissionRequestDescription": "Przed połączeniem aplikacja prosi o uprawnienie do urządzeń w pobliżu (ochrona sieci lokalnej).",
+  "permissionDeniedTitle": "Brak dostępu",
+  "@permissionDeniedTitle": {
+    "description": "PermissionState: GI Core answered HTTP 403 for data the screen shows (plan §7.5)."
+  },
+  "permissionDeniedBody": "Twoja rola w GI Home nie pozwala oglądać tych danych. Jeśli to pomyłka, poproś właściciela lub administratora o zmianę roli.",
+  "freshnessUpdated": "Zaktualizowano {time}",
+  "@freshnessUpdated": {
+    "description": "Screen-reader label of a FreshnessLabel; time is a relative time such as '2 min temu'.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2 min temu"
+      }
+    }
+  },
+  "freshnessUpdatedStale": "Zaktualizowano {time}, dane mogą być nieaktualne",
+  "@freshnessUpdatedStale": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2 min temu"
+      }
+    }
+  },
+  "staleAppTitle": "Zaktualizuj aplikację",
+  "@staleAppTitle": {
+    "description": "Non-blocking banner shown when GI Core keeps sending responses this app version cannot read (plan §16 point 4)."
+  },
+  "staleAppBody": "Ta wersja aplikacji nie rozumie części odpowiedzi GI Home. Zainstaluj najnowszą wersję.",
+  "staleAppOpenStore": "Otwórz sklep",
+  "staleAppDismiss": "Ukryj komunikat"
+}

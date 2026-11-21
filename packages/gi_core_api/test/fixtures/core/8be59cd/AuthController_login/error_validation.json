@@ -1,0 +1,13 @@
+{
+  "statusCode": 400,
+  "code": "VALIDATION_FAILED",
+  "message": "Validation failed.",
+  "path": "/api/v1/auth/login",
+  "requestId": "06cd7988-6207-445e-9008-d9fe67b45dcc",
+  "timestamp": "2026-11-17T22:06:20.801Z",
+  "details": {
+    "extra": [
+      "property extra should not exist"
+    ]
+  }
+}

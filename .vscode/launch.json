@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "GI Home (dev)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main_dev.dart",
+      "args": ["--flavor", "dev", "--dart-define-from-file=config/dev.json"]
+    },
+    {
+      "name": "GI Home (beta)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main_beta.dart",
+      "args": ["--flavor", "beta", "--dart-define-from-file=config/beta.json"]
+    },
+    {
+      "name": "GI Home (prod)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "app",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "prod", "--dart-define-from-file=config/prod.json"]
+    }
+  ]
+}

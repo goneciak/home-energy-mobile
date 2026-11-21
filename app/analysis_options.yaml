@@ -1,0 +1,36 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/l10n/app_localizations*.dart"
+    - "build/**"
+    - "android/**"
+    - "ios/**"
+  language:
+    strict-casts: true
+    strict-raw-types: true
+  errors:
+    invalid_annotation_target: ignore
+
+# Analysis server plugin (riverpod_lint README). The analyzer resolves it on
+# its own, outside pubspec.lock: keep this exact version on the release that
+# depends on the riverpod in pubspec.lock (riverpod_lint 3.2.0 -> riverpod
+# 3.5.0) and bump the two together; test/tooling/sdk_pins_test.dart checks it.
+plugins:
+  riverpod_lint: 3.2.0
+
+linter:
+  rules:
+    # Internal, unpublished code: public members are documented where the
+    # contract is not obvious, not as a rule.
+    public_member_api_docs: false
+    always_declare_return_types: true
+    avoid_print: true
+    directives_ordering: true
+    prefer_const_constructors: true
+    prefer_final_locals: true
+    prefer_single_quotes: true
+    unawaited_futures: true
+    unnecessary_lambdas: true

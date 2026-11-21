@@ -1,0 +1,6 @@
+tags:
+  golden:
+    # Golden tests (alchemist, plan §17.1): `flutter test --tags golden`.
+    # Update the committed CI goldens with
+    # `flutter test --update-goldens --tags golden`.
+    timeout: 2x

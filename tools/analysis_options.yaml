@@ -1,0 +1,6 @@
+include: ../packages/gi_core_api/analysis_options.yaml
+
+linter:
+  rules:
+    # Command-line tools report on stdout/stderr.
+    avoid_print: false

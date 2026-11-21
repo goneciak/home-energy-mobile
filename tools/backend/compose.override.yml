@@ -1,0 +1,24 @@
+# Local override for running the UNMODIFIED GI Core backend (C:\home-energy-poc)
+# in Docker for mobile development. The backend repo itself is never edited.
+#
+# Why this file exists:
+#  - GI Core connects to MQTT at a hardcoded mqtt://127.0.0.1:1883 (apps/gi-core/src/main.ts).
+#    Inside its own container nothing listens there, so startup hangs before HTTP starts.
+#    Sharing mosquitto's network namespace makes 127.0.0.1:1883 reach the broker.
+#  - The dev compose bind-mounts the source over /app, hiding the Prisma client generated
+#    in the image, so we generate it at container start.
+#
+# Usage (from C:\home-energy-poc):
+#   docker compose -f infrastructure/compose.yml -f ../home-energy-mobile/tools/backend/compose.override.yml up -d postgres mosquitto gi-core
+# Expose to a physical phone on the LAN: set GI_CORE_BIND_ADDRESS=0.0.0.0 before the command.
+
+services:
+  mosquitto:
+    ports:
+      - "${GI_CORE_BIND_ADDRESS:-127.0.0.1}:${GI_CORE_PORT:-3000}:3000"
+
+  gi-core:
+    network_mode: "service:mosquitto"
+    ports: !reset []
+    networks: !reset []
+    command: sh -c "npm ci && npx prisma generate && npx prisma migrate deploy && npm run start:dev"
