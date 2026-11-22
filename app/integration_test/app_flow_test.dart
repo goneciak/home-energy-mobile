@@ -151,6 +151,13 @@ void main() {
         matching: anyLanguageText((l) => l.navSettings),
       ),
     );
+    // The settings list is lazy and longer on small screens: build the
+    // logout row before looking for it.
+    await tester.scrollUntilVisible(
+      anyLanguageText((l) => l.settingsLogout),
+      300,
+      scrollable: find.byType(Scrollable).hitTestable().first,
+    );
     await tapWhenVisible(tester, anyLanguageText((l) => l.settingsLogout));
     await waitFor(tester, anyLanguageText((l) => l.loginTitle));
     await waitFor(tester, find.byType(NavigationBar), gone: true);
