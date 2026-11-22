@@ -132,7 +132,7 @@ final class CoreCapabilitiesProvider
   }
 }
 
-String _$coreCapabilitiesHash() => r'906e062991f1eaac22b181c46203bae96c3543fd';
+String _$coreCapabilitiesHash() => r'0cedde751fe445e4f8fd188d822be4e2bb944557';
 
 /// Whether the UI shows [capability] (see [coreCapabilities]).
 
