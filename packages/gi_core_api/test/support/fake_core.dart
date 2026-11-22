@@ -235,6 +235,7 @@ GiCoreClient testClient(
   DecodeMode decodeMode = DecodeMode.tolerant,
   ApplianceAddress? address,
   HttpClientAdapter? adapter,
+  EtagCache? etagCache,
 }) => GiCoreClient.create(
   address: address ?? testAddress,
   vault: vault ?? InMemoryTokenVault(),
@@ -252,4 +253,6 @@ GiCoreClient testClient(
   requestLimiter: requestLimiter,
   localNetworkDenied: localNetworkDenied,
   decodeMode: decodeMode,
+  etagCache: etagCache,
+  etagScope: 'profile-1',
 );

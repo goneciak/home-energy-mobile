@@ -127,10 +127,14 @@ class SettingsScreen extends ConsumerWidget {
           ],
           if (user != null) ...[
             SectionHeader(l10n.settingsAccountSection),
+            // The way to "Profil i bezpieczeństwo" (plan §20 M3.5).
             ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: Text(l10n.settingsUserName),
+              key: const ValueKey('settings-account'),
+              leading: const Icon(Icons.manage_accounts_outlined),
+              title: Text(l10n.settingsAccountManage),
               subtitle: Text([user.firstName, ?user.lastName].join(' ')),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => unawaited(context.push(AppRoutes.account)),
             ),
             ListTile(
               leading: const Icon(Icons.alternate_email),

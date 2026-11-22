@@ -5,6 +5,7 @@ import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/app/router/route_guard.dart';
 import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
+import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/centered_form.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
@@ -12,11 +13,16 @@ import 'package:gi_home/src/core/widgets/open_app_settings_button.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/appliance/presentation/change_appliance_dialog.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
+import 'package:gi_home/src/features/devices/application/device_snapshot.dart';
+import 'package:gi_home/src/features/devices/presentation/offline_snapshot_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Shown while the stored session is restored on start, and when restoring
 /// failed without ending the session (the cookie is kept for a retry).
+///
+/// When GI Home cannot be reached, the persistent snapshot of the last
+/// signed-in user is shown below, read-only and with its age (plan §8.3).
 class SessionRestoreScreen extends ConsumerWidget {
   const new({super.key});
 
@@ -27,6 +33,13 @@ class SessionRestoreScreen extends ConsumerWidget {
     final auth = ref.watch(authSessionProvider);
     final error = auth.isLoading ? null : auth.error;
     final vaultUnavailable = error is VaultUnavailableFailure;
+    final unreachable =
+        error is UnreachableFailure ||
+        error is TimeoutFailure ||
+        error is LocalNetworkDeniedFailure;
+    final snapshot = unreachable
+        ? ref.watch(offlineSnapshotProvider).value
+        : null;
 
     // The stored session may still be valid; removing it here cannot log
     // out on the appliance, so it is confirmed first.
@@ -96,6 +109,13 @@ class SessionRestoreScreen extends ConsumerWidget {
                   onPressed: changeAppliance,
                   child: Text(l10n.actionChangeAppliance),
                 ),
+                if (snapshot != null) ...[
+                  SizedBox(height: tokens.gap * 1.5),
+                  OfflineSnapshotView(
+                    snapshot: snapshot,
+                    now: ref.watch(clockProvider)(),
+                  ),
+                ],
               ],
       ),
     );

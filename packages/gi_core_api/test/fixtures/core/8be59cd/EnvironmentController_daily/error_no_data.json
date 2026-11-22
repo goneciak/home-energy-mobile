@@ -1,0 +1,8 @@
+{
+  "statusCode": 503,
+  "code": "HTTP_503",
+  "message": "Weather data is not available yet.",
+  "path": "/api/v1/weather/daily",
+  "requestId": "916190cd-dd94-4e86-ac71-7f2da6c4fede",
+  "timestamp": "2026-11-22T03:51:55.988Z"
+}

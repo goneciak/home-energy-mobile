@@ -98,10 +98,94 @@ final Map<String, ClientDecoder> clientDecoders = {
     (json) => ControlStrategyUpdateResult.fromJson(_object(json)),
     (value) => (value! as ControlStrategyUpdateResult).toJson(),
   ),
+  GiEndpoints.schedulesList.id: ClientDecoder(
+    (json) => [
+      for (final row in json! as List) HeatingSchedule.fromJson(_object(row)),
+    ],
+    (value) => [
+      for (final row in value! as List<HeatingSchedule>) row.toJson(),
+    ],
+  ),
+  GiEndpoints.scheduleCreate.id: _schedule,
+  GiEndpoints.scheduleUpdate.id: _schedule,
+  GiEndpoints.weatherCurrent.id: ClientDecoder(
+    (json) => WeatherEnvelope.fromJson(
+      _object(json),
+      (data) => CurrentWeather.fromJson(_object(data)),
+    ),
+    (value) => (value! as WeatherEnvelope<CurrentWeather>).toJson(
+      (data) => data.toJson(),
+    ),
+  ),
+  GiEndpoints.weatherHourly.id: ClientDecoder(
+    (json) => WeatherEnvelope.fromJson(
+      _object(json),
+      (data) => [
+        for (final row in data! as List) HourlyWeather.fromJson(_object(row)),
+      ],
+    ),
+    (value) => (value! as WeatherEnvelope<List<HourlyWeather>>).toJson(
+      (rows) => [for (final row in rows) row.toJson()],
+    ),
+  ),
+  GiEndpoints.weatherDaily.id: ClientDecoder(
+    (json) => WeatherEnvelope.fromJson(
+      _object(json),
+      (data) => [
+        for (final row in data! as List) DailyWeather.fromJson(_object(row)),
+      ],
+    ),
+    (value) => (value! as WeatherEnvelope<List<DailyWeather>>).toJson(
+      (rows) => [for (final row in rows) row.toJson()],
+    ),
+  ),
+  GiEndpoints.solarCurrent.id: ClientDecoder(
+    (json) => SolarStatus.fromJson(_object(json)),
+    (value) => (value! as SolarStatus).toJson(),
+  ),
+  GiEndpoints.pvForecast.id: ClientDecoder(
+    (json) => PvForecast.fromJson(_object(json)),
+    (value) => (value! as PvForecast).toJson(),
+  ),
+  GiEndpoints.pvHeatingPlan.id: ClientDecoder(
+    (json) => PvHeatingPlan.fromJson(_object(json)),
+    (value) => (value! as PvHeatingPlan).toJson(),
+  ),
+  GiEndpoints.entityHistory.id: ClientDecoder(
+    (json) => EntityHistory.fromJson(_object(json)),
+    (value) => (value! as EntityHistory).toJson(),
+  ),
+  GiEndpoints.authSessionsList.id: ClientDecoder(
+    (json) => [
+      for (final row in json! as List) AuthSessionInfo.fromJson(_object(row)),
+    ],
+    (value) => [
+      for (final row in value! as List<AuthSessionInfo>) row.toJson(),
+    ],
+  ),
+  GiEndpoints.authRecoveryRegenerate.id: ClientDecoder(
+    (json) => RecoveryCodeResult.fromJson(_object(json)),
+    (value) => (value! as RecoveryCodeResult).toJson(),
+  ),
+  GiEndpoints.usersMeProfileUpdate.id: ClientDecoder(
+    (json) => UserProfile.fromJson(_object(json)),
+    (value) => (value! as UserProfile).toJson(),
+  ),
 };
 
+final _schedule = ClientDecoder(
+  (json) => HeatingSchedule.fromJson(_object(json)),
+  (value) => (value! as HeatingSchedule).toJson(),
+);
+
 /// Catalog entries whose response body the client ignores (204 or unread).
-final Set<String> bodylessEndpointIds = {GiEndpoints.authLogout.id};
+final Set<String> bodylessEndpointIds = {
+  GiEndpoints.authLogout.id,
+  GiEndpoints.scheduleRemove.id,
+  GiEndpoints.authSessionRevoke.id,
+  GiEndpoints.authLogoutAll.id,
+  GiEndpoints.authRecoveryReset.id,
+};
 
 /// Probes [decoder] with recorded [samples]: every field present in a sample
 /// the decoder accepts is "decoded" (unless the model drops it as unknown),

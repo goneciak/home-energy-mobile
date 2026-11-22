@@ -356,7 +356,8 @@ void main() {
     await wait(const Duration(seconds: 30));
     expect(runs() - before, 2);
 
-    await tester.tapAt(const Offset(200, 600));
+    // A touch on a section header, which navigates nowhere.
+    await tester.tap(find.text('Stan'));
     await wait(const Duration(seconds: 10));
     expect(runs() - before, 2 + 3, reason: 'at once, then every 5 s');
   });

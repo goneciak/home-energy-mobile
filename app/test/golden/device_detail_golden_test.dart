@@ -9,7 +9,9 @@ import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/devices/application/device_repositories.dart';
 import 'package:gi_home/src/features/devices/presentation/device_detail_screen.dart';
+import 'package:gi_home/src/features/environment/application/environment_providers.dart';
 
+import '../support/environment_fixtures.dart';
 import '../support/fake_device_source.dart';
 import '../support/fixtures.dart';
 import '../support/golden.dart';
@@ -57,6 +59,7 @@ void main() {
     },
     overrides: () => [
       deviceReadSourceProvider.overrideWithValue(source),
+      environmentSourceProvider.overrideWithValue(FakeEnvironmentSource()),
       currentUserProvider.overrideWithValue(null),
       appForegroundProvider.overrideWithValue(AppForeground()),
       clockProvider.overrideWithValue(() => clock),

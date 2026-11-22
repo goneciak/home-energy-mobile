@@ -3,11 +3,15 @@ import 'dart:io';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:test/test.dart';
 
+import 'contract/account_contract_test.dart' as account;
 import 'contract/appliance_fingerprint_contract_test.dart' as fingerprint;
 import 'contract/auth_flow_contract_test.dart' as auth_flow;
+import 'contract/capability_probe_contract_test.dart' as capability_probe;
 import 'contract/control_contract_test.dart' as control;
 import 'contract/core_quirks_contract_test.dart' as core_quirks;
 import 'contract/devices_contract_test.dart' as devices;
+import 'contract/environment_history_contract_test.dart' as environment_history;
+import 'contract/schedules_contract_test.dart' as schedules;
 import 'contract/session_rotation_contract_test.dart' as session_rotation;
 import 'contract/support/live_coverage.dart';
 import 'support/fixtures.dart';
@@ -15,11 +19,15 @@ import 'support/fixtures.dart';
 /// The `liveCoverage` list of every live contract test file. A new
 /// `test/contract/*_contract_test.dart` must declare one and be added here.
 final Map<String, List<Endpoint>> liveCoverageByFile = {
+  'account_contract_test.dart': account.liveCoverage,
   'appliance_fingerprint_contract_test.dart': fingerprint.liveCoverage,
   'auth_flow_contract_test.dart': auth_flow.liveCoverage,
+  'capability_probe_contract_test.dart': capability_probe.liveCoverage,
   'control_contract_test.dart': control.liveCoverage,
   'core_quirks_contract_test.dart': core_quirks.liveCoverage,
   'devices_contract_test.dart': devices.liveCoverage,
+  'environment_history_contract_test.dart': environment_history.liveCoverage,
+  'schedules_contract_test.dart': schedules.liveCoverage,
   'session_rotation_contract_test.dart': session_rotation.liveCoverage,
 };
 

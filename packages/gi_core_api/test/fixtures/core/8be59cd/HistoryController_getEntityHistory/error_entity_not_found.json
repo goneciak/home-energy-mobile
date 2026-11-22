@@ -1,0 +1,8 @@
+{
+  "statusCode": 404,
+  "code": "DEVICE_ENTITY_NOT_FOUND",
+  "message": "Entity was not found on this device.",
+  "path": "/api/v1/devices/4e574b55-4fe0-4e31-8d4f-52814e0b1e72/entities/no-such-entity/history",
+  "requestId": "a91953a1-5577-466a-a143-7ebd00cefa81",
+  "timestamp": "2026-11-22T03:51:55.956Z"
+}

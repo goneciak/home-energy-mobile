@@ -59,6 +59,10 @@ void main() {
 
   Future<void> tapWhenVisible(WidgetTester tester, Finder finder) async {
     await waitFor(tester, finder);
+    // A post-login snack bar (the sessions review offer) may cover the
+    // target; it is only an offer, so dismiss it.
+    ScaffoldMessenger.maybeOf(tester.element(finder.first))?.clearSnackBars();
+    await tester.pump(const Duration(milliseconds: 300));
     // Centred, not scrolled to the edge: a pinned app bar would cover it.
     await Scrollable.ensureVisible(
       tester.element(finder.first),

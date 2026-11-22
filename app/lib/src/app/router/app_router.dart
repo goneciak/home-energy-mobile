@@ -2,16 +2,26 @@ import 'package:flutter/foundation.dart';
 import 'package:gi_home/src/app/router/app_shell.dart';
 import 'package:gi_home/src/app/router/route_guard.dart';
 import 'package:gi_home/src/core/config/config_providers.dart';
+import 'package:gi_home/src/features/account/presentation/account_screen.dart';
+import 'package:gi_home/src/features/account/presentation/recovery_code_screen.dart';
+import 'package:gi_home/src/features/account/presentation/recovery_reset_screen.dart';
+import 'package:gi_home/src/features/account/presentation/sessions_screen.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/appliance/presentation/connect_screen.dart';
 import 'package:gi_home/src/features/appliance/presentation/setup_required_screen.dart';
+import 'package:gi_home/src/features/attention/presentation/attention_screen.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/auth/presentation/change_password_screen.dart';
 import 'package:gi_home/src/features/auth/presentation/login_screen.dart';
 import 'package:gi_home/src/features/auth/presentation/session_restore_screen.dart';
 import 'package:gi_home/src/features/devices/presentation/device_detail_screen.dart';
+import 'package:gi_home/src/features/environment/presentation/weather_screen.dart';
 import 'package:gi_home/src/features/experimental/presentation/experimental_features_screen.dart';
+import 'package:gi_home/src/features/history/domain/history_window.dart';
+import 'package:gi_home/src/features/history/presentation/history_screen.dart';
 import 'package:gi_home/src/features/home/presentation/home_screen.dart';
+import 'package:gi_home/src/features/schedules/presentation/schedule_editor_screen.dart';
+import 'package:gi_home/src/features/schedules/presentation/schedules_screen.dart';
 import 'package:gi_home/src/features/settings/presentation/settings_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -74,6 +84,10 @@ GoRouter goRouter(Ref ref) {
         path: AppRoutes.changePassword,
         builder: (context, state) => const ChangePasswordScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.recover,
+        builder: (context, state) => const RecoveryResetScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             AppShell(navigationShell: navigationShell),
@@ -85,12 +99,58 @@ GoRouter goRouter(Ref ref) {
                 builder: (context, state) => const HomeScreen(),
                 routes: [
                   GoRoute(
+                    path: 'weather',
+                    builder: (context, state) => const WeatherScreen(),
+                  ),
+                  GoRoute(
                     path: 'devices/:id',
                     builder: (context, state) => DeviceDetailScreen(
                       deviceId: state.pathParameters['id']!,
                     ),
+                    routes: [
+                      GoRoute(
+                        path: 'history/:entityId',
+                        builder: (context, state) => HistoryScreen(
+                          deviceId: state.pathParameters['id']!,
+                          entityId: state.pathParameters['entityId']!,
+                          initialWindow: HistoryWindow.parse(
+                            state.uri.queryParameters[AppRoutes
+                                .historyWindowParam],
+                          ),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'schedules',
+                        builder: (context, state) => SchedulesScreen(
+                          deviceId: state.pathParameters['id']!,
+                        ),
+                        routes: [
+                          GoRoute(
+                            path: 'new',
+                            builder: (context, state) => ScheduleEditorScreen(
+                              deviceId: state.pathParameters['id']!,
+                            ),
+                          ),
+                          GoRoute(
+                            path: ':scheduleId',
+                            builder: (context, state) => ScheduleEditorScreen(
+                              deviceId: state.pathParameters['id']!,
+                              scheduleId: state.pathParameters['scheduleId'],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.attention,
+                builder: (context, state) => const AttentionScreen(),
               ),
             ],
           ),
@@ -100,6 +160,25 @@ GoRouter goRouter(Ref ref) {
                 path: AppRoutes.settings,
                 builder: (context, state) => const SettingsScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'account',
+                    builder: (context, state) => const AccountScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'password',
+                        builder: (context, state) =>
+                            const ChangePasswordScreen(voluntary: true),
+                      ),
+                      GoRoute(
+                        path: 'sessions',
+                        builder: (context, state) => const SessionsScreen(),
+                      ),
+                      GoRoute(
+                        path: 'recovery-code',
+                        builder: (context, state) => const RecoveryCodeScreen(),
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: 'experimental',
                     // Prod has no experimental features, not even by link.

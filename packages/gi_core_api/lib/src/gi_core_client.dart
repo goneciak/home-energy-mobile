@@ -12,14 +12,19 @@ import 'package:gi_core_api/src/failures/failure_mapping.dart';
 import 'package:gi_core_api/src/failures/failure_observer.dart';
 import 'package:gi_core_api/src/http/client_info.dart';
 import 'package:gi_core_api/src/http/concurrency_limiter.dart';
+import 'package:gi_core_api/src/http/conditional_get.dart';
 import 'package:gi_core_api/src/http/dio_factory.dart';
 import 'package:gi_core_api/src/http/interceptors.dart';
 import 'package:gi_core_api/src/http/response_decoding.dart';
+import 'package:gi_core_api/src/models/account_models.dart';
 import 'package:gi_core_api/src/models/auth_models.dart';
 import 'package:gi_core_api/src/models/device_commands.dart';
 import 'package:gi_core_api/src/models/device_detail.dart';
 import 'package:gi_core_api/src/models/device_list_item.dart';
 import 'package:gi_core_api/src/models/enums.dart';
+import 'package:gi_core_api/src/models/environment_models.dart';
+import 'package:gi_core_api/src/models/heating_schedule.dart';
+import 'package:gi_core_api/src/models/history.dart';
 import 'package:gi_core_api/src/models/room.dart';
 import 'package:gi_core_api/src/models/system_models.dart';
 import 'package:gi_core_api/src/models/user_models.dart';
@@ -63,6 +68,12 @@ final class GiCoreClient {
   /// [DecodeMode.tolerant]; contract tests pass [DecodeMode.strict] or
   /// [DecodeMode.fromEnvironment].
   ///
+  /// With [etagCache], `GET /devices` and `GET /devices/:id` are sent as
+  /// conditional GETs (plan §6.5 pt 4, spike S4). Entries are keyed by
+  /// [etagScope] (e.g. the profile id) and the signed-in user, and the cache
+  /// is cleared whenever the session stops being authenticated (logout,
+  /// logout-all, revoked or expired session).
+  ///
   /// [httpClientAdapter], [clock], [now] and [retryBackoff] exist for tests.
   factory create({
     required ApplianceAddress address,
@@ -83,15 +94,21 @@ final class GiCoreClient {
     MonotonicClock? clock,
     DateTime Function()? now,
     RetryBackoff? retryBackoff,
+    EtagCache? etagCache,
+    String etagScope = '',
   }) {
     final limiter =
         requestLimiter ??
         ConcurrencyLimiter(ConcurrencyLimiter.perApplianceRequests);
-    Dio build({AuthInterceptor? auth}) => createCoreDio(
+    Dio build({
+      AuthInterceptor? auth,
+      ConditionalGetInterceptor? conditionalGet,
+    }) => createCoreDio(
       apiBaseUrl: address.apiBaseUrl,
       clientInfo: clientInfo,
       acceptLanguage: acceptLanguage,
       auth: auth,
+      conditionalGet: conditionalGet,
       log: log,
       httpClientAdapter: httpClientAdapter,
       limiter: limiter,
@@ -109,8 +126,22 @@ final class GiCoreClient {
       waitUntilForeground: waitUntilForeground,
       decodeMode: decodeMode,
     );
+    final conditionalGet = etagCache == null
+        ? null
+        : ConditionalGetInterceptor(
+            etagCache,
+            scope: () => switch (session.state) {
+              AuthAuthenticated(:final user) => '$etagScope/${user.id}',
+              _ => null,
+            },
+          );
+    if (etagCache != null) {
+      session.states.listen((state) {
+        if (state is! AuthAuthenticated) etagCache.clear();
+      });
+    }
     return GiCoreClient._(
-      build(auth: AuthInterceptor(session)),
+      build(auth: AuthInterceptor(session), conditionalGet: conditionalGet),
       sessionDio,
       session,
       limiter,
@@ -185,6 +216,108 @@ final class GiCoreClient {
         (result) => result.toJson(),
         data: request.toJson(),
       );
+
+  /// `PATCH /users/me/profile`: only the fields set in [update] are sent;
+  /// the session's user picks up the new names. An update that breaks the
+  /// DTO rules throws [ArgumentError] before anything is sent.
+  Future<UserProfile> updateProfile(ProfileUpdate update) async {
+    final problems = update.validate();
+    if (problems.isNotEmpty) {
+      throw ArgumentError.value(
+        problems.map((p) => p.name).join(', '),
+        'update',
+        'breaks the server rules',
+      );
+    }
+    final profile = await _call(
+      GiEndpoints.usersMeProfileUpdate,
+      (json) => UserProfile.fromJson(asJsonObject(json)),
+      (profile) => profile.toJson(),
+      data: update.toJson(),
+    );
+    if (session.state case AuthAuthenticated(:final user)
+        when user.id == profile.id) {
+      session.updateUser(
+        user.copyWith(
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          mustChangePassword: profile.mustChangePassword,
+        ),
+      );
+    }
+    return profile;
+  }
+
+  /// `GET /auth/sessions`: live sessions of the user, newest first.
+  Future<List<AuthSessionInfo>> authSessions() => _call(
+    GiEndpoints.authSessionsList,
+    (json) => [
+      for (final row in asJsonList(json))
+        AuthSessionInfo.fromJson(asJsonObject(row)),
+    ],
+    (rows) => [for (final row in rows) row.toJson()],
+  );
+
+  /// `DELETE /auth/sessions/:sessionId`: 204, idempotent. Pass [current]
+  /// when [sessionId] is this phone's session (`AuthSessionInfo.current`):
+  /// the server then revokes the access token at once, so the session ends
+  /// locally too. Never retried automatically.
+  Future<void> revokeSession(String sessionId, {bool current = false}) async {
+    await _call<void>(
+      GiEndpoints.authSessionRevoke,
+      (_) {},
+      (_) => null,
+      pathParams: {'sessionId': sessionId},
+      noContent: true,
+    );
+    if (current) await session.endLocally();
+  }
+
+  /// `POST /auth/logout-all`: 204; every session of the user is revoked,
+  /// this one included, so the session ends locally (callers also drop
+  /// per-user caches). On a failure nothing local changes. Never retried
+  /// automatically.
+  Future<void> logoutAll() async {
+    await _call<void>(
+      GiEndpoints.authLogoutAll,
+      (_) {},
+      (_) => null,
+      noContent: true,
+    );
+    await session.endLocally();
+  }
+
+  /// `POST /auth/recovery/regenerate`: a new recovery code, shown once; the
+  /// previous one stops working. Sessions are not affected. Never logged.
+  Future<RecoveryCodeResult> regenerateRecoveryCode() => _call(
+    GiEndpoints.authRecoveryRegenerate,
+    (json) => RecoveryCodeResult.fromJson(asJsonObject(json)),
+    (result) => result.toJson(),
+  );
+
+  /// `POST /auth/recovery/reset` (public): 204. Every session of the user is
+  /// revoked; the recovery code stays valid, so callers should push a
+  /// regeneration after the next login. 400 `AUTH_RECOVERY_INVALID` for a
+  /// wrong e-mail or code, [RateLimitedFailure] after 5 requests in 15
+  /// minutes. A request that breaks the DTO rules throws [ArgumentError]
+  /// before anything is sent.
+  Future<void> resetPasswordWithRecoveryCode(RecoveryResetRequest request) {
+    final problems = request.validate();
+    if (problems.isNotEmpty) {
+      throw ArgumentError.value(
+        problems.map((p) => p.name).join(', '),
+        'request',
+        'breaks the server rules',
+      );
+    }
+    return _call<void>(
+      GiEndpoints.authRecoveryReset,
+      (_) {},
+      (_) => null,
+      data: request.toJson(),
+      noContent: true,
+    );
+  }
 
   Future<List<Room>> rooms() => _call(
     GiEndpoints.roomsList,
@@ -298,6 +431,224 @@ final class GiCoreClient {
     );
   }
 
+  /// `GET /devices/:deviceId/schedules`, oldest first.
+  Future<List<HeatingSchedule>> schedules(String deviceId) => _call(
+    GiEndpoints.schedulesList,
+    (json) => [
+      for (final row in asJsonList(json))
+        HeatingSchedule.fromJson(asJsonObject(row)),
+    ],
+    (rows) => [for (final row in rows) row.toJson()],
+    pathParams: {'id': deviceId},
+  );
+
+  /// `POST /devices/:deviceId/schedules` (OWNER, ADMIN): 201 with the row.
+  /// The server reconciles the effective strategy right away. An input that
+  /// breaks the DTO rules throws [ArgumentError] before anything is sent.
+  /// Never retried automatically.
+  Future<HeatingSchedule> createSchedule(
+    String deviceId,
+    HeatingScheduleInput input,
+  ) {
+    _checkSchedule(input.validate());
+    return _call(
+      GiEndpoints.scheduleCreate,
+      (json) => HeatingSchedule.fromJson(asJsonObject(json)),
+      (row) => row.toJson(),
+      pathParams: {'id': deviceId},
+      data: input.toJson(),
+    );
+  }
+
+  /// `PATCH /devices/:deviceId/schedules/:scheduleId` (OWNER, ADMIN): only
+  /// the fields set in [patch] are sent. Never retried automatically.
+  Future<HeatingSchedule> updateSchedule(
+    String deviceId,
+    String scheduleId,
+    HeatingSchedulePatch patch,
+  ) {
+    _checkSchedule(patch.validate());
+    return _call(
+      GiEndpoints.scheduleUpdate,
+      (json) => HeatingSchedule.fromJson(asJsonObject(json)),
+      (row) => row.toJson(),
+      pathParams: {'id': deviceId, 'scheduleId': scheduleId},
+      data: patch.toJson(),
+    );
+  }
+
+  /// `DELETE /devices/:deviceId/schedules/:scheduleId` (OWNER, ADMIN): 204.
+  /// Never retried automatically.
+  Future<void> deleteSchedule(String deviceId, String scheduleId) =>
+      _call<void>(
+        GiEndpoints.scheduleRemove,
+        (_) {},
+        (_) => null,
+        pathParams: {'id': deviceId, 'scheduleId': scheduleId},
+        noContent: true,
+      );
+
+  static void _checkSchedule(Set<ScheduleInputProblem> problems) {
+    if (problems.isNotEmpty) {
+      throw ArgumentError.value(
+        problems.map((p) => p.name).join(', '),
+        'schedule',
+        'breaks the server rules',
+      );
+    }
+  }
+
+  /// `GET /weather/current`; 503 → [EnvironmentNoData].
+  Future<EnvironmentResult<WeatherEnvelope<CurrentWeather>>> weatherCurrent() =>
+      _weather(
+        GiEndpoints.weatherCurrent,
+        (json) => CurrentWeather.fromJson(asJsonObject(json)),
+        (data) => data.toJson(),
+      );
+
+  /// `GET /weather/hourly`; 503 → [EnvironmentNoData].
+  Future<EnvironmentResult<WeatherEnvelope<List<HourlyWeather>>>>
+  weatherHourly() => _weather(
+    GiEndpoints.weatherHourly,
+    (json) => [
+      for (final row in asJsonList(json))
+        HourlyWeather.fromJson(asJsonObject(row)),
+    ],
+    (rows) => [for (final row in rows) row.toJson()],
+  );
+
+  /// `GET /weather/daily`; 503 → [EnvironmentNoData].
+  Future<EnvironmentResult<WeatherEnvelope<List<DailyWeather>>>>
+  weatherDaily() => _weather(
+    GiEndpoints.weatherDaily,
+    (json) => [
+      for (final row in asJsonList(json))
+        DailyWeather.fromJson(asJsonObject(row)),
+    ],
+    (rows) => [for (final row in rows) row.toJson()],
+  );
+
+  Future<EnvironmentResult<WeatherEnvelope<T>>> _weather<T>(
+    Endpoint endpoint,
+    T Function(Object? json) decodeData,
+    Object? Function(T data) encodeData,
+  ) => _environment(
+    _call(
+      endpoint,
+      (json) => WeatherEnvelope.fromJson(asJsonObject(json), decodeData),
+      (envelope) => envelope.toJson(encodeData),
+    ),
+  );
+
+  /// `GET /solar/current`; 400 (no house coordinates) →
+  /// [EnvironmentNotConfigured].
+  Future<EnvironmentResult<SolarStatus>> solarCurrent() => _environment(
+    _call(
+      GiEndpoints.solarCurrent,
+      (json) => SolarStatus.fromJson(asJsonObject(json)),
+      (solar) => solar.toJson(),
+    ),
+  );
+
+  /// `GET /pv/forecast`; 400 (no coordinates or no PV) →
+  /// [EnvironmentNotConfigured], 500 (Open-Meteo failed) →
+  /// [EnvironmentNoData].
+  Future<EnvironmentResult<PvForecast>> pvForecast() => _environment(
+    _call(
+      GiEndpoints.pvForecast,
+      (json) => PvForecast.fromJson(asJsonObject(json)),
+      (forecast) => forecast.toJson(),
+    ),
+  );
+
+  /// Maps the "nothing to show" answers of the environment endpoints (400
+  /// `HTTP_400`, 500, 503); every other failure is rethrown.
+  static Future<EnvironmentResult<T>> _environment<T>(Future<T> call) async {
+    try {
+      return EnvironmentAvailable(await call);
+    } on ApiFailure catch (failure) {
+      return switch (failure) {
+        DomainFailure(statusCode: 400, code: 'HTTP_400') =>
+          EnvironmentNotConfigured<T>(),
+        ServerFailure(statusCode: 500 || 503) => EnvironmentNoData<T>(),
+        _ => throw failure,
+      };
+    }
+  }
+
+  /// `GET /devices/:id/pv-heating-plan`.
+  Future<PvHeatingPlan> pvHeatingPlan(String deviceId) => _call(
+    GiEndpoints.pvHeatingPlan,
+    (json) => PvHeatingPlan.fromJson(asJsonObject(json)),
+    (plan) => plan.toJson(),
+    pathParams: {'id': deviceId},
+  );
+
+  /// One request of `GET /devices/:deviceId/entities/:entityId/history`.
+  /// [from]/[to] are sent as ISO UTC; omitted, the server uses the last
+  /// 24 h. [limit] must be within 1–5000 ([RangeError] before sending
+  /// otherwise). A full page holds the OLDEST samples of the range; use
+  /// [entityHistoryAll] to read a whole range.
+  Future<EntityHistory> entityHistory(
+    String deviceId,
+    String entityId, {
+    DateTime? from,
+    DateTime? to,
+    int limit = HistoryPaging.defaultLimit,
+  }) {
+    RangeError.checkValueInInterval(
+      limit,
+      HistoryPaging.minLimit,
+      HistoryPaging.maxLimit,
+      'limit',
+    );
+    return _call(
+      GiEndpoints.entityHistory,
+      (json) => EntityHistory.fromJson(asJsonObject(json)),
+      (history) => history.toJson(),
+      pathParams: {'id': deviceId, 'entityId': entityId},
+      query: {
+        if (from != null) 'from': from.toUtc().toIso8601String(),
+        if (to != null) 'to': to.toUtc().toIso8601String(),
+        'limit': limit,
+      },
+    );
+  }
+
+  /// Reads every sample of [from]–[to] page by page (the next `from` is the
+  /// last sample's instant; the repeated boundary sample is dropped), with
+  /// at most [maxPages] requests. `complete` is false when [maxPages] ran
+  /// out first or a full page could not advance (a burst of at least
+  /// [pageLimit] samples at one instant).
+  Future<({List<HistorySample> samples, bool complete})> entityHistoryAll(
+    String deviceId,
+    String entityId, {
+    required DateTime from,
+    required DateTime to,
+    int pageLimit = HistoryPaging.maxLimit,
+    int maxPages = 10,
+  }) async {
+    final pages = <EntityHistory>[];
+    DateTime? next = from;
+    var stuck = false;
+    while (next != null && pages.length < maxPages) {
+      final page = await entityHistory(
+        deviceId,
+        entityId,
+        from: next,
+        to: to,
+        limit: pageLimit,
+      );
+      pages.add(page);
+      next = HistoryPaging.nextFrom(page, pageLimit);
+      stuck = HistoryPaging.isStuck(page, pageLimit);
+    }
+    return (
+      samples: HistoryPaging.mergePages(pages),
+      complete: next == null && !stuck,
+    );
+  }
+
   static void _checkRange(double value, int min, int max, String name) {
     if (!value.isFinite || value < min || value > max) {
       throw RangeError.range(value, min, max, name);
@@ -320,9 +671,10 @@ final class GiCoreClient {
     Map<String, String> pathParams = const {},
     Map<String, Object?>? query,
     Object? data,
+    bool noContent = false,
   }) => observeFailures(
     _onFailure,
-    () => _send(endpoint, decode, encode, pathParams, query, data),
+    () => _send(endpoint, decode, encode, pathParams, query, data, noContent),
   );
 
   Future<T> _send<T>(
@@ -332,6 +684,7 @@ final class GiCoreClient {
     Map<String, String> pathParams,
     Map<String, Object?>? query,
     Object? data,
+    bool noContent,
   ) async {
     for (var attempt = 0; ; attempt++) {
       try {
@@ -342,6 +695,8 @@ final class GiCoreClient {
           query: query,
           data: data,
         );
+        // A 204 has no body to decode (dio hands over an empty string).
+        if (noContent) return decode(null);
         return decodeResponse<T>(
           endpoint,
           response,

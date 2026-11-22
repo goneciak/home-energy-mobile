@@ -12,6 +12,11 @@ part of 'device_list_notifier.dart';
 /// visible and the app is in the foreground (plan §11). It is the shared
 /// source of status, faults, heating and dry-run flags.
 ///
+/// Every good list is published to [lastDeviceListProvider] and saved as
+/// the persistent snapshot (plan §8.3). Before the first list of a cold
+/// start, that snapshot (of the same profile and user) is shown, with its
+/// age; it is never written back as fresh.
+///
 /// A 403 stops the cadence (plan §7.5: the role may not read the list, so
 /// asking again every 30 s could only fail); pull-to-refresh asks again.
 
@@ -21,6 +26,11 @@ final deviceListProvider = DeviceListNotifierProvider._();
 /// `GET /devices`, polled every 30 s while Home or device details are
 /// visible and the app is in the foreground (plan §11). It is the shared
 /// source of status, faults, heating and dry-run flags.
+///
+/// Every good list is published to [lastDeviceListProvider] and saved as
+/// the persistent snapshot (plan §8.3). Before the first list of a cold
+/// start, that snapshot (of the same profile and user) is shown, with its
+/// age; it is never written back as fresh.
 ///
 /// A 403 stops the cadence (plan §7.5: the role may not read the list, so
 /// asking again every 30 s could only fail); pull-to-refresh asks again.
@@ -33,6 +43,11 @@ final class DeviceListNotifierProvider
   /// `GET /devices`, polled every 30 s while Home or device details are
   /// visible and the app is in the foreground (plan §11). It is the shared
   /// source of status, faults, heating and dry-run flags.
+  ///
+  /// Every good list is published to [lastDeviceListProvider] and saved as
+  /// the persistent snapshot (plan §8.3). Before the first list of a cold
+  /// start, that snapshot (of the same profile and user) is shown, with its
+  /// age; it is never written back as fresh.
   ///
   /// A 403 stops the cadence (plan §7.5: the role may not read the list, so
   /// asking again every 30 s could only fail); pull-to-refresh asks again.
@@ -66,11 +81,16 @@ final class DeviceListNotifierProvider
 }
 
 String _$deviceListNotifierHash() =>
-    r'947efee3bc563afedf2169026d3194598530c456';
+    r'22caa93ca981e0ee23cddd98499ff31512687c00';
 
 /// `GET /devices`, polled every 30 s while Home or device details are
 /// visible and the app is in the foreground (plan §11). It is the shared
 /// source of status, faults, heating and dry-run flags.
+///
+/// Every good list is published to [lastDeviceListProvider] and saved as
+/// the persistent snapshot (plan §8.3). Before the first list of a cold
+/// start, that snapshot (of the same profile and user) is shown, with its
+/// age; it is never written back as fresh.
 ///
 /// A 403 stops the cadence (plan §7.5: the role may not read the list, so
 /// asking again every 30 s could only fail); pull-to-refresh asks again.

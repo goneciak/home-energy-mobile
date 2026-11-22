@@ -1,0 +1,8 @@
+{
+  "statusCode": 404,
+  "code": "AUTH_SESSION_NOT_FOUND",
+  "message": "Session was not found.",
+  "path": "/api/v1/auth/sessions/00000000-0000-4000-8000-000000000000",
+  "requestId": "e926230e-22be-4f1f-a13a-fe566b3162e4",
+  "timestamp": "2026-11-22T03:51:56.019Z"
+}

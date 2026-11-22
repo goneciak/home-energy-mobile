@@ -1080,5 +1080,978 @@
   "demoExit": "Zakończ demo",
   "@demoExit": {
     "description": "Demo banner button: leaves demo mode and wipes its state."
-  }
+  },
+  "schedulesTitle": "Harmonogramy",
+  "@schedulesTitle": {
+    "description": "Title of the heating schedule list (plan §20 M3)."
+  },
+  "schedulesEntryTitle": "Harmonogramy ogrzewania",
+  "@schedulesEntryTitle": {
+    "description": "Device details: row that opens the schedule list."
+  },
+  "schedulesEntrySubtitle": "Godziny i dni z inną temperaturą docelową",
+  "@schedulesEntrySubtitle": {
+    "description": "Device details: subtitle of the schedule list row."
+  },
+  "schedulesEmptyTitle": "Brak harmonogramów",
+  "@schedulesEmptyTitle": {
+    "description": "Schedule list without schedules."
+  },
+  "schedulesEmptyBody": "Ogrzewanie przez cały czas działa według strategii bazowej.",
+  "@schedulesEmptyBody": {
+    "description": "Schedule list without schedules: what that means."
+  },
+  "schedulesAdd": "Dodaj harmonogram",
+  "@schedulesAdd": {
+    "description": "Button that opens the editor for a new schedule."
+  },
+  "scheduleActiveNow": "Aktywny teraz",
+  "@scheduleActiveNow": {
+    "description": "Chip on the schedule that GI Core applies now (inferred on the phone)."
+  },
+  "scheduleDisabledChip": "Wyłączony",
+  "@scheduleDisabledChip": {
+    "description": "Chip on a disabled schedule."
+  },
+  "scheduleWholeDay": "Cała doba",
+  "@scheduleWholeDay": {
+    "description": "Schedule whose start equals its end: the whole day."
+  },
+  "scheduleTimeRange": "{start}–{end}",
+  "@scheduleTimeRange": {
+    "description": "Time window of a schedule, e.g. 06:00–08:00.",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleTimeRangeNextDay": "{start}–{end} (następnego dnia)",
+  "@scheduleTimeRangeNextDay": {
+    "description": "Time window that ends after midnight.",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleTargetLine": "{target} °C, histereza {hysteresis} °C",
+  "@scheduleTargetLine": {
+    "description": "Target and hysteresis of a schedule.",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "hysteresis": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleClockCoreOnly": "Godziny według zegara GI Home (UTC).",
+  "@scheduleClockCoreOnly": {
+    "description": "Schedule clock label without any other zone."
+  },
+  "scheduleClockDualHome": "Godziny według zegara GI Home (UTC). Dziś {core} UTC to {local} czasu domu.",
+  "@scheduleClockDualHome": {
+    "description": "Schedule clock label with the home time today (plan §13.4).",
+    "placeholders": {
+      "core": {
+        "type": "String"
+      },
+      "local": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleClockDualPhone": "Godziny według zegara GI Home (UTC). Dziś {core} UTC to {local} na tym telefonie.",
+  "@scheduleClockDualPhone": {
+    "description": "Schedule clock label with the phone time today, for roles that cannot read the home zone.",
+    "placeholders": {
+      "core": {
+        "type": "String"
+      },
+      "local": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleClockConverting": "Godziny w czasie domu ({zone}). Przeliczamy je na zegar GI Home (UTC) z dzisiejszym przesunięciem.",
+  "@scheduleClockConverting": {
+    "description": "Schedule clock label when editing in home time (feature flag, D8).",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleDstAhead": "Wkrótce zmiana czasu. Harmonogramy zostaną przy tej samej godzinie UTC, więc w czasie domu przesuną się o godzinę. Nic nie zmieniamy samodzielnie.",
+  "@scheduleDstAhead": {
+    "description": "Banner before a DST change when editing in home time."
+  },
+  "scheduleOrderHint": "Gdy okna się nakładają, obowiązuje harmonogram dodany wcześniej. Wstrzymanie ogrzewania ma pierwszeństwo przed harmonogramami.",
+  "@scheduleOrderHint": {
+    "description": "Schedule list: how GI Core picks a schedule."
+  },
+  "scheduleGone": "Tego harmonogramu już nie ma. Lista została odświeżona.",
+  "@scheduleGone": {
+    "description": "HEATING_SCHEDULE_NOT_FOUND after a change or delete."
+  },
+  "scheduleSaved": "Harmonogram zapisany.",
+  "@scheduleSaved": {
+    "description": "Snackbar after a schedule was created or changed."
+  },
+  "scheduleDeleted": "Harmonogram usunięty.",
+  "@scheduleDeleted": {
+    "description": "Snackbar after a schedule was deleted."
+  },
+  "scheduleNotFound": "Nie znaleziono harmonogramu.",
+  "@scheduleNotFound": {
+    "description": "Editor opened for a schedule that is not in the list."
+  },
+  "scheduleEditorNewTitle": "Nowy harmonogram",
+  "@scheduleEditorNewTitle": {
+    "description": "Editor title for a new schedule."
+  },
+  "scheduleEditorEditTitle": "Edytuj harmonogram",
+  "@scheduleEditorEditTitle": {
+    "description": "Editor title for an existing schedule."
+  },
+  "scheduleFieldName": "Nazwa",
+  "@scheduleFieldName": {
+    "description": "Editor field: schedule name."
+  },
+  "scheduleFieldDays": "Dni",
+  "@scheduleFieldDays": {
+    "description": "Editor field: days of the week."
+  },
+  "scheduleFieldStart": "Od",
+  "@scheduleFieldStart": {
+    "description": "Editor field: start time."
+  },
+  "scheduleFieldEnd": "Do",
+  "@scheduleFieldEnd": {
+    "description": "Editor field: end time."
+  },
+  "scheduleFieldTarget": "Temperatura docelowa (°C)",
+  "@scheduleFieldTarget": {
+    "description": "Editor field: target temperature."
+  },
+  "scheduleFieldHysteresis": "Histereza (°C)",
+  "@scheduleFieldHysteresis": {
+    "description": "Editor field: hysteresis."
+  },
+  "scheduleFieldEnabled": "Włączony",
+  "@scheduleFieldEnabled": {
+    "description": "Editor switch: schedule enabled."
+  },
+  "scheduleErrorName": "Podaj nazwę, najwyżej 120 znaków.",
+  "@scheduleErrorName": {
+    "description": "Editor validation: name."
+  },
+  "scheduleErrorDays": "Wybierz co najmniej jeden dzień.",
+  "@scheduleErrorDays": {
+    "description": "Editor validation: days."
+  },
+  "scheduleErrorTarget": "Podaj wartość od 0 do 100 °C.",
+  "@scheduleErrorTarget": {
+    "description": "Editor validation: target temperature."
+  },
+  "scheduleErrorHysteresis": "Podaj wartość od 1 do 20 °C.",
+  "@scheduleErrorHysteresis": {
+    "description": "Editor validation: hysteresis."
+  },
+  "scheduleWarnWholeDay": "Początek i koniec są takie same, więc harmonogram obowiązuje przez całą dobę w wybrane dni.",
+  "@scheduleWarnWholeDay": {
+    "description": "Editor warning: start equals end."
+  },
+  "scheduleWarnWraps": "Okno kończy się następnego dnia o {end}.",
+  "@scheduleWarnWraps": {
+    "description": "Editor note: the window runs past midnight.",
+    "placeholders": {
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleWarnOverlap": "Nakłada się na: {names}. Obowiązuje harmonogram dodany wcześniej.",
+  "@scheduleWarnOverlap": {
+    "description": "Editor warning: overlapping schedules (GI Core does not reject them).",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleSave": "Zapisz",
+  "@scheduleSave": {
+    "description": "Editor button: save the schedule."
+  },
+  "scheduleDelete": "Usuń harmonogram",
+  "@scheduleDelete": {
+    "description": "Editor button: delete the schedule."
+  },
+  "scheduleDeleteConfirmTitle": "Usunąć harmonogram?",
+  "@scheduleDeleteConfirmTitle": {
+    "description": "Delete confirmation title."
+  },
+  "scheduleDeleteConfirmBody": "Harmonogram „{name}” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do strategii bazowej.",
+  "@scheduleDeleteConfirmBody": {
+    "description": "Delete confirmation body.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleDeleteConfirm": "Usuń",
+  "@scheduleDeleteConfirm": {
+    "description": "Delete confirmation button."
+  },
+  "weatherEntryTitle": "Pogoda i słońce",
+  "@weatherEntryTitle": {
+    "description": "Home: entry to the weather screen (plan §4.2)."
+  },
+  "weatherEntrySubtitle": "Prognoza, wschód i zachód słońca, produkcja PV",
+  "@weatherEntrySubtitle": {
+    "description": "Home: subtitle of the weather screen entry."
+  },
+  "weatherTitle": "Pogoda i słońce",
+  "@weatherTitle": {
+    "description": "Weather screen title."
+  },
+  "weatherSection": "Pogoda",
+  "@weatherSection": {
+    "description": "Weather screen: title of the weather card (now, hours, days)."
+  },
+  "weatherHourlySection": "Najbliższe godziny",
+  "@weatherHourlySection": {
+    "description": "Weather screen: hourly forecast strip."
+  },
+  "weatherDailySection": "Najbliższe dni",
+  "@weatherDailySection": {
+    "description": "Weather screen: daily forecast list."
+  },
+  "weatherNoDataTitle": "Brak danych pogodowych",
+  "@weatherNoDataTitle": {
+    "description": "Weather 503: the appliance has no weather data (G3: no internet in the appliance)."
+  },
+  "weatherNoDataBody": "GI Home nie ma teraz dostępu do internetu albo jeszcze nie pobrał prognozy. Aplikacja działa – sprawdź połączenie urządzenia z internetem.",
+  "@weatherNoDataBody": {
+    "description": "Weather 503 explanation; distinct from 'GI Home unreachable' and 'device offline' (G3)."
+  },
+  "weatherStaleBanner": "Prognoza może być nieaktualna – GI Home nie mógł jej odświeżyć, bo nie ma dostępu do internetu.",
+  "@weatherStaleBanner": {
+    "description": "Weather envelope stale:true; the detail line holds the server's lastError."
+  },
+  "weatherHumidity": "Wilgotność {value}%",
+  "@weatherHumidity": {
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "82"
+      }
+    }
+  },
+  "weatherWind": "Wiatr {speed} m/s",
+  "@weatherWind": {
+    "placeholders": {
+      "speed": {
+        "type": "String",
+        "example": "3,4"
+      }
+    }
+  },
+  "weatherPressure": "Ciśnienie {value} hPa",
+  "@weatherPressure": {
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "1013"
+      }
+    }
+  },
+  "weatherPrecipitation": "Opady {value} mm",
+  "@weatherPrecipitation": {
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "0,4"
+      }
+    }
+  },
+  "weatherTemperature": "{value} °C",
+  "@weatherTemperature": {
+    "description": "A weather temperature with its unit.",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "3,5"
+      }
+    }
+  },
+  "weatherHourSemantics": "{time}: {temperature}, {condition}",
+  "@weatherHourSemantics": {
+    "description": "Screen reader label of one hour of the forecast strip.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "14:00"
+      },
+      "temperature": {
+        "type": "String",
+        "example": "3,5 °C"
+      },
+      "condition": {
+        "type": "String",
+        "example": "Pochmurno"
+      }
+    }
+  },
+  "weatherDaySemantics": "{day}: od {min} do {max}, opady {precipitation} mm, {condition}",
+  "@weatherDaySemantics": {
+    "description": "Screen reader label of one day of the forecast.",
+    "placeholders": {
+      "day": {
+        "type": "String",
+        "example": "pon., 23 lis"
+      },
+      "min": {
+        "type": "String",
+        "example": "-1,0 °C"
+      },
+      "max": {
+        "type": "String",
+        "example": "4,5 °C"
+      },
+      "precipitation": {
+        "type": "String",
+        "example": "1,2"
+      },
+      "condition": {
+        "type": "String",
+        "example": "Deszcz"
+      }
+    }
+  },
+  "weatherTimesHouseZone": "Godziny w strefie czasowej domu ({zone})",
+  "@weatherTimesHouseZone": {
+    "description": "Weather hours (UTC from the API) are shown in the home time zone.",
+    "placeholders": {
+      "zone": {
+        "type": "String",
+        "example": "Europe/Warsaw"
+      }
+    }
+  },
+  "weatherTimesPhoneZone": "Godziny w strefie czasowej telefonu",
+  "@weatherTimesPhoneZone": {
+    "description": "Weather hours are shown in the phone's zone (the home zone is not readable for this role)."
+  },
+  "weatherDaysUtc": "Doby liczone według czasu UTC",
+  "@weatherDaysUtc": {
+    "description": "Daily weather rows are UTC days (plan §13.4)."
+  },
+  "weatherGlyphClearSky": "Bezchmurnie",
+  "@weatherGlyphClearSky": {
+    "description": "Weather condition (met.no clearsky)."
+  },
+  "weatherGlyphFair": "Pogodnie",
+  "@weatherGlyphFair": {
+    "description": "Weather condition (met.no fair)."
+  },
+  "weatherGlyphPartlyCloudy": "Częściowe zachmurzenie",
+  "@weatherGlyphPartlyCloudy": {
+    "description": "Weather condition (met.no partlycloudy)."
+  },
+  "weatherGlyphCloudy": "Pochmurno",
+  "@weatherGlyphCloudy": {
+    "description": "Weather condition (met.no cloudy, partly cloudy at night)."
+  },
+  "weatherGlyphFog": "Mgła",
+  "@weatherGlyphFog": {
+    "description": "Weather condition (met.no fog)."
+  },
+  "weatherGlyphShowers": "Przelotny deszcz",
+  "@weatherGlyphShowers": {
+    "description": "Weather condition (light rain, rain showers)."
+  },
+  "weatherGlyphRain": "Deszcz",
+  "@weatherGlyphRain": {
+    "description": "Weather condition (rain, heavy showers)."
+  },
+  "weatherGlyphThunder": "Burza",
+  "@weatherGlyphThunder": {
+    "description": "Weather condition (anything with thunder)."
+  },
+  "weatherGlyphSleetOrSnowShowers": "Deszcz ze śniegiem lub przelotny śnieg",
+  "@weatherGlyphSleetOrSnowShowers": {
+    "description": "Weather condition (sleet, snow showers, light snow)."
+  },
+  "weatherGlyphSnow": "Śnieg",
+  "@weatherGlyphSnow": {
+    "description": "Weather condition (snow, heavy snow)."
+  },
+  "weatherGlyphClearNight": "Pogodna noc",
+  "@weatherGlyphClearNight": {
+    "description": "Weather condition (clear or fair at night)."
+  },
+  "weatherGlyphUnknown": "Nieznany stan pogody",
+  "@weatherGlyphUnknown": {
+    "description": "Weather condition the app does not know."
+  },
+  "solarSection": "Słońce",
+  "@solarSection": {
+    "description": "Weather screen: sun card."
+  },
+  "solarSunrise": "Wschód",
+  "@solarSunrise": {
+    "description": "Sun card: sunrise time."
+  },
+  "solarSunset": "Zachód",
+  "@solarSunset": {
+    "description": "Sun card: sunset time."
+  },
+  "solarDayLength": "Długość dnia",
+  "@solarDayLength": {
+    "description": "Sun card: day length."
+  },
+  "solarAboveHorizon": "Słońce nad horyzontem ({elevation}°)",
+  "@solarAboveHorizon": {
+    "placeholders": {
+      "elevation": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "solarBelowHorizon": "Słońce pod horyzontem",
+  "@solarBelowHorizon": {
+    "description": "Sun card: the sun is below the horizon."
+  },
+  "solarNotConfigured": "Ustaw lokalizację domu w panelu GI Home, aby zobaczyć wschód i zachód słońca.",
+  "@solarNotConfigured": {
+    "description": "Solar 400: the appliance has no house coordinates."
+  },
+  "solarNoData": "Brak danych o słońcu.",
+  "@solarNoData": {
+    "description": "Solar: no data right now."
+  },
+  "pvForecastSection": "Prognoza produkcji PV",
+  "@pvForecastSection": {
+    "description": "Weather screen: PV forecast card (hidden when PV is not configured)."
+  },
+  "pvForecastPeakPower": "Moc instalacji {power} kWp",
+  "@pvForecastPeakPower": {
+    "placeholders": {
+      "power": {
+        "type": "String",
+        "example": "6,5"
+      }
+    }
+  },
+  "pvForecastDayEnergy": "{energy} kWh",
+  "@pvForecastDayEnergy": {
+    "description": "PV forecast: estimated production of one day.",
+    "placeholders": {
+      "energy": {
+        "type": "String",
+        "example": "12,4"
+      }
+    }
+  },
+  "pvForecastDayPeak": "szczyt {power} kW o {time}",
+  "@pvForecastDayPeak": {
+    "description": "PV forecast: the day's highest hourly production and its house-local time.",
+    "placeholders": {
+      "power": {
+        "type": "String",
+        "example": "3,2"
+      },
+      "time": {
+        "type": "String",
+        "example": "12:00"
+      }
+    }
+  },
+  "pvForecastNoDataTitle": "Brak prognozy PV",
+  "@pvForecastNoDataTitle": {
+    "description": "PV forecast 500: the appliance could not get a forecast."
+  },
+  "pvForecastNoDataBody": "GI Home nie mógł pobrać prognozy produkcji – możliwe, że nie ma dostępu do internetu.",
+  "@pvForecastNoDataBody": {
+    "description": "PV forecast 500 explanation (G3: no internet in the appliance)."
+  },
+  "pvHouseTimeNote": "Godziny w czasie lokalnym domu",
+  "@pvHouseTimeNote": {
+    "description": "PV times are house-local wall times, shown as they come (plan §13.4)."
+  },
+  "pvPlanSection": "Plan grzania PV",
+  "@pvPlanSection": {
+    "description": "Device details: the PV heating plan."
+  },
+  "pvPlanDisabled": "Plan PV wyłączony",
+  "@pvPlanDisabled": {
+    "description": "PV heating plan mode DISABLED."
+  },
+  "pvPlanDisabledBody": "Ogrzewanie nie korzysta z prognozy produkcji PV.",
+  "@pvPlanDisabledBody": {
+    "description": "PV heating plan mode DISABLED explanation."
+  },
+  "pvPlanNoHours": "Plan PV bez prognozy",
+  "@pvPlanNoHours": {
+    "description": "PV heating plan enabled but without hours (no forecast)."
+  },
+  "pvPlanNoHoursBody": "GI Home nie ma teraz prognozy produkcji, więc nie planuje dogrzewania z PV.",
+  "@pvPlanNoHoursBody": {
+    "description": "PV heating plan enabled but without hours."
+  },
+  "pvPlanMode": "Tryb: {mode}",
+  "@pvPlanMode": {
+    "placeholders": {
+      "mode": {
+        "type": "String",
+        "example": "hybrydowy"
+      }
+    }
+  },
+  "pvModeForecastOnly": "tylko prognoza",
+  "@pvModeForecastOnly": {
+    "description": "PV control mode FORECAST_ONLY."
+  },
+  "pvModeLiveInverterOnly": "tylko odczyt z falownika",
+  "@pvModeLiveInverterOnly": {
+    "description": "PV control mode LIVE_INVERTER_ONLY."
+  },
+  "pvModeHybrid": "hybrydowy (prognoza i falownik)",
+  "@pvModeHybrid": {
+    "description": "PV control mode HYBRID."
+  },
+  "pvModeUnknown": "nieznany",
+  "@pvModeUnknown": {
+    "description": "PV control mode the app does not know."
+  },
+  "pvPlanBaseTarget": "Temperatura bazowa {temperature} °C",
+  "@pvPlanBaseTarget": {
+    "placeholders": {
+      "temperature": {
+        "type": "String",
+        "example": "55,0"
+      }
+    }
+  },
+  "pvPlanSafeMax": "Bezpieczne maksimum {temperature} °C",
+  "@pvPlanSafeMax": {
+    "placeholders": {
+      "temperature": {
+        "type": "String",
+        "example": "60,0"
+      }
+    }
+  },
+  "pvPlanBoost": "Dogrzewanie do {temperature} °C",
+  "@pvPlanBoost": {
+    "description": "A plan hour with a predicted boost (favourable forecast).",
+    "placeholders": {
+      "temperature": {
+        "type": "String",
+        "example": "60,0"
+      }
+    }
+  },
+  "pvPlanNoBoost": "Bez dogrzewania, {temperature} °C",
+  "@pvPlanNoBoost": {
+    "description": "A plan hour without a boost; the predicted target.",
+    "placeholders": {
+      "temperature": {
+        "type": "String",
+        "example": "55,0"
+      }
+    }
+  },
+  "pvPlanProduction": "{power} kW",
+  "@pvPlanProduction": {
+    "placeholders": {
+      "power": {
+        "type": "String",
+        "example": "2,4"
+      }
+    }
+  },
+  "pvPlanHourSemantics": "{time}: produkcja {production}, {state}",
+  "@pvPlanHourSemantics": {
+    "description": "Screen reader label of one plan hour.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "12:00"
+      },
+      "production": {
+        "type": "String",
+        "example": "2,4 kW"
+      },
+      "state": {
+        "type": "String",
+        "example": "Dogrzewanie do 60,0 °C"
+      }
+    }
+  },
+  "pvPlanShowAll": "Pokaż wszystkie godziny ({count})",
+  "@pvPlanShowAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pvPlanShowLess": "Pokaż mniej",
+  "@pvPlanShowLess": {
+    "description": "Collapse the PV plan hours."
+  },
+  "pvPlanLoadFailed": "Nie udało się wczytać planu PV",
+  "@pvPlanLoadFailed": {
+    "description": "The PV heating plan request failed."
+  },
+  "historyTitle": "Historia",
+  "@historyTitle": {
+    "description": "Entity history screen title."
+  },
+  "historyNightEntryTitle": "Co działo się w nocy?",
+  "@historyNightEntryTitle": {
+    "description": "Device details: opens the history of the control temperature (last 24 h)."
+  },
+  "historyNightEntrySubtitle": "Temperatura sterująca z ostatniej doby",
+  "@historyNightEntrySubtitle": {
+    "description": "Subtitle of the overnight history entry."
+  },
+  "historyEntityHint": "pokaż historię",
+  "@historyEntityHint": {
+    "description": "Screen reader hint of an entity row that opens its history."
+  },
+  "historyWindowLabel": "Zakres",
+  "@historyWindowLabel": {
+    "description": "Label of the history time range selector."
+  },
+  "historyWindowHour": "1 h",
+  "@historyWindowHour": {
+    "description": "History range: last hour."
+  },
+  "historyWindowSixHours": "6 h",
+  "@historyWindowSixHours": {
+    "description": "History range: last 6 hours."
+  },
+  "historyWindowDay": "24 h",
+  "@historyWindowDay": {
+    "description": "History range: last 24 hours."
+  },
+  "historyWindowWeek": "7 dni",
+  "@historyWindowWeek": {
+    "description": "History range: last 7 days."
+  },
+  "historyWindowHourLong": "ostatnia godzina",
+  "@historyWindowHourLong": {
+    "description": "History range in a sentence: last hour."
+  },
+  "historyWindowSixHoursLong": "ostatnie 6 godzin",
+  "@historyWindowSixHoursLong": {
+    "description": "History range in a sentence: last 6 hours."
+  },
+  "historyWindowDayLong": "ostatnia doba",
+  "@historyWindowDayLong": {
+    "description": "History range in a sentence: last 24 hours."
+  },
+  "historyWindowWeekLong": "ostatnie 7 dni",
+  "@historyWindowWeekLong": {
+    "description": "History range in a sentence: last 7 days."
+  },
+  "historyShowTable": "Pokaż jako tabelę",
+  "@historyShowTable": {
+    "description": "Switches the history chart to an accessible table."
+  },
+  "historyShowChart": "Pokaż wykres",
+  "@historyShowChart": {
+    "description": "Switches the history table back to the chart."
+  },
+  "historyEmptyTitle": "Brak zmian w tym okresie",
+  "@historyEmptyTitle": {
+    "description": "History without samples in the range."
+  },
+  "historyEmptyBody": "GI Home zapisuje odczyt tylko wtedy, gdy jego wartość się zmienia. Jeśli była stała, historia jest pusta.",
+  "@historyEmptyBody": {
+    "description": "Why a history can be empty (samples are change events)."
+  },
+  "historyTruncated": "W tym okresie jest więcej zmian, niż aplikacja wczytuje naraz. Wykres pokazuje tylko ich część; wybierz krótszy zakres.",
+  "@historyTruncated": {
+    "description": "Banner: the history was truncated by the server limit."
+  },
+  "historyTextOnly": "To odczyt tekstowy, więc jego historia jest pokazana jako tabela.",
+  "@historyTextOnly": {
+    "description": "Text entities have no chart, only the table."
+  },
+  "historyChartLoading": "Przygotowywanie wykresu",
+  "@historyChartLoading": {
+    "description": "Screen reader label while the chart is being downsampled."
+  },
+  "historySummaryMin": "Najniżej",
+  "@historySummaryMin": {
+    "description": "History summary: minimum value."
+  },
+  "historySummaryMax": "Najwyżej",
+  "@historySummaryMax": {
+    "description": "History summary: maximum value."
+  },
+  "historySummaryLast": "Ostatnio",
+  "@historySummaryLast": {
+    "description": "History summary: latest value."
+  },
+  "historySummaryChanges": "Zmiany",
+  "@historySummaryChanges": {
+    "description": "History summary: number of recorded changes."
+  },
+  "historyChartSemantics": "Wykres: {name}, {range}. Najniżej {min}, najwyżej {max}, ostatnio {last} o {time}. Zapisanych zmian: {count}.",
+  "@historyChartSemantics": {
+    "description": "Screen reader summary of a numeric history chart.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Temperatura zasilania"
+      },
+      "range": {
+        "type": "String",
+        "example": "ostatnia doba"
+      },
+      "min": {
+        "type": "String",
+        "example": "41,2 °C"
+      },
+      "max": {
+        "type": "String",
+        "example": "47,9 °C"
+      },
+      "last": {
+        "type": "String",
+        "example": "45,5 °C"
+      },
+      "time": {
+        "type": "String",
+        "example": "22 lis 06:40"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historySwitchSemantics": "Wykres: {name}, {range}. Ostatnio {last} o {time}. Zapisanych przełączeń: {count}.",
+  "@historySwitchSemantics": {
+    "description": "Screen reader summary of an on/off history chart.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Przekaźnik kotła"
+      },
+      "range": {
+        "type": "String",
+        "example": "ostatnia doba"
+      },
+      "last": {
+        "type": "String",
+        "example": "włączony"
+      },
+      "time": {
+        "type": "String",
+        "example": "22 lis 06:40"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyTableTime": "Czas",
+  "@historyTableTime": {
+    "description": "History table column: time."
+  },
+  "historyTableValue": "Wartość",
+  "@historyTableValue": {
+    "description": "History table column: value."
+  },
+  "historyTableRowSemantics": "{time}: {value}",
+  "@historyTableRowSemantics": {
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "22 lis 06:40"
+      },
+      "value": {
+        "type": "String",
+        "example": "45,5 °C"
+      }
+    }
+  },
+  "historyTablePage": "Strona {page} z {pages}",
+  "@historyTablePage": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "pages": {
+        "type": "int"
+      }
+    }
+  },
+  "historyTableNewer": "Nowsze",
+  "@historyTableNewer": {
+    "description": "History table: previous page (newer samples)."
+  },
+  "historyTableOlder": "Starsze",
+  "@historyTableOlder": {
+    "description": "History table: next page (older samples)."
+  },
+  "errorHistoryRangeInvalid": "GI Home odrzucił ten zakres czasu. Sprawdź datę i godzinę w telefonie.",
+  "@errorHistoryRangeInvalid": {
+    "description": "HISTORY_RANGE_INVALID: the from/to range was rejected."
+  },
+  "navAttention": "Uwaga",
+  "attentionTitle": "Uwaga",
+  "attentionBadgeSemantics": "{count, plural, one{1 sprawa wymaga uwagi} few{{count} sprawy wymagają uwagi} many{{count} spraw wymaga uwagi} other{{count} sprawy wymaga uwagi}}",
+  "@attentionBadgeSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "attentionEmptyTitle": "Nic nie wymaga uwagi",
+  "attentionEmptyBody": "Urządzenia działają i mają kontakt z GI Home.",
+  "attentionSectionCritical": "Krytyczne",
+  "attentionSectionImportant": "Ważne",
+  "attentionSectionNotice": "Do sprawdzenia",
+  "attentionSectionResolved": "Rozwiązane w ciągu 24 h",
+  "attentionAccountTitle": "Twoje konto",
+  "attentionMustChangePassword": "Wymagana zmiana hasła",
+  "attentionResolvedAt": "{what} · rozwiązane o {time}",
+  "@attentionResolvedAt": {
+    "placeholders": {
+      "what": {
+        "type": "String",
+        "example": "Urządzenie offline"
+      },
+      "time": {
+        "type": "String",
+        "example": "07:41"
+      }
+    }
+  },
+  "offlineSnapshotReadOnly": "Tylko do odczytu: stan urządzeń z ostatniego połączenia.",
+  "flagConditionalGetTitle": "Warunkowe pobieranie urządzeń (ETag)",
+  "flagConditionalGetDescription": "Lista i szczegóły urządzeń są pobierane z nagłówkiem If-None-Match; odpowiedź 304 oszczędza transfer. Zmiana działa od następnej sesji.",
+  "settingsAccountManage": "Profil i bezpieczeństwo",
+  "accountTitle": "Profil i bezpieczeństwo",
+  "accountProfileSection": "Profil",
+  "accountFirstNameLabel": "Imię",
+  "accountLastNameLabel": "Nazwisko (opcjonalnie)",
+  "accountFirstNameRequired": "Podaj imię.",
+  "accountNameTooLong": "Maksymalnie 100 znaków.",
+  "accountSave": "Zapisz zmiany",
+  "accountSaved": "Zapisano profil.",
+  "accountLanguageSection": "Język konta",
+  "accountLanguageHint": "Po zalogowaniu aplikacja i panel WWW używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.",
+  "accountLanguagePolish": "Polski",
+  "accountLanguageEnglish": "English",
+  "accountLanguageSaved": "Zmieniono język konta.",
+  "accountSecuritySection": "Bezpieczeństwo",
+  "accountChangePassword": "Zmień hasło",
+  "accountChangePasswordSubtitle": "Inne urządzenia zostaną wylogowane",
+  "accountSessions": "Aktywne sesje",
+  "accountSessionsSubtitle": "Urządzenia zalogowane na Twoje konto",
+  "accountRecoveryCode": "Kod odzyskiwania",
+  "accountRecoveryCodeSubtitle": "Pozwala ustawić nowe hasło, gdy zapomnisz obecnego",
+  "changePasswordVoluntaryIntro": "Po zmianie hasła inne urządzenia zostaną wylogowane. Ten telefon pozostanie zalogowany.",
+  "changePasswordVoluntarySubmit": "Zmień hasło",
+  "sessionsTitle": "Aktywne sesje",
+  "sessionsThisPhone": "Ten telefon",
+  "sessionsUnknownDevice": "Nieznane urządzenie",
+  "sessionsSignedIn": "Zalogowano {date}",
+  "@sessionsSignedIn": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "sessionsLastUsed": "Ostatnio aktywna {date}",
+  "@sessionsLastUsed": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "sessionsIpAddress": "Adres IP: {ip}",
+  "@sessionsIpAddress": {
+    "placeholders": {
+      "ip": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionsRevokeTooltip": "Wyloguj tę sesję",
+  "sessionsRevokeTitle": "Wylogować to urządzenie?",
+  "sessionsRevokeBody": "Urządzenie będzie musiało zalogować się ponownie.",
+  "sessionsRevokeCurrentTitle": "Wylogować ten telefon?",
+  "sessionsRevokeCurrentBody": "Sesja tego telefonu zostanie zakończona i wrócisz do ekranu logowania.",
+  "sessionsRevokeConfirm": "Wyloguj",
+  "sessionsRevoked": "Sesja została zakończona.",
+  "sessionsLogoutAll": "Wyloguj wszystkie urządzenia",
+  "sessionsLogoutAllTitle": "Wylogować wszystkie urządzenia?",
+  "sessionsLogoutAllBody": "Wszystkie sesje, również na tym telefonie, zostaną zakończone.",
+  "sessionsEmpty": "Brak aktywnych sesji.",
+  "sessionsReviewPrompt": "{count, plural, one{Na Twoim koncie jest jeszcze 1 aktywna sesja.} few{Na Twoim koncie są jeszcze {count} aktywne sesje.} many{Na Twoim koncie jest jeszcze {count} aktywnych sesji.} other{Na Twoim koncie jest jeszcze {count} aktywnej sesji.}}",
+  "@sessionsReviewPrompt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionsReviewAction": "Przejrzyj",
+  "recoveryCodeTitle": "Kod odzyskiwania",
+  "recoveryCodeIntro": "Kod odzyskiwania pozwala ustawić nowe hasło na ekranie logowania, gdy zapomnisz obecnego. Nowy kod unieważnia poprzedni.",
+  "recoveryCodeGenerate": "Wygeneruj nowy kod",
+  "recoveryCodeConfirmTitle": "Wygenerować nowy kod?",
+  "recoveryCodeConfirmBody": "Poprzedni kod przestanie działać. Nowy kod zobaczysz tylko raz.",
+  "recoveryCodeConfirm": "Wygeneruj",
+  "recoveryCodeShownOnce": "Ten kod jest pokazywany tylko raz. Zapisz go w bezpiecznym miejscu, np. w menedżerze haseł.",
+  "recoveryCodeCopy": "Kopiuj kod",
+  "recoveryCodeCopied": "Skopiowano. Schowek zostanie wyczyszczony za minutę.",
+  "recoveryCodeHidden": "Kod jest ukryty, gdy ekran jest nagrywany lub aplikacja działa w tle.",
+  "recoveryCodeAcknowledge": "Zapisałem kod w bezpiecznym miejscu",
+  "recoveryCodeDone": "Gotowe",
+  "recoveryCodeLeaveBlocked": "Najpierw potwierdź, że kod został zapisany.",
+  "recoveryRotatePromptTitle": "Wygeneruj nowy kod odzyskiwania",
+  "recoveryRotatePromptBody": "Hasło zostało ustawione kodem odzyskiwania, który nadal działa. Wygeneruj nowy kod, aby poprzedni przestał działać.",
+  "recoveryRotatePromptLater": "Później",
+  "loginForgotPassword": "Nie pamiętasz hasła?",
+  "recoveryResetTitle": "Odzyskiwanie hasła",
+  "recoveryResetHidden": "Formularz jest ukryty, gdy ekran jest nagrywany lub aplikacja działa w tle.",
+  "@recoveryResetHidden": {"description": "Replaces the recovery reset form while the screen is recorded or the app is in the background."},
+  "recoveryResetIntro": "Podaj e-mail konta, kod odzyskiwania i nowe hasło. Po zmianie wszystkie urządzenia zostaną wylogowane.",
+  "recoveryResetCodeLabel": "Kod odzyskiwania",
+  "recoveryResetCodeHelper": "8 grup po 4 znaki oddzielonych myślnikami, np. 1A2B-3C4D-…",
+  "recoveryResetCodeRequired": "Podaj kod odzyskiwania.",
+  "recoveryResetCodeMalformed": "Kod ma postać 8 grup po 4 znaki (0–9, A–F) oddzielonych myślnikami.",
+  "recoveryResetSubmit": "Ustaw nowe hasło",
+  "recoveryResetInvalid": "Nie udało się ustawić hasła. Sprawdź e-mail i kod odzyskiwania.",
+  "recoveryResetRateLimited": "Zbyt wiele prób. Spróbuj za kilka minut.",
+  "recoveryResetDoneTitle": "Hasło zostało zmienione",
+  "recoveryResetDoneBody": "Zaloguj się nowym hasłem. Po zalogowaniu wygeneruj nowy kod odzyskiwania, bo obecny nadal działa.",
+  "recoveryResetGoToLogin": "Przejdź do logowania",
+  "recoveryResetBack": "Wróć do logowania"
 }

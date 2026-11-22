@@ -1,0 +1,13 @@
+{
+  "statusCode": 400,
+  "code": "VALIDATION_FAILED",
+  "message": "Validation failed.",
+  "path": "/api/v1/devices/4e574b55-4fe0-4e31-8d4f-52814e0b1e72/schedules",
+  "requestId": "b30a303c-c871-4e46-83da-ce062439d617",
+  "timestamp": "2026-11-22T03:51:55.885Z",
+  "details": {
+    "startTime": [
+      "startTime must be HH:mm (24h)"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "statusCode": 404,
+  "code": "HEATING_SCHEDULE_NOT_FOUND",
+  "message": "Heating schedule was not found for this device.",
+  "path": "/api/v1/devices/4e574b55-4fe0-4e31-8d4f-52814e0b1e72/schedules/ckmissingschedule000000",
+  "requestId": "d1282f49-d3b4-4a0f-b783-64acb07e51a0",
+  "timestamp": "2026-11-22T03:51:55.894Z"
+}

@@ -600,6 +600,35 @@ Future<void> _recordFixtures(
     );
   }
 
+  // M3 environment: the contract stack has no house location or PV (and
+  // the app may not write /settings/energy*), so only the "nothing to
+  // show" answers are recordable; the 200 shapes are hand-written.
+  for (final MapEntry(key: path, value: url) in {
+    'EnvironmentController_current/error_no_data.json': '/weather/current',
+    'EnvironmentController_hourly/error_no_data.json': '/weather/hourly',
+    'EnvironmentController_daily/error_no_data.json': '/weather/daily',
+    'EnvironmentController_solarCurrent/error_no_location.json':
+        '/solar/current',
+    'EnvironmentController_pvForecast/error_not_configured.json':
+        '/pv/forecast',
+  }.entries) {
+    await recorder.record(path, () async => (await api.get(url)).body);
+  }
+  // M3 account. PATCH {} changes nothing; the revoke errors touch no
+  // session. Regenerate, logout-all and the recovery reset are not recorded:
+  // they would rotate the owner's code, end its sessions or spend the
+  // 5-per-15-minutes reset budget (account_contract_test.dart covers them).
+  await recorder.record(
+    'UsersController_updateProfile/unchanged.json',
+    () async => (await api.patch('/users/me/profile', <String, Object>{})).body,
+  );
+  await recorder.record(
+    'AuthController_revokeSession/error_not_found.json',
+    () async => (await api.delete(
+      '/auth/sessions/00000000-0000-4000-8000-000000000000',
+    )).body,
+  );
+
   // Error envelopes. The two login attempts count against the login rate
   // limit (5/min per IP), so they are made only when needed.
   final anonymous = _Api(api.base);
@@ -693,6 +722,102 @@ Future<void> _recordWriteFixtures(
       ..._controlStrategy,
       'hysteresisCelsius': 0,
     })).body,
+  );
+
+  await _recordM3DeviceFixtures(api, recorder, deviceId, relayId, sensorId);
+}
+
+/// The M3 device endpoints on the fake device: schedule CRUD (the created
+/// schedule is disabled and deleted again, so the effective strategy stays
+/// the seeded one), the PV heating plan (DISABLED without PV) and entity
+/// history (the relay toggles of [_recordWriteFixtures] and earlier runs;
+/// the fake temperature is constant, so its history is empty).
+Future<void> _recordM3DeviceFixtures(
+  _Api api,
+  _Recorder recorder,
+  String deviceId,
+  String relayId,
+  String sensorId,
+) async {
+  final base = '/devices/$deviceId/schedules';
+  const body = {
+    'name': 'Dni robocze',
+    'daysOfWeek': [1, 2, 3, 4, 5],
+    'startTime': '06:00',
+    'endTime': '22:00',
+    'targetTemperatureCelsius': 50,
+    'hysteresisCelsius': 3,
+    'enabled': false,
+  };
+  if (recorder.wants('HeatingScheduleController_create/created.json') ||
+      recorder.wants('HeatingScheduleController_update/renamed.json') ||
+      recorder.wants('HeatingScheduleController_list/one_row.json')) {
+    final created = await api.post(base, body);
+    _expect(created, 201);
+    final id = _field(created.body, 'id')! as String;
+    try {
+      final list = await api.get(base);
+      _expect(list, 200);
+      final updated = await api.patch('$base/$id', {
+        'name': 'Dni robocze (zmienione)',
+      });
+      _expect(updated, 200);
+      recorder
+        ..save('HeatingScheduleController_create/created.json', created.body)
+        ..save('HeatingScheduleController_list/one_row.json', list.body)
+        ..save('HeatingScheduleController_update/renamed.json', updated.body);
+    } finally {
+      _expect(await api.delete('$base/$id'), 204);
+    }
+  }
+  await recorder.record(
+    'HeatingScheduleController_list/empty.json',
+    () async => (await api.get(base)).body,
+  );
+  await recorder.record(
+    'HeatingScheduleController_create/error_validation.json',
+    () async => (await api.post(base, {...body, 'startTime': '24:00'})).body,
+  );
+  await recorder.record(
+    'HeatingScheduleController_update/error_not_found.json',
+    () async => (await api.patch('$base/ckmissingschedule000000', {
+      'enabled': false,
+    })).body,
+  );
+  await recorder.record(
+    'HeatingScheduleController_remove/error_not_found.json',
+    () async => (await api.delete('$base/ckmissingschedule000000')).body,
+  );
+
+  await recorder.record(
+    'PvHeatingController_getPlan/disabled.json',
+    () async => (await api.get('/devices/$deviceId/pv-heating-plan')).body,
+  );
+
+  const history = 'HistoryController_getEntityHistory';
+  String historyOf(String entityId) =>
+      '/devices/$deviceId/entities/$entityId/history';
+  await recorder.record(
+    '$history/relay.json',
+    () async => (await api.get(historyOf(relayId))).body,
+  );
+  await recorder.record(
+    '$history/temperature_empty.json',
+    () async => (await api.get(historyOf(sensorId))).body,
+  );
+  await recorder.record(
+    '$history/error_range_invalid.json',
+    () async => (await api.get(
+      '${historyOf(relayId)}?from=2026-01-02T00:00:00Z&to=2026-01-01T00:00:00Z',
+    )).body,
+  );
+  await recorder.record(
+    '$history/error_validation.json',
+    () async => (await api.get('${historyOf(relayId)}?limit=0')).body,
+  );
+  await recorder.record(
+    '$history/error_entity_not_found.json',
+    () async => (await api.get(historyOf('no-such-entity'))).body,
   );
 }
 
@@ -844,6 +969,7 @@ class _Api {
   }) => _send('POST', path, body, headers);
   Future<_Res> patch(String path, Object body) => _send('PATCH', path, body);
   Future<_Res> put(String path, Object body) => _send('PUT', path, body);
+  Future<_Res> delete(String path) => _send('DELETE', path, null);
 
   Future<_Res> _send(
     String method,

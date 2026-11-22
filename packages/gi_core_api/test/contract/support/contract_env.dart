@@ -137,6 +137,7 @@ GiCoreClient strictClient({
   required TokenVault vault,
   DateTime? expectedInitializedAt,
   HttpClientAdapter? httpClientAdapter,
+  EtagCache? etagCache,
 }) => GiCoreClient.create(
   address: address,
   vault: vault,
@@ -144,6 +145,8 @@ GiCoreClient strictClient({
   expectedInitializedAt: expectedInitializedAt,
   decodeMode: DecodeMode.strict,
   httpClientAdapter: httpClientAdapter,
+  etagCache: etagCache,
+  etagScope: 'contract',
 );
 
 /// A raw Dio on [address]'s API base that never throws on a status code.

@@ -24,7 +24,12 @@ final class DemoHttpClientAdapter implements HttpClientAdapter {
   ) async {
     final body = await _readBody(options, requestStream);
     if (latency > Duration.zero) await Future<void>.delayed(latency);
-    final reply = core.handle(options.method, options.uri.path, body);
+    final reply = core.handle(
+      options.method,
+      options.uri.path,
+      body,
+      query: options.uri.queryParameters,
+    );
     final isLogin =
         reply.status == 200 &&
         options.method == 'POST' &&

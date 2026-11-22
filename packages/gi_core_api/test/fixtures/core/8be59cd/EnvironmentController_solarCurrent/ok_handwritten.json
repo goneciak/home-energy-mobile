@@ -1,0 +1,14 @@
+{
+  "sunrise": "2026-11-22T06:21:40.512Z",
+  "sunset": "2026-11-22T14:31:05.004Z",
+  "dawn": "2026-11-22T05:41:02.117Z",
+  "dusk": "2026-11-22T15:11:43.400Z",
+  "solarNoon": "2026-11-22T10:26:22.758Z",
+  "solarMidnight": "2026-11-21T22:26:22.758Z",
+  "nextSunrise": "2026-11-23T06:23:11.902Z",
+  "nextSunset": "2026-11-22T14:31:05.004Z",
+  "currentElevationDegrees": 17.3421,
+  "currentAzimuthDegrees": 172.0815,
+  "aboveHorizon": true,
+  "dayLengthSeconds": 29365
+}

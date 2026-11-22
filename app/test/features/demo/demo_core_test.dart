@@ -115,7 +115,7 @@ void main() {
       ));
       expect(
         core.handle('POST', '/api/v1/users/me/change-password', {}).status,
-        204,
+        400,
       );
       final system = ok(core.handle('GET', '/api/v1/settings/system', null));
       expect(system['timezone'], 'Europe/Warsaw');

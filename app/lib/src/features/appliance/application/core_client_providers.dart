@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
+import 'package:gi_home/src/core/config/config_providers.dart';
 import 'package:gi_home/src/core/l10n/request_language.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
@@ -93,6 +94,12 @@ GiCoreClient? giCoreClient(Ref ref) {
     },
     waitUntilForeground: foreground.untilForeground,
     httpClientAdapter: ref.watch(coreHttpClientAdapterProvider),
+    // Read, not watched: toggling the flag must not rebuild the client
+    // mid-session (plan §6.5 pt 4); the cache is per client, so per profile.
+    etagCache: ref.read(featureFlagsProvider).conditionalGet
+        ? EtagCache()
+        : null,
+    etagScope: ref.read(applianceProfileProvider)?.profileId ?? '',
     onFailure: (failure) {
       diagnostics.recordFailure(failure);
       // A reset seen mid-session (a refresh before any request); a reset

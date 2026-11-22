@@ -1,0 +1,21 @@
+{
+  "data": [
+    {
+      "date": "2026-11-22",
+      "minimumTemperatureC": -1.5,
+      "maximumTemperatureC": 4.9,
+      "precipitationMm": 1.6,
+      "symbolCode": "fair_day"
+    },
+    {
+      "date": "2026-11-23",
+      "minimumTemperatureC": null,
+      "maximumTemperatureC": null,
+      "precipitationMm": 0,
+      "symbolCode": null
+    }
+  ],
+  "fetchedAt": "2026-11-22T10:05:12.331Z",
+  "stale": false,
+  "lastError": null
+}

@@ -30,6 +30,7 @@ void main() {
           '/setup/status',
           '/auth/login',
           '/auth/refresh',
+          '/auth/recovery/reset',
         ]),
       );
     });

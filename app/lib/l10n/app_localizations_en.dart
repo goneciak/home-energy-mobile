@@ -1600,4 +1600,851 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get demoExit => 'Exit demo';
+
+  @override
+  String get schedulesTitle => 'Schedules';
+
+  @override
+  String get schedulesEntryTitle => 'Heating schedules';
+
+  @override
+  String get schedulesEntrySubtitle =>
+      'Times and days with a different target temperature';
+
+  @override
+  String get schedulesEmptyTitle => 'No schedules';
+
+  @override
+  String get schedulesEmptyBody =>
+      'Heating follows the base strategy all the time.';
+
+  @override
+  String get schedulesAdd => 'Add schedule';
+
+  @override
+  String get scheduleActiveNow => 'Active now';
+
+  @override
+  String get scheduleDisabledChip => 'Disabled';
+
+  @override
+  String get scheduleWholeDay => 'All day';
+
+  @override
+  String scheduleTimeRange(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
+  String scheduleTimeRangeNextDay(String start, String end) {
+    return '$start–$end (next day)';
+  }
+
+  @override
+  String scheduleTargetLine(String target, String hysteresis) {
+    return '$target °C, hysteresis $hysteresis °C';
+  }
+
+  @override
+  String get scheduleClockCoreOnly => 'Times follow the GI Home clock (UTC).';
+
+  @override
+  String scheduleClockDualHome(String core, String local) {
+    return 'Times follow the GI Home clock (UTC). Today $core UTC is $local home time.';
+  }
+
+  @override
+  String scheduleClockDualPhone(String core, String local) {
+    return 'Times follow the GI Home clock (UTC). Today $core UTC is $local on this phone.';
+  }
+
+  @override
+  String scheduleClockConverting(String zone) {
+    return 'Times are in home time ($zone). They are converted to the GI Home clock (UTC) with today\'s offset.';
+  }
+
+  @override
+  String get scheduleDstAhead =>
+      'A clock change is coming. Schedules stay at the same UTC time, so in home time they will move by an hour. Nothing is changed automatically.';
+
+  @override
+  String get scheduleOrderHint =>
+      'When windows overlap, the schedule added first applies. Suspending heating takes precedence over schedules.';
+
+  @override
+  String get scheduleGone =>
+      'This schedule no longer exists. The list has been refreshed.';
+
+  @override
+  String get scheduleSaved => 'Schedule saved.';
+
+  @override
+  String get scheduleDeleted => 'Schedule deleted.';
+
+  @override
+  String get scheduleNotFound => 'Schedule not found.';
+
+  @override
+  String get scheduleEditorNewTitle => 'New schedule';
+
+  @override
+  String get scheduleEditorEditTitle => 'Edit schedule';
+
+  @override
+  String get scheduleFieldName => 'Name';
+
+  @override
+  String get scheduleFieldDays => 'Days';
+
+  @override
+  String get scheduleFieldStart => 'From';
+
+  @override
+  String get scheduleFieldEnd => 'To';
+
+  @override
+  String get scheduleFieldTarget => 'Target temperature (°C)';
+
+  @override
+  String get scheduleFieldHysteresis => 'Hysteresis (°C)';
+
+  @override
+  String get scheduleFieldEnabled => 'Enabled';
+
+  @override
+  String get scheduleErrorName => 'Enter a name of up to 120 characters.';
+
+  @override
+  String get scheduleErrorDays => 'Choose at least one day.';
+
+  @override
+  String get scheduleErrorTarget => 'Enter a value from 0 to 100 °C.';
+
+  @override
+  String get scheduleErrorHysteresis => 'Enter a value from 1 to 20 °C.';
+
+  @override
+  String get scheduleWarnWholeDay =>
+      'Start and end are the same, so the schedule applies all day on the chosen days.';
+
+  @override
+  String scheduleWarnWraps(String end) {
+    return 'The window ends the next day at $end.';
+  }
+
+  @override
+  String scheduleWarnOverlap(String names) {
+    return 'Overlaps with: $names. The schedule added first applies.';
+  }
+
+  @override
+  String get scheduleSave => 'Save';
+
+  @override
+  String get scheduleDelete => 'Delete schedule';
+
+  @override
+  String get scheduleDeleteConfirmTitle => 'Delete the schedule?';
+
+  @override
+  String scheduleDeleteConfirmBody(String name) {
+    return 'The schedule “$name” will be deleted. If it was active, heating returns to the base strategy.';
+  }
+
+  @override
+  String get scheduleDeleteConfirm => 'Delete';
+
+  @override
+  String get weatherEntryTitle => 'Weather and sun';
+
+  @override
+  String get weatherEntrySubtitle =>
+      'Forecast, sunrise and sunset, PV production';
+
+  @override
+  String get weatherTitle => 'Weather and sun';
+
+  @override
+  String get weatherSection => 'Weather';
+
+  @override
+  String get weatherHourlySection => 'Next hours';
+
+  @override
+  String get weatherDailySection => 'Next days';
+
+  @override
+  String get weatherNoDataTitle => 'No weather data';
+
+  @override
+  String get weatherNoDataBody =>
+      'GI Home has no internet access right now or has not fetched the forecast yet. The app works – check the device’s internet connection.';
+
+  @override
+  String get weatherStaleBanner =>
+      'The forecast may be out of date – GI Home could not refresh it because it has no internet access.';
+
+  @override
+  String weatherHumidity(String value) {
+    return 'Humidity $value%';
+  }
+
+  @override
+  String weatherWind(String speed) {
+    return 'Wind $speed m/s';
+  }
+
+  @override
+  String weatherPressure(String value) {
+    return 'Pressure $value hPa';
+  }
+
+  @override
+  String weatherPrecipitation(String value) {
+    return 'Precipitation $value mm';
+  }
+
+  @override
+  String weatherTemperature(String value) {
+    return '$value °C';
+  }
+
+  @override
+  String weatherHourSemantics(
+    String time,
+    String temperature,
+    String condition,
+  ) {
+    return '$time: $temperature, $condition';
+  }
+
+  @override
+  String weatherDaySemantics(
+    String day,
+    String min,
+    String max,
+    String precipitation,
+    String condition,
+  ) {
+    return '$day: from $min to $max, precipitation $precipitation mm, $condition';
+  }
+
+  @override
+  String weatherTimesHouseZone(String zone) {
+    return 'Times in the home time zone ($zone)';
+  }
+
+  @override
+  String get weatherTimesPhoneZone => 'Times in the phone’s time zone';
+
+  @override
+  String get weatherDaysUtc => 'Days are counted in UTC';
+
+  @override
+  String get weatherGlyphClearSky => 'Clear sky';
+
+  @override
+  String get weatherGlyphFair => 'Fair';
+
+  @override
+  String get weatherGlyphPartlyCloudy => 'Partly cloudy';
+
+  @override
+  String get weatherGlyphCloudy => 'Cloudy';
+
+  @override
+  String get weatherGlyphFog => 'Fog';
+
+  @override
+  String get weatherGlyphShowers => 'Showers';
+
+  @override
+  String get weatherGlyphRain => 'Rain';
+
+  @override
+  String get weatherGlyphThunder => 'Thunderstorm';
+
+  @override
+  String get weatherGlyphSleetOrSnowShowers => 'Sleet or snow showers';
+
+  @override
+  String get weatherGlyphSnow => 'Snow';
+
+  @override
+  String get weatherGlyphClearNight => 'Clear night';
+
+  @override
+  String get weatherGlyphUnknown => 'Unknown weather';
+
+  @override
+  String get solarSection => 'Sun';
+
+  @override
+  String get solarSunrise => 'Sunrise';
+
+  @override
+  String get solarSunset => 'Sunset';
+
+  @override
+  String get solarDayLength => 'Day length';
+
+  @override
+  String solarAboveHorizon(String elevation) {
+    return 'Sun above the horizon ($elevation°)';
+  }
+
+  @override
+  String get solarBelowHorizon => 'Sun below the horizon';
+
+  @override
+  String get solarNotConfigured =>
+      'Set the house location in the GI Home panel to see sunrise and sunset.';
+
+  @override
+  String get solarNoData => 'No sun data.';
+
+  @override
+  String get pvForecastSection => 'PV production forecast';
+
+  @override
+  String pvForecastPeakPower(String power) {
+    return 'Installed power $power kWp';
+  }
+
+  @override
+  String pvForecastDayEnergy(String energy) {
+    return '$energy kWh';
+  }
+
+  @override
+  String pvForecastDayPeak(String power, String time) {
+    return 'peak $power kW at $time';
+  }
+
+  @override
+  String get pvForecastNoDataTitle => 'No PV forecast';
+
+  @override
+  String get pvForecastNoDataBody =>
+      'GI Home could not fetch the production forecast – it may have no internet access.';
+
+  @override
+  String get pvHouseTimeNote => 'Times in the home’s local time';
+
+  @override
+  String get pvPlanSection => 'PV heating plan';
+
+  @override
+  String get pvPlanDisabled => 'PV plan off';
+
+  @override
+  String get pvPlanDisabledBody =>
+      'Heating does not use the PV production forecast.';
+
+  @override
+  String get pvPlanNoHours => 'PV plan without a forecast';
+
+  @override
+  String get pvPlanNoHoursBody =>
+      'GI Home has no production forecast right now, so it plans no PV boost.';
+
+  @override
+  String pvPlanMode(String mode) {
+    return 'Mode: $mode';
+  }
+
+  @override
+  String get pvModeForecastOnly => 'forecast only';
+
+  @override
+  String get pvModeLiveInverterOnly => 'live inverter only';
+
+  @override
+  String get pvModeHybrid => 'hybrid (forecast and inverter)';
+
+  @override
+  String get pvModeUnknown => 'unknown';
+
+  @override
+  String pvPlanBaseTarget(String temperature) {
+    return 'Base temperature $temperature °C';
+  }
+
+  @override
+  String pvPlanSafeMax(String temperature) {
+    return 'Safe maximum $temperature °C';
+  }
+
+  @override
+  String pvPlanBoost(String temperature) {
+    return 'Boost to $temperature °C';
+  }
+
+  @override
+  String pvPlanNoBoost(String temperature) {
+    return 'No boost, $temperature °C';
+  }
+
+  @override
+  String pvPlanProduction(String power) {
+    return '$power kW';
+  }
+
+  @override
+  String pvPlanHourSemantics(String time, String production, String state) {
+    return '$time: production $production, $state';
+  }
+
+  @override
+  String pvPlanShowAll(int count) {
+    return 'Show all hours ($count)';
+  }
+
+  @override
+  String get pvPlanShowLess => 'Show less';
+
+  @override
+  String get pvPlanLoadFailed => 'Could not load the PV plan';
+
+  @override
+  String get historyTitle => 'History';
+
+  @override
+  String get historyNightEntryTitle => 'What happened overnight?';
+
+  @override
+  String get historyNightEntrySubtitle =>
+      'Control temperature over the last 24 hours';
+
+  @override
+  String get historyEntityHint => 'show history';
+
+  @override
+  String get historyWindowLabel => 'Range';
+
+  @override
+  String get historyWindowHour => '1 h';
+
+  @override
+  String get historyWindowSixHours => '6 h';
+
+  @override
+  String get historyWindowDay => '24 h';
+
+  @override
+  String get historyWindowWeek => '7 days';
+
+  @override
+  String get historyWindowHourLong => 'last hour';
+
+  @override
+  String get historyWindowSixHoursLong => 'last 6 hours';
+
+  @override
+  String get historyWindowDayLong => 'last 24 hours';
+
+  @override
+  String get historyWindowWeekLong => 'last 7 days';
+
+  @override
+  String get historyShowTable => 'Show as table';
+
+  @override
+  String get historyShowChart => 'Show chart';
+
+  @override
+  String get historyEmptyTitle => 'No changes in this period';
+
+  @override
+  String get historyEmptyBody =>
+      'GI Home records a reading only when its value changes. If it stayed constant, the history is empty.';
+
+  @override
+  String get historyTruncated =>
+      'This period has more changes than the app loads at once. The chart shows only part of them; pick a shorter range.';
+
+  @override
+  String get historyTextOnly =>
+      'This is a text reading, so its history is shown as a table.';
+
+  @override
+  String get historyChartLoading => 'Preparing the chart';
+
+  @override
+  String get historySummaryMin => 'Lowest';
+
+  @override
+  String get historySummaryMax => 'Highest';
+
+  @override
+  String get historySummaryLast => 'Latest';
+
+  @override
+  String get historySummaryChanges => 'Changes';
+
+  @override
+  String historyChartSemantics(
+    String name,
+    String range,
+    String min,
+    String max,
+    String last,
+    String time,
+    int count,
+  ) {
+    return 'Chart: $name, $range. Lowest $min, highest $max, latest $last at $time. Recorded changes: $count.';
+  }
+
+  @override
+  String historySwitchSemantics(
+    String name,
+    String range,
+    String last,
+    String time,
+    int count,
+  ) {
+    return 'Chart: $name, $range. Latest $last at $time. Recorded switches: $count.';
+  }
+
+  @override
+  String get historyTableTime => 'Time';
+
+  @override
+  String get historyTableValue => 'Value';
+
+  @override
+  String historyTableRowSemantics(String time, String value) {
+    return '$time: $value';
+  }
+
+  @override
+  String historyTablePage(int page, int pages) {
+    return 'Page $page of $pages';
+  }
+
+  @override
+  String get historyTableNewer => 'Newer';
+
+  @override
+  String get historyTableOlder => 'Older';
+
+  @override
+  String get errorHistoryRangeInvalid =>
+      'GI Home rejected this time range. Check the date and time on your phone.';
+
+  @override
+  String get navAttention => 'Alerts';
+
+  @override
+  String get attentionTitle => 'Alerts';
+
+  @override
+  String attentionBadgeSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items need attention',
+      one: '1 item needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get attentionEmptyTitle => 'Nothing needs attention';
+
+  @override
+  String get attentionEmptyBody =>
+      'Devices are working and in contact with GI Home.';
+
+  @override
+  String get attentionSectionCritical => 'Critical';
+
+  @override
+  String get attentionSectionImportant => 'Important';
+
+  @override
+  String get attentionSectionNotice => 'Worth checking';
+
+  @override
+  String get attentionSectionResolved => 'Resolved in the last 24 h';
+
+  @override
+  String get attentionAccountTitle => 'Your account';
+
+  @override
+  String get attentionMustChangePassword => 'Password change required';
+
+  @override
+  String attentionResolvedAt(String what, String time) {
+    return '$what · resolved at $time';
+  }
+
+  @override
+  String get offlineSnapshotReadOnly =>
+      'Read-only: device states from the last connection.';
+
+  @override
+  String get flagConditionalGetTitle => 'Conditional device requests (ETag)';
+
+  @override
+  String get flagConditionalGetDescription =>
+      'The device list and details are requested with If-None-Match; a 304 response saves data. The change applies from the next session.';
+
+  @override
+  String get settingsAccountManage => 'Profile and security';
+
+  @override
+  String get accountTitle => 'Profile and security';
+
+  @override
+  String get accountProfileSection => 'Profile';
+
+  @override
+  String get accountFirstNameLabel => 'First name';
+
+  @override
+  String get accountLastNameLabel => 'Last name (optional)';
+
+  @override
+  String get accountFirstNameRequired => 'Enter your first name.';
+
+  @override
+  String get accountNameTooLong => 'At most 100 characters.';
+
+  @override
+  String get accountSave => 'Save changes';
+
+  @override
+  String get accountSaved => 'Profile saved.';
+
+  @override
+  String get accountLanguageSection => 'Account language';
+
+  @override
+  String get accountLanguageHint =>
+      'After sign-in the app and the web panel use this language, unless another one is picked in the app settings.';
+
+  @override
+  String get accountLanguagePolish => 'Polski';
+
+  @override
+  String get accountLanguageEnglish => 'English';
+
+  @override
+  String get accountLanguageSaved => 'Account language changed.';
+
+  @override
+  String get accountSecuritySection => 'Security';
+
+  @override
+  String get accountChangePassword => 'Change password';
+
+  @override
+  String get accountChangePasswordSubtitle => 'Other devices are signed out';
+
+  @override
+  String get accountSessions => 'Active sessions';
+
+  @override
+  String get accountSessionsSubtitle => 'Devices signed in to your account';
+
+  @override
+  String get accountRecoveryCode => 'Recovery code';
+
+  @override
+  String get accountRecoveryCodeSubtitle =>
+      'Lets you set a new password if you forget the current one';
+
+  @override
+  String get changePasswordVoluntaryIntro =>
+      'After the change, other devices are signed out. This phone stays signed in.';
+
+  @override
+  String get changePasswordVoluntarySubmit => 'Change password';
+
+  @override
+  String get sessionsTitle => 'Active sessions';
+
+  @override
+  String get sessionsThisPhone => 'This phone';
+
+  @override
+  String get sessionsUnknownDevice => 'Unknown device';
+
+  @override
+  String sessionsSignedIn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Signed in $dateString';
+  }
+
+  @override
+  String sessionsLastUsed(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Last active $dateString';
+  }
+
+  @override
+  String sessionsIpAddress(String ip) {
+    return 'IP address: $ip';
+  }
+
+  @override
+  String get sessionsRevokeTooltip => 'Sign out this session';
+
+  @override
+  String get sessionsRevokeTitle => 'Sign out this device?';
+
+  @override
+  String get sessionsRevokeBody => 'The device will have to sign in again.';
+
+  @override
+  String get sessionsRevokeCurrentTitle => 'Sign out this phone?';
+
+  @override
+  String get sessionsRevokeCurrentBody =>
+      'This phone\'s session ends and you return to the sign-in screen.';
+
+  @override
+  String get sessionsRevokeConfirm => 'Sign out';
+
+  @override
+  String get sessionsRevoked => 'The session was ended.';
+
+  @override
+  String get sessionsLogoutAll => 'Sign out all devices';
+
+  @override
+  String get sessionsLogoutAllTitle => 'Sign out all devices?';
+
+  @override
+  String get sessionsLogoutAllBody =>
+      'Every session, this phone\'s included, will end.';
+
+  @override
+  String get sessionsEmpty => 'No active sessions.';
+
+  @override
+  String sessionsReviewPrompt(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Your account has $count other active sessions.',
+      one: 'Your account has 1 other active session.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sessionsReviewAction => 'Review';
+
+  @override
+  String get recoveryCodeTitle => 'Recovery code';
+
+  @override
+  String get recoveryCodeIntro =>
+      'The recovery code lets you set a new password on the sign-in screen if you forget the current one. A new code replaces the previous one.';
+
+  @override
+  String get recoveryCodeGenerate => 'Generate a new code';
+
+  @override
+  String get recoveryCodeConfirmTitle => 'Generate a new code?';
+
+  @override
+  String get recoveryCodeConfirmBody =>
+      'The previous code stops working. You will see the new code only once.';
+
+  @override
+  String get recoveryCodeConfirm => 'Generate';
+
+  @override
+  String get recoveryCodeShownOnce =>
+      'This code is shown only once. Save it in a safe place, such as a password manager.';
+
+  @override
+  String get recoveryCodeCopy => 'Copy code';
+
+  @override
+  String get recoveryCodeCopied =>
+      'Copied. The clipboard is cleared in a minute.';
+
+  @override
+  String get recoveryCodeHidden =>
+      'The code is hidden while the screen is recorded or the app is in the background.';
+
+  @override
+  String get recoveryCodeAcknowledge => 'I have saved the code in a safe place';
+
+  @override
+  String get recoveryCodeDone => 'Done';
+
+  @override
+  String get recoveryCodeLeaveBlocked =>
+      'First confirm that you saved the code.';
+
+  @override
+  String get recoveryRotatePromptTitle => 'Generate a new recovery code';
+
+  @override
+  String get recoveryRotatePromptBody =>
+      'Your password was set with the recovery code, which still works. Generate a new code so the previous one stops working.';
+
+  @override
+  String get recoveryRotatePromptLater => 'Later';
+
+  @override
+  String get loginForgotPassword => 'Forgot your password?';
+
+  @override
+  String get recoveryResetTitle => 'Password recovery';
+
+  @override
+  String get recoveryResetHidden =>
+      'The form is hidden while the screen is recorded or the app is in the background.';
+
+  @override
+  String get recoveryResetIntro =>
+      'Enter the account e-mail, the recovery code and a new password. After the change every device is signed out.';
+
+  @override
+  String get recoveryResetCodeLabel => 'Recovery code';
+
+  @override
+  String get recoveryResetCodeHelper =>
+      '8 groups of 4 characters separated by dashes, e.g. 1A2B-3C4D-…';
+
+  @override
+  String get recoveryResetCodeRequired => 'Enter the recovery code.';
+
+  @override
+  String get recoveryResetCodeMalformed =>
+      'The code is 8 groups of 4 characters (0–9, A–F) separated by dashes.';
+
+  @override
+  String get recoveryResetSubmit => 'Set new password';
+
+  @override
+  String get recoveryResetInvalid =>
+      'The password could not be set. Check the e-mail and the recovery code.';
+
+  @override
+  String get recoveryResetRateLimited =>
+      'Too many attempts. Try again in a few minutes.';
+
+  @override
+  String get recoveryResetDoneTitle => 'Password changed';
+
+  @override
+  String get recoveryResetDoneBody =>
+      'Sign in with the new password. After signing in, generate a new recovery code, because the current one still works.';
+
+  @override
+  String get recoveryResetGoToLogin => 'Go to sign-in';
+
+  @override
+  String get recoveryResetBack => 'Back to sign-in';
 }

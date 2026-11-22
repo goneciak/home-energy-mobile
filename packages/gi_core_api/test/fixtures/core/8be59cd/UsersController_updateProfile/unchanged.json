@@ -1,0 +1,13 @@
+{
+  "id": "cmwraje4y000501o6bp59x6ca",
+  "email": "owner@gihome.test",
+  "firstName": "Dev",
+  "lastName": "Owner",
+  "locale": "pl-PL",
+  "role": "OWNER",
+  "enabled": true,
+  "mustChangePassword": false,
+  "lastLoginAt": "2026-11-22T03:51:55.757Z",
+  "createdAt": "2026-11-22T03:42:12.562Z",
+  "updatedAt": "2026-11-22T03:51:55.761Z"
+}

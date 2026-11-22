@@ -237,6 +237,9 @@ void main() {
 
     await tester.tap(find.text('Ustawienia'));
     await tester.pumpAndSettle();
+    // The account row (plan M3.5) pushes the licences to the fold.
+    await tester.ensureVisible(find.text('Licencje open source'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Licencje open source'));
     // The licence list loads in the background; the page itself is enough.
     await tester.pump();

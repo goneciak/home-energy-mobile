@@ -1,0 +1,18 @@
+{
+  "data": {
+    "observedAt": "2026-11-22T10:00:00Z",
+    "temperatureC": 3.4,
+    "apparentTemperatureC": 3.4,
+    "relativeHumidityPercent": 87.2,
+    "pressureHpa": 1012.6,
+    "windSpeedMps": 4.1,
+    "windDirectionDegrees": 245.3,
+    "windGustMps": 8.9,
+    "cloudCoveragePercent": 92.1,
+    "symbolCode": "lightrain",
+    "precipitationMm": 0.4
+  },
+  "fetchedAt": "2026-11-22T10:05:12.331Z",
+  "stale": false,
+  "lastError": null
+}

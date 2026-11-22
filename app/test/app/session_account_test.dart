@@ -16,6 +16,7 @@ import 'package:gi_home/src/features/appliance/application/core_client_providers
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/auth/data/secure_token_vault.dart';
+import 'package:gi_home/src/features/devices/data/device_snapshot_store.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_service.dart';
 import 'package:gi_home/src/features/diagnostics/data/diagnostics_store.dart';
@@ -559,6 +560,7 @@ void main() {
       when(() => storage.delete(key: any(named: 'key'))).thenAnswer(
         (invocation) async => secrets.remove(invocation.namedArguments[#key]),
       );
+      when(storage.readAll).thenAnswer((_) async => {...secrets});
       support = Directory.systemTemp.createTempSync('gi-support-');
       addTearDown(() => support.deleteSync(recursive: true));
       files = FileDiagnosticsStore(support);
@@ -583,10 +585,12 @@ void main() {
         await tester.runAsync(diagnostics.flush);
         final prefs = container.read(sharedPreferencesProvider);
 
-        // Everything a session leaves behind is there.
+        // Everything a session leaves behind is there, the device list
+        // snapshot included.
         expect(secrets.keys, {
           SecureTokenVault.keyFor(testProfile.profileId),
           SecureTokenVault.accessTokenKeyFor(testProfile.profileId),
+          SecureDeviceSnapshotStore.keyFor(testProfile.profileId, ownerId),
         });
         expect(prefs.containsKey(SessionLocaleStore.key), isTrue);
         expect(files.errorsFile.existsSync(), isTrue);

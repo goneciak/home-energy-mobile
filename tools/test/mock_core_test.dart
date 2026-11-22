@@ -348,6 +348,115 @@ void main() {
       expect(_code(response), 'DEVICE_OFFLINE');
     });
   });
+  group('M3', () {
+    final fake =
+        fixtures.json['DevicesController_get']!['fake_esphome']!
+            as Map<String, Object?>;
+    final deviceId = fake['id']! as String;
+
+    setUp(() => client.login(email: 'dev@gihome.test', password: 'x'));
+
+    test('schedules: CRUD with Core statuses, reconciled on UTC', () async {
+      // 2026-11-19 is a Thursday (day 4); now is 12:00 UTC.
+      final before = await client.schedules(deviceId);
+      final created = await client.createSchedule(
+        deviceId,
+        const HeatingScheduleInput(
+          name: 'Noon',
+          daysOfWeek: [4],
+          startTime: '11:00',
+          endTime: '13:00',
+          targetTemperatureCelsius: 61.5,
+          hysteresisCelsius: 2,
+        ),
+      );
+      expect(created.enabled, isTrue);
+      expect(await client.schedules(deviceId), hasLength(before.length + 1));
+      var strategy = (await client.device(deviceId)).controlStrategy!;
+      expect(strategy.targetTemperatureCelsius, 61.5);
+      expect(strategy.mode, ControlStrategyMode.manual);
+
+      final disabled = await client.updateSchedule(
+        deviceId,
+        created.id,
+        const HeatingSchedulePatch(enabled: false),
+      );
+      expect(disabled.enabled, isFalse);
+      strategy = (await client.device(deviceId)).controlStrategy!;
+      expect(strategy.targetTemperatureCelsius, 55);
+
+      final dio = raw();
+      final path = '/devices/$deviceId/schedules';
+      final bad = await _authorized(client, dio, 'POST', path, {
+        'name': 'x',
+        'daysOfWeek': [7],
+        'startTime': '24:00',
+        'endTime': '06:00',
+        'targetTemperatureCelsius': 50,
+        'hysteresisCelsius': 2,
+      });
+      expect(bad.statusCode, 400);
+      expect(_code(bad), 'VALIDATION_FAILED');
+
+      await client.deleteSchedule(deviceId, created.id);
+      expect(await client.schedules(deviceId), hasLength(before.length));
+      final gone = await _authorized(
+        client,
+        dio,
+        'DELETE',
+        '$path/${created.id}',
+        const <String, Object?>{},
+      );
+      expect(gone.statusCode, 404);
+      expect(_code(gone), 'HEATING_SCHEDULE_NOT_FOUND');
+    });
+
+    test('sessions: list marks this one, revoke, logout-all', () async {
+      final other = newClient();
+      addTearDown(other.close);
+      await other.login(email: 'dev@gihome.test', password: 'x');
+      final sessions = await client.authSessions();
+      expect(sessions, hasLength(2));
+      expect(sessions.where((s) => s.current), hasLength(1));
+      final foreign = sessions.firstWhere((s) => !s.current);
+      await client.revokeSession(foreign.id);
+      expect(core.activeSessions, 1);
+      await client.logoutAll();
+      expect(core.activeSessions, 0);
+    });
+
+    test('recovery code: regenerate, reset revokes every session', () async {
+      final code = (await client.regenerateRecoveryCode()).recoveryCode;
+      expect(RecoveryCodeFormat.check(code), isNull);
+      await client.resetPasswordWithRecoveryCode(
+        RecoveryResetRequest(
+          email: 'dev@gihome.test',
+          recoveryCode: code,
+          newPassword: 'Recovered1',
+        ),
+      );
+      expect(core.activeSessions, 0);
+    });
+
+    test('profile update is served back', () async {
+      final updated = await client.updateProfile(
+        const ProfileUpdate(locale: 'en-US', firstName: 'Ada'),
+      );
+      expect(updated.locale, 'en-US');
+      expect((await client.profile()).firstName, 'Ada');
+      expect((await client.me()).firstName, 'Ada');
+    });
+
+    test('M3 reads are served from fixtures', () async {
+      expect(await client.pvHeatingPlan(deviceId), isA<PvHeatingPlan>());
+      expect(
+        await client.weatherCurrent(),
+        isA<EnvironmentAvailable<Object?>>(),
+      );
+      expect(await client.solarCurrent(), isA<EnvironmentAvailable<Object?>>());
+      expect(await client.pvForecast(), isA<EnvironmentAvailable<Object?>>());
+    });
+  });
 }
 
 Future<Response<Object?>> _authorized(

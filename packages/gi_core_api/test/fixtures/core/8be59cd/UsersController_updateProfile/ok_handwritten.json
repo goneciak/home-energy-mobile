@@ -1,0 +1,13 @@
+{
+  "id": "cmwl8s1se000680n2ryr54481",
+  "email": "owner@gihome.test",
+  "firstName": "Anna",
+  "lastName": null,
+  "locale": "en-US",
+  "role": "OWNER",
+  "enabled": true,
+  "mustChangePassword": false,
+  "lastLoginAt": "2026-11-22T09:58:02.120Z",
+  "createdAt": "2026-11-17T22:06:20.174Z",
+  "updatedAt": "2026-11-22T10:15:00.000Z"
+}

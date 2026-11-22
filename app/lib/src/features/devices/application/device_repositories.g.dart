@@ -60,7 +60,7 @@ final class DeviceReadSourceProvider
   }
 }
 
-String _$deviceReadSourceHash() => r'647ae1c81d59d1c5545b1494944fba3a0dc3a9b1';
+String _$deviceReadSourceHash() => r'75f573e0864c554f294164ddd494c5a85e4d070d';
 
 /// Device write endpoints of the saved appliance (plan §12). Only read once
 /// signed in, i.e. when a client exists.
@@ -116,7 +116,7 @@ final class DeviceCommandSourceProvider
 }
 
 String _$deviceCommandSourceHash() =>
-    r'38b2b5427fb511d596daa1c9e1e1823c28920030';
+    r'1a322aab70ff5bae4cb649acdf1fd9173ec9e127';
 
 /// Shared device cache. A new appliance gets a new repository; a different
 /// (or no) user clears it, so nothing outlives the session (plan §8.3).

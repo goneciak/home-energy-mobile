@@ -219,6 +219,15 @@ final class AuthSessionManager implements AccessTokenSource {
     return LogoutResult(serverSessionEnded: serverSessionEnded);
   }
 
+  /// Ends the session locally after the server revoked it at the user's
+  /// request (`POST /auth/logout-all`, revoking this phone's own session):
+  /// wipes the stored credentials and reports
+  /// [AuthState.unauthenticated], like [logout].
+  Future<void> endLocally() async {
+    await _lock.synchronized(_wipeLocal);
+    _setState(const AuthState.unauthenticated());
+  }
+
   /// Replaces the user in an authenticated state (after `GET /auth/me`).
   void updateUser(CurrentUser user) {
     if (_state is AuthAuthenticated) _setState(AuthState.authenticated(user));

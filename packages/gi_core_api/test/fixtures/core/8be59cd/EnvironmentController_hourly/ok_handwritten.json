@@ -1,0 +1,34 @@
+{
+  "data": [
+    {
+      "time": "2026-11-22T22:00:00Z",
+      "temperatureC": 1.2,
+      "precipitationMm": 0,
+      "precipitationProbabilityPercent": 5.3,
+      "windSpeedMps": 2.2,
+      "cloudCoveragePercent": 12.5,
+      "symbolCode": "clearsky_night"
+    },
+    {
+      "time": "2026-11-23T10:00:00Z",
+      "temperatureC": 4.8,
+      "precipitationMm": 0.2,
+      "precipitationProbabilityPercent": null,
+      "windSpeedMps": 3.6,
+      "cloudCoveragePercent": 61,
+      "symbolCode": "partlycloudy_polartwilight"
+    },
+    {
+      "time": "2026-11-25T06:00:00Z",
+      "temperatureC": null,
+      "precipitationMm": null,
+      "precipitationProbabilityPercent": null,
+      "windSpeedMps": null,
+      "cloudCoveragePercent": null,
+      "symbolCode": null
+    }
+  ],
+  "fetchedAt": "2026-11-22T10:05:12.331Z",
+  "stale": false,
+  "lastError": null
+}

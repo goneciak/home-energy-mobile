@@ -30,7 +30,13 @@ enum FeatureFlag {
   /// ready for when the target API enforces local network protection.
   androidLocalNetworkPermissionRequest(
     'FF_ANDROID_LOCAL_NETWORK_PERMISSION_REQUEST',
-  );
+  ),
+
+  /// `GET /devices` and `GET /devices/:id` are sent with `If-None-Match`
+  /// and a 304 replays the cached body (plan §6.5 pt 4, spike S4). Saves
+  /// bandwidth only; nothing depends on it. Read when the GI Core client is
+  /// built, so a change applies from the next session.
+  conditionalGet('FF_CONDITIONAL_GET');
 
   new(this.define, {this.devOnly = false});
 
@@ -46,8 +52,8 @@ enum FeatureFlag {
 
 /// The value of every [FeatureFlag]: immutable, compared by value.
 ///
-/// Screens and use cases read the typed getters. The M3 merge with the
-/// capability probe results (plan §16) is not part of this object yet.
+/// Screens and use cases read the typed getters. The capability probe
+/// results (plan §16) are kept apart, in `coreCapabilitiesProvider`.
 @immutable
 final class FeatureFlags {
   /// [values] for the flags it names; the others are off.
@@ -69,6 +75,7 @@ final class FeatureFlags {
       this[FeatureFlag.switchControlByIntegration];
   bool get androidLocalNetworkPermissionRequest =>
       this[FeatureFlag.androidLocalNetworkPermissionRequest];
+  bool get conditionalGet => this[FeatureFlag.conditionalGet];
 
   /// Every flag with its value, in declaration order.
   Map<FeatureFlag, bool> asMap() => _values;

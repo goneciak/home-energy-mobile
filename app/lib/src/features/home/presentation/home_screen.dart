@@ -208,6 +208,15 @@ class _Dashboard extends StatelessWidget {
                     ),
             ),
         ],
+        gap,
+        ListTile(
+          key: const ValueKey('home-weather'),
+          leading: const Icon(Icons.wb_cloudy_outlined),
+          title: Text(l10n.weatherEntryTitle),
+          subtitle: Text(l10n.weatherEntrySubtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.go(AppRoutes.weather),
+        ),
       ],
     );
   }

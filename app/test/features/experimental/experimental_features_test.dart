@@ -131,10 +131,11 @@ void main() {
       'Przeliczanie godzin harmonogramów',
       'Sterowanie przełącznikami według integracji',
       'Prośba o dostęp do sieci lokalnej (Android)',
+      'Warunkowe pobieranie urządzeń (ETag)',
     ]) {
       expect(find.text(title), findsOneWidget, reason: title);
     }
-    expect(find.byType(SwitchListTile), findsNWidgets(4));
+    expect(find.byType(SwitchListTile), findsNWidgets(5));
     final integration = find.byKey(
       const ValueKey('flag-switchControlByIntegration'),
     );
@@ -157,6 +158,12 @@ void main() {
       findsOneWidget,
     );
 
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('experimental-reset')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('experimental-reset')));
     await tester.pumpAndSettle();
 

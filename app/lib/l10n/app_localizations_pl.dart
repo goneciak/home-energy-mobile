@@ -1614,4 +1614,858 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get demoExit => 'Zakończ demo';
+
+  @override
+  String get schedulesTitle => 'Harmonogramy';
+
+  @override
+  String get schedulesEntryTitle => 'Harmonogramy ogrzewania';
+
+  @override
+  String get schedulesEntrySubtitle =>
+      'Godziny i dni z inną temperaturą docelową';
+
+  @override
+  String get schedulesEmptyTitle => 'Brak harmonogramów';
+
+  @override
+  String get schedulesEmptyBody =>
+      'Ogrzewanie przez cały czas działa według strategii bazowej.';
+
+  @override
+  String get schedulesAdd => 'Dodaj harmonogram';
+
+  @override
+  String get scheduleActiveNow => 'Aktywny teraz';
+
+  @override
+  String get scheduleDisabledChip => 'Wyłączony';
+
+  @override
+  String get scheduleWholeDay => 'Cała doba';
+
+  @override
+  String scheduleTimeRange(String start, String end) {
+    return '$start–$end';
+  }
+
+  @override
+  String scheduleTimeRangeNextDay(String start, String end) {
+    return '$start–$end (następnego dnia)';
+  }
+
+  @override
+  String scheduleTargetLine(String target, String hysteresis) {
+    return '$target °C, histereza $hysteresis °C';
+  }
+
+  @override
+  String get scheduleClockCoreOnly => 'Godziny według zegara GI Home (UTC).';
+
+  @override
+  String scheduleClockDualHome(String core, String local) {
+    return 'Godziny według zegara GI Home (UTC). Dziś $core UTC to $local czasu domu.';
+  }
+
+  @override
+  String scheduleClockDualPhone(String core, String local) {
+    return 'Godziny według zegara GI Home (UTC). Dziś $core UTC to $local na tym telefonie.';
+  }
+
+  @override
+  String scheduleClockConverting(String zone) {
+    return 'Godziny w czasie domu ($zone). Przeliczamy je na zegar GI Home (UTC) z dzisiejszym przesunięciem.';
+  }
+
+  @override
+  String get scheduleDstAhead =>
+      'Wkrótce zmiana czasu. Harmonogramy zostaną przy tej samej godzinie UTC, więc w czasie domu przesuną się o godzinę. Nic nie zmieniamy samodzielnie.';
+
+  @override
+  String get scheduleOrderHint =>
+      'Gdy okna się nakładają, obowiązuje harmonogram dodany wcześniej. Wstrzymanie ogrzewania ma pierwszeństwo przed harmonogramami.';
+
+  @override
+  String get scheduleGone =>
+      'Tego harmonogramu już nie ma. Lista została odświeżona.';
+
+  @override
+  String get scheduleSaved => 'Harmonogram zapisany.';
+
+  @override
+  String get scheduleDeleted => 'Harmonogram usunięty.';
+
+  @override
+  String get scheduleNotFound => 'Nie znaleziono harmonogramu.';
+
+  @override
+  String get scheduleEditorNewTitle => 'Nowy harmonogram';
+
+  @override
+  String get scheduleEditorEditTitle => 'Edytuj harmonogram';
+
+  @override
+  String get scheduleFieldName => 'Nazwa';
+
+  @override
+  String get scheduleFieldDays => 'Dni';
+
+  @override
+  String get scheduleFieldStart => 'Od';
+
+  @override
+  String get scheduleFieldEnd => 'Do';
+
+  @override
+  String get scheduleFieldTarget => 'Temperatura docelowa (°C)';
+
+  @override
+  String get scheduleFieldHysteresis => 'Histereza (°C)';
+
+  @override
+  String get scheduleFieldEnabled => 'Włączony';
+
+  @override
+  String get scheduleErrorName => 'Podaj nazwę, najwyżej 120 znaków.';
+
+  @override
+  String get scheduleErrorDays => 'Wybierz co najmniej jeden dzień.';
+
+  @override
+  String get scheduleErrorTarget => 'Podaj wartość od 0 do 100 °C.';
+
+  @override
+  String get scheduleErrorHysteresis => 'Podaj wartość od 1 do 20 °C.';
+
+  @override
+  String get scheduleWarnWholeDay =>
+      'Początek i koniec są takie same, więc harmonogram obowiązuje przez całą dobę w wybrane dni.';
+
+  @override
+  String scheduleWarnWraps(String end) {
+    return 'Okno kończy się następnego dnia o $end.';
+  }
+
+  @override
+  String scheduleWarnOverlap(String names) {
+    return 'Nakłada się na: $names. Obowiązuje harmonogram dodany wcześniej.';
+  }
+
+  @override
+  String get scheduleSave => 'Zapisz';
+
+  @override
+  String get scheduleDelete => 'Usuń harmonogram';
+
+  @override
+  String get scheduleDeleteConfirmTitle => 'Usunąć harmonogram?';
+
+  @override
+  String scheduleDeleteConfirmBody(String name) {
+    return 'Harmonogram „$name” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do strategii bazowej.';
+  }
+
+  @override
+  String get scheduleDeleteConfirm => 'Usuń';
+
+  @override
+  String get weatherEntryTitle => 'Pogoda i słońce';
+
+  @override
+  String get weatherEntrySubtitle =>
+      'Prognoza, wschód i zachód słońca, produkcja PV';
+
+  @override
+  String get weatherTitle => 'Pogoda i słońce';
+
+  @override
+  String get weatherSection => 'Pogoda';
+
+  @override
+  String get weatherHourlySection => 'Najbliższe godziny';
+
+  @override
+  String get weatherDailySection => 'Najbliższe dni';
+
+  @override
+  String get weatherNoDataTitle => 'Brak danych pogodowych';
+
+  @override
+  String get weatherNoDataBody =>
+      'GI Home nie ma teraz dostępu do internetu albo jeszcze nie pobrał prognozy. Aplikacja działa – sprawdź połączenie urządzenia z internetem.';
+
+  @override
+  String get weatherStaleBanner =>
+      'Prognoza może być nieaktualna – GI Home nie mógł jej odświeżyć, bo nie ma dostępu do internetu.';
+
+  @override
+  String weatherHumidity(String value) {
+    return 'Wilgotność $value%';
+  }
+
+  @override
+  String weatherWind(String speed) {
+    return 'Wiatr $speed m/s';
+  }
+
+  @override
+  String weatherPressure(String value) {
+    return 'Ciśnienie $value hPa';
+  }
+
+  @override
+  String weatherPrecipitation(String value) {
+    return 'Opady $value mm';
+  }
+
+  @override
+  String weatherTemperature(String value) {
+    return '$value °C';
+  }
+
+  @override
+  String weatherHourSemantics(
+    String time,
+    String temperature,
+    String condition,
+  ) {
+    return '$time: $temperature, $condition';
+  }
+
+  @override
+  String weatherDaySemantics(
+    String day,
+    String min,
+    String max,
+    String precipitation,
+    String condition,
+  ) {
+    return '$day: od $min do $max, opady $precipitation mm, $condition';
+  }
+
+  @override
+  String weatherTimesHouseZone(String zone) {
+    return 'Godziny w strefie czasowej domu ($zone)';
+  }
+
+  @override
+  String get weatherTimesPhoneZone => 'Godziny w strefie czasowej telefonu';
+
+  @override
+  String get weatherDaysUtc => 'Doby liczone według czasu UTC';
+
+  @override
+  String get weatherGlyphClearSky => 'Bezchmurnie';
+
+  @override
+  String get weatherGlyphFair => 'Pogodnie';
+
+  @override
+  String get weatherGlyphPartlyCloudy => 'Częściowe zachmurzenie';
+
+  @override
+  String get weatherGlyphCloudy => 'Pochmurno';
+
+  @override
+  String get weatherGlyphFog => 'Mgła';
+
+  @override
+  String get weatherGlyphShowers => 'Przelotny deszcz';
+
+  @override
+  String get weatherGlyphRain => 'Deszcz';
+
+  @override
+  String get weatherGlyphThunder => 'Burza';
+
+  @override
+  String get weatherGlyphSleetOrSnowShowers =>
+      'Deszcz ze śniegiem lub przelotny śnieg';
+
+  @override
+  String get weatherGlyphSnow => 'Śnieg';
+
+  @override
+  String get weatherGlyphClearNight => 'Pogodna noc';
+
+  @override
+  String get weatherGlyphUnknown => 'Nieznany stan pogody';
+
+  @override
+  String get solarSection => 'Słońce';
+
+  @override
+  String get solarSunrise => 'Wschód';
+
+  @override
+  String get solarSunset => 'Zachód';
+
+  @override
+  String get solarDayLength => 'Długość dnia';
+
+  @override
+  String solarAboveHorizon(String elevation) {
+    return 'Słońce nad horyzontem ($elevation°)';
+  }
+
+  @override
+  String get solarBelowHorizon => 'Słońce pod horyzontem';
+
+  @override
+  String get solarNotConfigured =>
+      'Ustaw lokalizację domu w panelu GI Home, aby zobaczyć wschód i zachód słońca.';
+
+  @override
+  String get solarNoData => 'Brak danych o słońcu.';
+
+  @override
+  String get pvForecastSection => 'Prognoza produkcji PV';
+
+  @override
+  String pvForecastPeakPower(String power) {
+    return 'Moc instalacji $power kWp';
+  }
+
+  @override
+  String pvForecastDayEnergy(String energy) {
+    return '$energy kWh';
+  }
+
+  @override
+  String pvForecastDayPeak(String power, String time) {
+    return 'szczyt $power kW o $time';
+  }
+
+  @override
+  String get pvForecastNoDataTitle => 'Brak prognozy PV';
+
+  @override
+  String get pvForecastNoDataBody =>
+      'GI Home nie mógł pobrać prognozy produkcji – możliwe, że nie ma dostępu do internetu.';
+
+  @override
+  String get pvHouseTimeNote => 'Godziny w czasie lokalnym domu';
+
+  @override
+  String get pvPlanSection => 'Plan grzania PV';
+
+  @override
+  String get pvPlanDisabled => 'Plan PV wyłączony';
+
+  @override
+  String get pvPlanDisabledBody =>
+      'Ogrzewanie nie korzysta z prognozy produkcji PV.';
+
+  @override
+  String get pvPlanNoHours => 'Plan PV bez prognozy';
+
+  @override
+  String get pvPlanNoHoursBody =>
+      'GI Home nie ma teraz prognozy produkcji, więc nie planuje dogrzewania z PV.';
+
+  @override
+  String pvPlanMode(String mode) {
+    return 'Tryb: $mode';
+  }
+
+  @override
+  String get pvModeForecastOnly => 'tylko prognoza';
+
+  @override
+  String get pvModeLiveInverterOnly => 'tylko odczyt z falownika';
+
+  @override
+  String get pvModeHybrid => 'hybrydowy (prognoza i falownik)';
+
+  @override
+  String get pvModeUnknown => 'nieznany';
+
+  @override
+  String pvPlanBaseTarget(String temperature) {
+    return 'Temperatura bazowa $temperature °C';
+  }
+
+  @override
+  String pvPlanSafeMax(String temperature) {
+    return 'Bezpieczne maksimum $temperature °C';
+  }
+
+  @override
+  String pvPlanBoost(String temperature) {
+    return 'Dogrzewanie do $temperature °C';
+  }
+
+  @override
+  String pvPlanNoBoost(String temperature) {
+    return 'Bez dogrzewania, $temperature °C';
+  }
+
+  @override
+  String pvPlanProduction(String power) {
+    return '$power kW';
+  }
+
+  @override
+  String pvPlanHourSemantics(String time, String production, String state) {
+    return '$time: produkcja $production, $state';
+  }
+
+  @override
+  String pvPlanShowAll(int count) {
+    return 'Pokaż wszystkie godziny ($count)';
+  }
+
+  @override
+  String get pvPlanShowLess => 'Pokaż mniej';
+
+  @override
+  String get pvPlanLoadFailed => 'Nie udało się wczytać planu PV';
+
+  @override
+  String get historyTitle => 'Historia';
+
+  @override
+  String get historyNightEntryTitle => 'Co działo się w nocy?';
+
+  @override
+  String get historyNightEntrySubtitle =>
+      'Temperatura sterująca z ostatniej doby';
+
+  @override
+  String get historyEntityHint => 'pokaż historię';
+
+  @override
+  String get historyWindowLabel => 'Zakres';
+
+  @override
+  String get historyWindowHour => '1 h';
+
+  @override
+  String get historyWindowSixHours => '6 h';
+
+  @override
+  String get historyWindowDay => '24 h';
+
+  @override
+  String get historyWindowWeek => '7 dni';
+
+  @override
+  String get historyWindowHourLong => 'ostatnia godzina';
+
+  @override
+  String get historyWindowSixHoursLong => 'ostatnie 6 godzin';
+
+  @override
+  String get historyWindowDayLong => 'ostatnia doba';
+
+  @override
+  String get historyWindowWeekLong => 'ostatnie 7 dni';
+
+  @override
+  String get historyShowTable => 'Pokaż jako tabelę';
+
+  @override
+  String get historyShowChart => 'Pokaż wykres';
+
+  @override
+  String get historyEmptyTitle => 'Brak zmian w tym okresie';
+
+  @override
+  String get historyEmptyBody =>
+      'GI Home zapisuje odczyt tylko wtedy, gdy jego wartość się zmienia. Jeśli była stała, historia jest pusta.';
+
+  @override
+  String get historyTruncated =>
+      'W tym okresie jest więcej zmian, niż aplikacja wczytuje naraz. Wykres pokazuje tylko ich część; wybierz krótszy zakres.';
+
+  @override
+  String get historyTextOnly =>
+      'To odczyt tekstowy, więc jego historia jest pokazana jako tabela.';
+
+  @override
+  String get historyChartLoading => 'Przygotowywanie wykresu';
+
+  @override
+  String get historySummaryMin => 'Najniżej';
+
+  @override
+  String get historySummaryMax => 'Najwyżej';
+
+  @override
+  String get historySummaryLast => 'Ostatnio';
+
+  @override
+  String get historySummaryChanges => 'Zmiany';
+
+  @override
+  String historyChartSemantics(
+    String name,
+    String range,
+    String min,
+    String max,
+    String last,
+    String time,
+    int count,
+  ) {
+    return 'Wykres: $name, $range. Najniżej $min, najwyżej $max, ostatnio $last o $time. Zapisanych zmian: $count.';
+  }
+
+  @override
+  String historySwitchSemantics(
+    String name,
+    String range,
+    String last,
+    String time,
+    int count,
+  ) {
+    return 'Wykres: $name, $range. Ostatnio $last o $time. Zapisanych przełączeń: $count.';
+  }
+
+  @override
+  String get historyTableTime => 'Czas';
+
+  @override
+  String get historyTableValue => 'Wartość';
+
+  @override
+  String historyTableRowSemantics(String time, String value) {
+    return '$time: $value';
+  }
+
+  @override
+  String historyTablePage(int page, int pages) {
+    return 'Strona $page z $pages';
+  }
+
+  @override
+  String get historyTableNewer => 'Nowsze';
+
+  @override
+  String get historyTableOlder => 'Starsze';
+
+  @override
+  String get errorHistoryRangeInvalid =>
+      'GI Home odrzucił ten zakres czasu. Sprawdź datę i godzinę w telefonie.';
+
+  @override
+  String get navAttention => 'Uwaga';
+
+  @override
+  String get attentionTitle => 'Uwaga';
+
+  @override
+  String attentionBadgeSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sprawy wymaga uwagi',
+      many: '$count spraw wymaga uwagi',
+      few: '$count sprawy wymagają uwagi',
+      one: '1 sprawa wymaga uwagi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get attentionEmptyTitle => 'Nic nie wymaga uwagi';
+
+  @override
+  String get attentionEmptyBody =>
+      'Urządzenia działają i mają kontakt z GI Home.';
+
+  @override
+  String get attentionSectionCritical => 'Krytyczne';
+
+  @override
+  String get attentionSectionImportant => 'Ważne';
+
+  @override
+  String get attentionSectionNotice => 'Do sprawdzenia';
+
+  @override
+  String get attentionSectionResolved => 'Rozwiązane w ciągu 24 h';
+
+  @override
+  String get attentionAccountTitle => 'Twoje konto';
+
+  @override
+  String get attentionMustChangePassword => 'Wymagana zmiana hasła';
+
+  @override
+  String attentionResolvedAt(String what, String time) {
+    return '$what · rozwiązane o $time';
+  }
+
+  @override
+  String get offlineSnapshotReadOnly =>
+      'Tylko do odczytu: stan urządzeń z ostatniego połączenia.';
+
+  @override
+  String get flagConditionalGetTitle => 'Warunkowe pobieranie urządzeń (ETag)';
+
+  @override
+  String get flagConditionalGetDescription =>
+      'Lista i szczegóły urządzeń są pobierane z nagłówkiem If-None-Match; odpowiedź 304 oszczędza transfer. Zmiana działa od następnej sesji.';
+
+  @override
+  String get settingsAccountManage => 'Profil i bezpieczeństwo';
+
+  @override
+  String get accountTitle => 'Profil i bezpieczeństwo';
+
+  @override
+  String get accountProfileSection => 'Profil';
+
+  @override
+  String get accountFirstNameLabel => 'Imię';
+
+  @override
+  String get accountLastNameLabel => 'Nazwisko (opcjonalnie)';
+
+  @override
+  String get accountFirstNameRequired => 'Podaj imię.';
+
+  @override
+  String get accountNameTooLong => 'Maksymalnie 100 znaków.';
+
+  @override
+  String get accountSave => 'Zapisz zmiany';
+
+  @override
+  String get accountSaved => 'Zapisano profil.';
+
+  @override
+  String get accountLanguageSection => 'Język konta';
+
+  @override
+  String get accountLanguageHint =>
+      'Po zalogowaniu aplikacja i panel WWW używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.';
+
+  @override
+  String get accountLanguagePolish => 'Polski';
+
+  @override
+  String get accountLanguageEnglish => 'English';
+
+  @override
+  String get accountLanguageSaved => 'Zmieniono język konta.';
+
+  @override
+  String get accountSecuritySection => 'Bezpieczeństwo';
+
+  @override
+  String get accountChangePassword => 'Zmień hasło';
+
+  @override
+  String get accountChangePasswordSubtitle =>
+      'Inne urządzenia zostaną wylogowane';
+
+  @override
+  String get accountSessions => 'Aktywne sesje';
+
+  @override
+  String get accountSessionsSubtitle => 'Urządzenia zalogowane na Twoje konto';
+
+  @override
+  String get accountRecoveryCode => 'Kod odzyskiwania';
+
+  @override
+  String get accountRecoveryCodeSubtitle =>
+      'Pozwala ustawić nowe hasło, gdy zapomnisz obecnego';
+
+  @override
+  String get changePasswordVoluntaryIntro =>
+      'Po zmianie hasła inne urządzenia zostaną wylogowane. Ten telefon pozostanie zalogowany.';
+
+  @override
+  String get changePasswordVoluntarySubmit => 'Zmień hasło';
+
+  @override
+  String get sessionsTitle => 'Aktywne sesje';
+
+  @override
+  String get sessionsThisPhone => 'Ten telefon';
+
+  @override
+  String get sessionsUnknownDevice => 'Nieznane urządzenie';
+
+  @override
+  String sessionsSignedIn(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Zalogowano $dateString';
+  }
+
+  @override
+  String sessionsLastUsed(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Ostatnio aktywna $dateString';
+  }
+
+  @override
+  String sessionsIpAddress(String ip) {
+    return 'Adres IP: $ip';
+  }
+
+  @override
+  String get sessionsRevokeTooltip => 'Wyloguj tę sesję';
+
+  @override
+  String get sessionsRevokeTitle => 'Wylogować to urządzenie?';
+
+  @override
+  String get sessionsRevokeBody =>
+      'Urządzenie będzie musiało zalogować się ponownie.';
+
+  @override
+  String get sessionsRevokeCurrentTitle => 'Wylogować ten telefon?';
+
+  @override
+  String get sessionsRevokeCurrentBody =>
+      'Sesja tego telefonu zostanie zakończona i wrócisz do ekranu logowania.';
+
+  @override
+  String get sessionsRevokeConfirm => 'Wyloguj';
+
+  @override
+  String get sessionsRevoked => 'Sesja została zakończona.';
+
+  @override
+  String get sessionsLogoutAll => 'Wyloguj wszystkie urządzenia';
+
+  @override
+  String get sessionsLogoutAllTitle => 'Wylogować wszystkie urządzenia?';
+
+  @override
+  String get sessionsLogoutAllBody =>
+      'Wszystkie sesje, również na tym telefonie, zostaną zakończone.';
+
+  @override
+  String get sessionsEmpty => 'Brak aktywnych sesji.';
+
+  @override
+  String sessionsReviewPrompt(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Na Twoim koncie jest jeszcze $count aktywnej sesji.',
+      many: 'Na Twoim koncie jest jeszcze $count aktywnych sesji.',
+      few: 'Na Twoim koncie są jeszcze $count aktywne sesje.',
+      one: 'Na Twoim koncie jest jeszcze 1 aktywna sesja.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get sessionsReviewAction => 'Przejrzyj';
+
+  @override
+  String get recoveryCodeTitle => 'Kod odzyskiwania';
+
+  @override
+  String get recoveryCodeIntro =>
+      'Kod odzyskiwania pozwala ustawić nowe hasło na ekranie logowania, gdy zapomnisz obecnego. Nowy kod unieważnia poprzedni.';
+
+  @override
+  String get recoveryCodeGenerate => 'Wygeneruj nowy kod';
+
+  @override
+  String get recoveryCodeConfirmTitle => 'Wygenerować nowy kod?';
+
+  @override
+  String get recoveryCodeConfirmBody =>
+      'Poprzedni kod przestanie działać. Nowy kod zobaczysz tylko raz.';
+
+  @override
+  String get recoveryCodeConfirm => 'Wygeneruj';
+
+  @override
+  String get recoveryCodeShownOnce =>
+      'Ten kod jest pokazywany tylko raz. Zapisz go w bezpiecznym miejscu, np. w menedżerze haseł.';
+
+  @override
+  String get recoveryCodeCopy => 'Kopiuj kod';
+
+  @override
+  String get recoveryCodeCopied =>
+      'Skopiowano. Schowek zostanie wyczyszczony za minutę.';
+
+  @override
+  String get recoveryCodeHidden =>
+      'Kod jest ukryty, gdy ekran jest nagrywany lub aplikacja działa w tle.';
+
+  @override
+  String get recoveryCodeAcknowledge => 'Zapisałem kod w bezpiecznym miejscu';
+
+  @override
+  String get recoveryCodeDone => 'Gotowe';
+
+  @override
+  String get recoveryCodeLeaveBlocked =>
+      'Najpierw potwierdź, że kod został zapisany.';
+
+  @override
+  String get recoveryRotatePromptTitle => 'Wygeneruj nowy kod odzyskiwania';
+
+  @override
+  String get recoveryRotatePromptBody =>
+      'Hasło zostało ustawione kodem odzyskiwania, który nadal działa. Wygeneruj nowy kod, aby poprzedni przestał działać.';
+
+  @override
+  String get recoveryRotatePromptLater => 'Później';
+
+  @override
+  String get loginForgotPassword => 'Nie pamiętasz hasła?';
+
+  @override
+  String get recoveryResetTitle => 'Odzyskiwanie hasła';
+
+  @override
+  String get recoveryResetHidden =>
+      'Formularz jest ukryty, gdy ekran jest nagrywany lub aplikacja działa w tle.';
+
+  @override
+  String get recoveryResetIntro =>
+      'Podaj e-mail konta, kod odzyskiwania i nowe hasło. Po zmianie wszystkie urządzenia zostaną wylogowane.';
+
+  @override
+  String get recoveryResetCodeLabel => 'Kod odzyskiwania';
+
+  @override
+  String get recoveryResetCodeHelper =>
+      '8 grup po 4 znaki oddzielonych myślnikami, np. 1A2B-3C4D-…';
+
+  @override
+  String get recoveryResetCodeRequired => 'Podaj kod odzyskiwania.';
+
+  @override
+  String get recoveryResetCodeMalformed =>
+      'Kod ma postać 8 grup po 4 znaki (0–9, A–F) oddzielonych myślnikami.';
+
+  @override
+  String get recoveryResetSubmit => 'Ustaw nowe hasło';
+
+  @override
+  String get recoveryResetInvalid =>
+      'Nie udało się ustawić hasła. Sprawdź e-mail i kod odzyskiwania.';
+
+  @override
+  String get recoveryResetRateLimited =>
+      'Zbyt wiele prób. Spróbuj za kilka minut.';
+
+  @override
+  String get recoveryResetDoneTitle => 'Hasło zostało zmienione';
+
+  @override
+  String get recoveryResetDoneBody =>
+      'Zaloguj się nowym hasłem. Po zalogowaniu wygeneruj nowy kod odzyskiwania, bo obecny nadal działa.';
+
+  @override
+  String get recoveryResetGoToLogin => 'Przejdź do logowania';
+
+  @override
+  String get recoveryResetBack => 'Wróć do logowania';
 }

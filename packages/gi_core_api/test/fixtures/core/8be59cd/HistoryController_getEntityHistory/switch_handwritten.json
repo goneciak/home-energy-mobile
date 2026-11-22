@@ -1,0 +1,19 @@
+{
+  "entityId": "9b1d6c2e-4f3a-4e8b-9c1d-2a3b4c5d6e7f",
+  "from": "2026-11-21T10:15:00.000Z",
+  "to": "2026-11-22T10:15:00.000Z",
+  "samples": [
+    {
+      "at": "2026-11-21T18:02:11.204Z",
+      "kind": "switch",
+      "value": true,
+      "unit": null
+    },
+    {
+      "at": "2026-11-21T19:47:40.991Z",
+      "kind": "switch",
+      "value": false,
+      "unit": null
+    }
+  ]
+}

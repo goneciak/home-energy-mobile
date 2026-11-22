@@ -6,8 +6,18 @@ import 'package:gi_home/src/core/l10n/l10n.dart';
 /// (plan §8.1). Screens handle their own specific codes first (for example
 /// `AUTH_INVALID_CREDENTIALS` on the login form) and fall back to this.
 String failureMessage(AppLocalizations l10n, Object error) =>
-    (error is ApiFailure ? deviceCommandFailureMessage(l10n, error) : null) ??
+    (error is ApiFailure
+        ? deviceCommandFailureMessage(l10n, error) ??
+              _readFailureMessage(l10n, error)
+        : null) ??
     _genericFailureMessage(l10n, error);
+
+/// Text for error codes of read endpoints, or `null`.
+String? _readFailureMessage(AppLocalizations l10n, ApiFailure failure) =>
+    switch (failure.code) {
+      GiErrorCodes.historyRangeInvalid => l10n.errorHistoryRangeInvalid,
+      _ => null,
+    };
 
 /// Text for the device-control error codes (plan §8.2, §12), or `null` for
 /// any other failure. None of them claims a relay switched: an unconfirmed

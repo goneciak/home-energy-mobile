@@ -13,7 +13,7 @@ Wpisy katalogu `GiEndpoints.all` (`packages/gi_core_api/lib/src/catalog/endpoint
 |---|---|---|---|---|---|---|---|---|
 | `HealthController_live` | GET | `/health/live` | publiczny | M1 | `connect` | `read` | `ok` | `appliance_fingerprint_contract_test.dart`, `auth_flow_contract_test.dart` |
 | `SetupController_getStatus` | GET | `/setup/status` | publiczny | M1 | `connect` | `read`, 2 ponowienia | `initialized`, `uninitialized` | `appliance_fingerprint_contract_test.dart`, `auth_flow_contract_test.dart`, `core_quirks_contract_test.dart`, `session_rotation_contract_test.dart` |
-| `AuthController_login` | POST | `/auth/login` | publiczny | M1 | `auth` | `write` | `error_invalid_credentials`, `error_validation`, `ok`, `ok.set-cookie.txt` | `appliance_fingerprint_contract_test.dart`, `auth_flow_contract_test.dart`, `core_quirks_contract_test.dart`, `devices_contract_test.dart`, `session_rotation_contract_test.dart` |
+| `AuthController_login` | POST | `/auth/login` | publiczny | M1 | `auth` | `write` | `error_invalid_credentials`, `error_validation`, `ok`, `ok.set-cookie.txt` | `appliance_fingerprint_contract_test.dart`, `auth_flow_contract_test.dart`, `capability_probe_contract_test.dart`, `core_quirks_contract_test.dart`, `devices_contract_test.dart`, `session_rotation_contract_test.dart` |
 | `AuthController_refresh` | POST | `/auth/refresh` | ciasteczko refresh | M1 | `session` | `refresh` | `ok`, `ok.set-cookie.txt` | `appliance_fingerprint_contract_test.dart`, `auth_flow_contract_test.dart`, `session_rotation_contract_test.dart` |
 | `AuthController_logout` | POST | `/auth/logout` | Bearer, każda rola | M1 | `settings` | `write` | `ok.set-cookie.txt` | `auth_flow_contract_test.dart` |
 | `AuthController_getMe` | GET | `/auth/me` | Bearer, każda rola | M1 | `session` | `read`, 2 ponowienia | `error_unauthorized`, `owner` | `auth_flow_contract_test.dart`, `session_rotation_contract_test.dart` |
@@ -22,16 +22,32 @@ Wpisy katalogu `GiEndpoints.all` (`packages/gi_core_api/lib/src/catalog/endpoint
 | `RoomsController_list` | GET | `/rooms` | Bearer, każda rola | M1 | `home` | `read`, 2 ponowienia | `seeded` | `auth_flow_contract_test.dart` |
 | `DevicesController_list` | GET | `/devices` | Bearer, każda rola | M1 | `home` | `read`, 2 ponowienia | `seeded` | `auth_flow_contract_test.dart`, `core_quirks_contract_test.dart`, `devices_contract_test.dart` |
 | `DevicesController_get` | GET | `/devices/{id}` | Bearer, każda rola | M1 | `device` | `read`, 2 ponowienia | `fake_esphome`, `no_room_no_entities` | `auth_flow_contract_test.dart`, `core_quirks_contract_test.dart`, `devices_contract_test.dart` |
-| `SettingsController_getSystem` | GET | `/settings/system` | Bearer: OWNER, ADMIN, SERVICE | M2 | `settings` | `read`, 2 ponowienia | `ok` | zwolniony (niżej) |
-| `ApplianceUpdateController_getStatus` | GET | `/appliance/updates/status` | Bearer: OWNER, ADMIN | M2 | `settings` | `read`, 2 ponowienia | `checked_handwritten`, `unconfigured_handwritten` | zwolniony (niżej) |
+| `SettingsController_getSystem` | GET | `/settings/system` | Bearer: OWNER, ADMIN, SERVICE | M2 | `settings` | `read`, 2 ponowienia | `ok` | `environment_history_contract_test.dart` |
+| `ApplianceUpdateController_getStatus` | GET | `/appliance/updates/status` | Bearer: OWNER, ADMIN | M2 | `settings` | `read`, 2 ponowienia | `checked_handwritten`, `unconfigured_handwritten` | `capability_probe_contract_test.dart` |
 | `DeviceEspHomeSyncController_setSwitchState` | PUT | `/devices/{id}/entities/{entityId}/state` | Bearer: OWNER, ADMIN | M2 | `device` | `write` | `error_entity_not_found`, `error_entity_not_writable`, `error_validation`, `gi_edge_dry_run_handwritten`, `gi_edge_requested_handwritten`, `legacy_off`, `legacy_ok_handwritten`, `legacy_on` | `control_contract_test.dart` |
 | `DevicesController_update` | PATCH | `/devices/{id}` | Bearer: OWNER, ADMIN | M2 | `device` | `write` | `resumed`, `suspended_handwritten` | `control_contract_test.dart` |
 | `DevicesController_updateControlStrategy` | PATCH | `/devices/{id}/control-strategy` | Bearer: OWNER, ADMIN | M2 | `device` | `write` | `error_validation`, `null_base_handwritten`, `ok_handwritten`, `seeded`, `suspended_handwritten` | `control_contract_test.dart` |
+| `HeatingScheduleController_list` | GET | `/devices/{id}/schedules` | Bearer, każda rola | M3 | `schedules` | `read`, 2 ponowienia | `empty`, `one_row`, `two_rows_handwritten` | `schedules_contract_test.dart` |
+| `HeatingScheduleController_create` | POST | `/devices/{id}/schedules` | Bearer: OWNER, ADMIN | M3 | `schedules` | `write` | `created`, `created_handwritten`, `error_validation`, `error_validation_handwritten` | `schedules_contract_test.dart` |
+| `HeatingScheduleController_update` | PATCH | `/devices/{id}/schedules/{scheduleId}` | Bearer: OWNER, ADMIN | M3 | `schedules` | `write` | `disabled_handwritten`, `error_not_found`, `error_not_found_handwritten`, `renamed` | `schedules_contract_test.dart` |
+| `HeatingScheduleController_remove` | DELETE | `/devices/{id}/schedules/{scheduleId}` | Bearer: OWNER, ADMIN | M3 | `schedules` | `write` | `error_not_found`, `error_not_found_handwritten` | `schedules_contract_test.dart` |
+| `EnvironmentController_current` | GET | `/weather/current` | Bearer, każda rola | M3 | `weather` | `read` | `error_no_data`, `error_no_data_handwritten`, `ok_handwritten`, `stale_nulls_handwritten` | `environment_history_contract_test.dart` |
+| `EnvironmentController_hourly` | GET | `/weather/hourly` | Bearer, każda rola | M3 | `weather` | `read` | `error_no_data`, `ok_handwritten` | `environment_history_contract_test.dart` |
+| `EnvironmentController_daily` | GET | `/weather/daily` | Bearer, każda rola | M3 | `weather` | `read` | `error_no_data`, `ok_handwritten` | `environment_history_contract_test.dart` |
+| `EnvironmentController_solarCurrent` | GET | `/solar/current` | Bearer, każda rola | M3 | `weather` | `read`, 2 ponowienia | `error_no_location`, `error_no_location_handwritten`, `ok_handwritten`, `polar_night_handwritten` | `environment_history_contract_test.dart` |
+| `EnvironmentController_pvForecast` | GET | `/pv/forecast` | Bearer, każda rola | M3 | `weather` | `read` | `error_not_configured`, `error_not_configured_handwritten`, `error_provider_handwritten`, `ok_handwritten` | `environment_history_contract_test.dart` |
+| `PvHeatingController_getPlan` | GET | `/devices/{id}/pv-heating-plan` | Bearer, każda rola | M3 | `device` | `read`, 2 ponowienia | `disabled`, `disabled_handwritten`, `hybrid_handwritten` | `schedules_contract_test.dart` |
+| `HistoryController_getEntityHistory` | GET | `/devices/{id}/entities/{entityId}/history` | Bearer, każda rola | M3 | `history` | `read`, 2 ponowienia | `error_entity_not_found`, `error_entity_not_found_handwritten`, `error_range_invalid`, `error_range_invalid_handwritten`, `error_validation`, `mixed_kinds_handwritten`, `relay`, `switch_handwritten`, `temperature_empty` | `environment_history_contract_test.dart` |
+| `AuthController_listSessions` | GET | `/auth/sessions` | Bearer, każda rola | M3 | `sessions` | `read`, 2 ponowienia | `owner` | `account_contract_test.dart` |
+| `AuthController_revokeSession` | DELETE | `/auth/sessions/{sessionId}` | Bearer, każda rola | M3 | `sessions` | `write` | `error_forbidden_handwritten`, `error_not_found`, `error_not_found_handwritten` | `account_contract_test.dart` |
+| `AuthController_logoutAll` | POST | `/auth/logout-all` | Bearer, każda rola | M3 | `sessions` | `write` | `error_session_revoked_handwritten` | `account_contract_test.dart` |
+| `AuthController_regenerateRecoveryCode` | POST | `/auth/recovery/regenerate` | Bearer, każda rola | M3 | `recovery` | `write` | `ok_handwritten` | `account_contract_test.dart` |
+| `AuthController_recoveryReset` | POST | `/auth/recovery/reset` | publiczny | M3 | `recovery` | `write` | `error_invalid_handwritten`, `error_rate_limited_handwritten` | `account_contract_test.dart` |
+| `UsersController_updateProfile` | PATCH | `/users/me/profile` | Bearer, każda rola | M3 | `settings` | `write` | `ok_handwritten`, `unchanged` | `account_contract_test.dart` |
 
 ## Zwolnienia z testu na żywo
 
-- `SettingsController_getSystem`: M2: live contract test not written yet; decoded from a recorded fixture.
-- `ApplianceUpdateController_getStatus`: M2: live contract test not written yet; the contract stack has no Supervisor, so only the unconfigured status is reachable there.
+Brak: każdy wpis ma test kontraktowy na żywo.
 
 ## Legenda
 

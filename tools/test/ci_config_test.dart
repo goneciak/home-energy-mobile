@@ -190,8 +190,8 @@ void main() {
     }
   });
 
-  test('every secret is documented in the README', () {
-    final readme = File(path('README.md')).readAsStringSync();
+  test('every secret is documented in docs/development.md', () {
+    final readme = File(path('docs/development.md')).readAsStringSync();
     final used = <String>{};
     for (final f in workflowFiles) {
       used.addAll(
@@ -202,7 +202,11 @@ void main() {
     }
     expect(used, isNotEmpty);
     for (final secret in used) {
-      expect(readme, contains(secret), reason: 'README lists $secret');
+      expect(
+        readme,
+        contains(secret),
+        reason: 'docs/development.md lists $secret',
+      );
     }
   });
 

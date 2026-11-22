@@ -46,6 +46,26 @@ abstract final class GiErrorCodes {
 
   /// 403: the user's role may not call the endpoint.
   static const forbidden = 'HTTP_403';
+
+  /// 404: the heating schedule does not exist or belongs to another device
+  /// (PATCH and DELETE `/devices/:deviceId/schedules/:scheduleId`).
+  static const heatingScheduleNotFound = 'HEATING_SCHEDULE_NOT_FOUND';
+
+  /// 404: no session with this id.
+  static const authSessionNotFound = 'AUTH_SESSION_NOT_FOUND';
+
+  /// 403: the session belongs to another user.
+  static const authSessionForbidden = 'AUTH_SESSION_FORBIDDEN';
+
+  /// 400: wrong e-mail or recovery code (deliberately indistinguishable).
+  static const authRecoveryInvalid = 'AUTH_RECOVERY_INVALID';
+
+  /// 400: the history range is invalid (an unparsable date or
+  /// `from >= to`).
+  static const historyRangeInvalid = 'HISTORY_RANGE_INVALID';
+
+  /// 429: throttled (recovery reset: 5 requests per 15 minutes).
+  static const rateLimited = 'HTTP_429';
 }
 
 /// Device-command classification of an [ApiFailure].

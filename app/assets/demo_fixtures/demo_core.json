@@ -285,5 +285,95 @@
       "pvConsumptionEntityId": null,
       "pvBoostActive": false
     }
-  ]
+  ],
+  "schedules": [
+    {
+      "id": "cdemoschedule000000000001",
+      "deviceId": "9d3c6a52-1f0e-4c8b-a6d2-0b7e5f4a1c01",
+      "name": "Poranek",
+      "daysOfWeek": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "startTime": "04:30",
+      "endTime": "06:30",
+      "targetTemperatureCelsius": 60,
+      "hysteresisCelsius": 4,
+      "enabled": true,
+      "createdAt": "2026-01-06T08:00:00.000Z",
+      "updatedAt": "2026-01-06T08:00:00.000Z"
+    },
+    {
+      "id": "cdemoschedule000000000002",
+      "deviceId": "9d3c6a52-1f0e-4c8b-a6d2-0b7e5f4a1c01",
+      "name": "Wieczór",
+      "daysOfWeek": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "startTime": "16:00",
+      "endTime": "20:00",
+      "targetTemperatureCelsius": 58,
+      "hysteresisCelsius": 3,
+      "enabled": true,
+      "createdAt": "2026-01-06T08:05:00.000Z",
+      "updatedAt": "2026-01-06T08:05:00.000Z"
+    },
+    {
+      "id": "cdemoschedule000000000003",
+      "deviceId": "9d3c6a52-1f0e-4c8b-a6d2-0b7e5f4a1c01",
+      "name": "Weekend",
+      "daysOfWeek": [
+        0,
+        6
+      ],
+      "startTime": "22:00",
+      "endTime": "06:00",
+      "targetTemperatureCelsius": 50,
+      "hysteresisCelsius": 5,
+      "enabled": false,
+      "createdAt": "2026-01-06T08:10:00.000Z",
+      "updatedAt": "2026-01-06T08:10:00.000Z"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "5e1d0c3b-2a4f-4b6e-8d7c-9a0b1c2d3e01",
+      "createdAt": "2026-11-01T08:00:00.000Z",
+      "lastUsedAt": null,
+      "expiresAt": "2026-12-31T08:00:00.000Z",
+      "userAgent": "GI Home (demo)",
+      "ipAddress": null,
+      "current": true
+    },
+    {
+      "id": "5e1d0c3b-2a4f-4b6e-8d7c-9a0b1c2d3e02",
+      "createdAt": "2026-10-20T18:30:00.000Z",
+      "lastUsedAt": "2026-11-18T19:10:00.000Z",
+      "expiresAt": "2026-12-19T18:30:00.000Z",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0) Firefox/133.0",
+      "ipAddress": null,
+      "current": false
+    },
+    {
+      "id": "5e1d0c3b-2a4f-4b6e-8d7c-9a0b1c2d3e03",
+      "createdAt": "2026-09-02T07:15:00.000Z",
+      "lastUsedAt": "2026-10-30T06:45:00.000Z",
+      "expiresAt": "2026-12-01T07:15:00.000Z",
+      "userAgent": "GI Home/1.0 (Android 15)",
+      "ipAddress": null,
+      "current": false
+    }
+  ],
+  "pv": {
+    "peakPowerKw": 6.5
+  }
 }

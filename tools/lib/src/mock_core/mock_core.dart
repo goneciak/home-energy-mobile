@@ -95,9 +95,10 @@ Directory resolveFixturesDir(Directory root, String? ref) {
 }
 
 final class _Session {
-  new(this.id, this.user, this.password, this.refresh);
+  new(this.id, this.user, this.password, this.refresh, this.createdAt);
 
   final String id;
+  final DateTime createdAt;
   final Map<String, Object?> user;
   final String password;
   String refresh;
@@ -142,6 +143,12 @@ final class _Access {
 ///   `heatingSuspended` and `dryRun` (suspending turns every switch OFF and
 ///   the effective mode to OFF); `PATCH .../control-strategy` takes all
 ///   three fields within Core's ranges.
+/// * M3: heating schedules are stateful per device (`201`/`200`/`204`,
+///   `HEATING_SCHEDULE_NOT_FOUND`, DTO validation) and reconciled into
+///   `controlStrategy` on the UTC clock like Core. Sessions list the live
+///   in-memory sessions (`current` marks the caller); revoke, logout-all,
+///   recovery regenerate/reset and the profile update act on memory. The
+///   other M3 reads (weather, sun, PV, PV plan, history) serve fixtures.
 /// * Anything else is Core's `404 HTTP_404` envelope.
 final class MockCore {
   new({
@@ -186,6 +193,17 @@ final class MockCore {
   static const apiPrefix = '/api/v1';
   static const String cookieName = RefreshCookieCodec.defaultName;
   static const _cookiePath = '$apiPrefix/auth/refresh';
+
+  /// Heating schedules by device id (seeded from the recorded list rows of
+  /// that device), oldest first.
+  final Map<String, List<Map<String, Object?>>> _schedules = {};
+  int _nextScheduleId = 1;
+
+  /// Fields changed by `PATCH /users/me/profile`.
+  final Map<String, Object?> _profilePatch = {};
+
+  /// The code of the last `POST /auth/recovery/regenerate`.
+  String? _recoveryCode;
 
   /// Sessions that are not revoked.
   int get activeSessions => _sessions.where((s) => !s.revoked).length;
@@ -237,21 +255,61 @@ final class MockCore {
         return _refresh(request, requestId);
       case 'AuthController_logout':
         access!.session.revoked = true;
-        return Response(
-          204,
-          headers: {
-            'set-cookie':
-                fixtures.text['AuthController_logout']?['ok.set-cookie.txt'] ??
-                '$cookieName=; Path=$_cookiePath; '
-                    'Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; '
-                    'SameSite=Lax',
-          },
-        );
-      case 'AuthController_getMe' || 'UsersController_getProfile':
+        return Response(204, headers: {'set-cookie': _clearCookie()});
+      case 'AuthController_getMe':
         return _json({
           ...?fixtures.success(endpoint.id) as Map<String, Object?>?,
-          ..._identity(access!.session.user),
+          ..._identity({...access!.session.user, ..._profilePatch}),
         });
+      case 'UsersController_getProfile':
+        return _json(_profile(access!.session));
+      case 'UsersController_updateProfile':
+        return await _updateProfile(request, requestId, access!.session);
+      case 'AuthController_listSessions':
+        return _json([
+          for (final s in _sessions.reversed)
+            if (!s.revoked)
+              _sessionInfo(s, current: identical(s, access!.session)),
+        ]);
+      case 'AuthController_revokeSession':
+        return _revokeSession(
+          request,
+          requestId,
+          access!.session,
+          params['sessionId']!,
+        );
+      case 'AuthController_logoutAll':
+        for (final s in _sessions) {
+          s.revoked = true;
+        }
+        return Response(204, headers: {'set-cookie': _clearCookie()});
+      case 'AuthController_regenerateRecoveryCode':
+        _recoveryCode = [
+          for (var g = 0; g < RecoveryCodeFormat.groups; g++)
+            _hex(2).toUpperCase(),
+        ].join('-');
+        return _json({'recoveryCode': _recoveryCode});
+      case 'AuthController_recoveryReset':
+        return await _recoveryReset(request, requestId);
+      case 'HeatingScheduleController_list':
+        await _mutableDevice(request, requestId, params['id']!);
+        return _json(_schedulesOf(params['id']!));
+      case 'HeatingScheduleController_create':
+        return await _createSchedule(request, requestId, params['id']!);
+      case 'HeatingScheduleController_update':
+        return await _updateSchedule(
+          request,
+          requestId,
+          params['id']!,
+          params['scheduleId']!,
+        );
+      case 'HeatingScheduleController_remove':
+        return await _removeSchedule(
+          request,
+          requestId,
+          params['id']!,
+          params['scheduleId']!,
+        );
       case 'UsersController_changePassword':
         return await _changePassword(request, requestId, access!.session);
       case 'DevicesController_get':
@@ -402,7 +460,13 @@ final class MockCore {
         fixtures.success('AuthController_login') as Map<String, Object?>? ??
         const {};
     final user = {...?login['user'] as Map<String, Object?>?, 'email': email};
-    final session = _Session(_uuid(), user, given, _refreshValue());
+    final session = _Session(
+      _uuid(),
+      user,
+      given,
+      _refreshValue(),
+      _now().toUtc(),
+    );
     _sessions.add(session);
     _sessionsByRefresh[session.refresh] = session;
     return _json(
@@ -678,7 +742,7 @@ final class MockCore {
     );
     final device = await _mutableDevice(request, requestId, deviceId);
     device.addAll(body);
-    _reconcile(device);
+    _reconcileSchedules(device);
     if (device['heatingSuspended'] == true) {
       for (final entity in device['entities'] as List? ?? const []) {
         if (entity is Map<String, Object?> && entity['domain'] == 'switch') {
@@ -726,7 +790,7 @@ final class MockCore {
     );
     final device = await _mutableDevice(request, requestId, deviceId);
     device['baseControlStrategy'] = body;
-    _reconcile(device);
+    _reconcileSchedules(device);
     return _json({
       'controlStrategy': device['controlStrategy'],
       'baseControlStrategy': device['baseControlStrategy'],
@@ -746,6 +810,295 @@ final class MockCore {
     }
     final version = device['configurationVersion'];
     device['configurationVersion'] = (version is int ? version : 0) + 1;
+  }
+
+  String _clearCookie() =>
+      fixtures.text['AuthController_logout']?['ok.set-cookie.txt'] ??
+      '$cookieName=; Path=$_cookiePath; '
+          'Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax';
+
+  Map<String, Object?> _profile(_Session session) => {
+    ...?fixtures.success('UsersController_getProfile') as Map<String, Object?>?,
+    ..._identity(session.user),
+    ..._profilePatch,
+  };
+
+  Future<Response> _updateProfile(
+    Request request,
+    String requestId,
+    _Session session,
+  ) async {
+    String? Function(Object?) text(String name, int min) =>
+        (value) =>
+            value is String &&
+                value.trim().length >= min &&
+                value.trim().length <= 100
+            ? null
+            : '$name must be a string of $min to 100 characters';
+    final body = await _typedBody(
+      request,
+      requestId,
+      valid: {
+        'firstName': text('firstName', 1),
+        'lastName': text('lastName', 0),
+        'locale': (value) =>
+            value is String &&
+                RegExp(r'^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$').hasMatch(value)
+            ? null
+            : 'locale must be locale',
+      },
+    );
+    for (final MapEntry(:key, :value) in body.entries) {
+      final trimmed = (value! as String).trim();
+      _profilePatch[key] = key == 'lastName' && trimmed.isEmpty
+          ? null
+          : trimmed;
+    }
+    _profilePatch['updatedAt'] = _now().toUtc().toIso8601String();
+    return _json(_profile(session));
+  }
+
+  Map<String, Object?> _sessionInfo(_Session s, {required bool current}) => {
+    'id': s.id,
+    'createdAt': s.createdAt.toIso8601String(),
+    'lastUsedAt': null,
+    'expiresAt': s.createdAt.add(const Duration(days: 30)).toIso8601String(),
+    'userAgent': null,
+    'ipAddress': null,
+    'current': current,
+  };
+
+  static final _uuidPattern = RegExp(
+    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    caseSensitive: false,
+  );
+
+  /// `DELETE /auth/sessions/:id`: 204 (idempotent); revoking this session
+  /// also clears the refresh cookie.
+  Response _revokeSession(
+    Request request,
+    String requestId,
+    _Session current,
+    String id,
+  ) {
+    if (!_uuidPattern.hasMatch(id)) {
+      return _error(
+        request,
+        requestId,
+        400,
+        'HTTP_400',
+        'Validation failed (uuid is expected)',
+      );
+    }
+    final session = _sessions.where((s) => s.id == id).firstOrNull;
+    if (session == null) {
+      return _error(
+        request,
+        requestId,
+        404,
+        'AUTH_SESSION_NOT_FOUND',
+        'Session not found.',
+      );
+    }
+    session.revoked = true;
+    return Response(
+      204,
+      headers: {if (identical(session, current)) 'set-cookie': _clearCookie()},
+    );
+  }
+
+  /// `POST /auth/recovery/reset`: only the last regenerated code works;
+  /// success sets the password and revokes every session.
+  Future<Response> _recoveryReset(Request request, String requestId) async {
+    final body = await _typedBody(
+      request,
+      requestId,
+      valid: {
+        'email': (v) => v is String && v.contains('@') && v.length <= 254
+            ? null
+            : 'email must be an email',
+        'recoveryCode': (v) => v is String && v.isNotEmpty && v.length <= 64
+            ? null
+            : 'recoveryCode must be 1 to 64 characters',
+        'newPassword': (v) => v is String && PasswordPolicy.check(v) == null
+            ? null
+            : 'newPassword is too weak',
+      },
+      required: const ['email', 'recoveryCode', 'newPassword'],
+    );
+    if (_recoveryCode == null ||
+        RecoveryCodeFormat.normalize(body['recoveryCode']! as String) !=
+            _recoveryCode) {
+      return _error(
+        request,
+        requestId,
+        400,
+        'AUTH_RECOVERY_INVALID',
+        'Nieprawidłowy e-mail lub kod odzyskiwania.',
+      );
+    }
+    for (final s in _sessions) {
+      s.revoked = true;
+    }
+    if (password != null) password = body['newPassword']! as String;
+    return Response(204);
+  }
+
+  List<Map<String, Object?>> _schedulesOf(String deviceId) =>
+      _schedules[deviceId] ??= [
+        for (final row in fixtures.successCases(
+          'HeatingScheduleController_list',
+        ))
+          if (row is List<Object?>)
+            for (final item in row.whereType<Map<String, Object?>>())
+              if (item['deviceId'] == deviceId) item,
+      ];
+
+  static Map<String, String? Function(Object?)> get _scheduleFields => {
+    'name': (v) => v is String && HeatingScheduleRules.validName(v)
+        ? null
+        : 'name must be 1 to 120 characters',
+    'daysOfWeek': (v) =>
+        v is List<Object?> &&
+            v.every((d) => d is int) &&
+            HeatingScheduleRules.validDays(v.cast<int>())
+        ? null
+        : 'daysOfWeek must be 1 to 7 unique days 0..6',
+    'startTime': (v) => v is String && HeatingScheduleRules.validTime(v)
+        ? null
+        : 'startTime must match HH:mm',
+    'endTime': (v) => v is String && HeatingScheduleRules.validTime(v)
+        ? null
+        : 'endTime must match HH:mm',
+    'targetTemperatureCelsius': _number('targetTemperatureCelsius', 0, 100),
+    'hysteresisCelsius': _number('hysteresisCelsius', 1, 20),
+    'enabled': _boolean('enabled'),
+  };
+
+  Future<Response> _createSchedule(
+    Request request,
+    String requestId,
+    String deviceId,
+  ) async {
+    final device = await _mutableDevice(request, requestId, deviceId);
+    final body = await _typedBody(
+      request,
+      requestId,
+      valid: _scheduleFields,
+      required: const [
+        'name',
+        'daysOfWeek',
+        'startTime',
+        'endTime',
+        'targetTemperatureCelsius',
+        'hysteresisCelsius',
+      ],
+    );
+    final now = _now().toUtc().toIso8601String();
+    final row = <String, Object?>{
+      'id': 'cmock${(_nextScheduleId++).toString().padLeft(20, '0')}',
+      'deviceId': deviceId,
+      'name': body['name'],
+      'daysOfWeek': body['daysOfWeek'],
+      'startTime': body['startTime'],
+      'endTime': body['endTime'],
+      'targetTemperatureCelsius': body['targetTemperatureCelsius'],
+      'hysteresisCelsius': body['hysteresisCelsius'],
+      'enabled': body['enabled'] ?? true,
+      'createdAt': now,
+      'updatedAt': now,
+    };
+    _schedulesOf(deviceId).add(row);
+    _reconcileSchedules(device);
+    return _json(row, status: 201);
+  }
+
+  Future<Map<String, Object?>> _scheduleRow(
+    Request request,
+    String requestId,
+    String deviceId,
+    String scheduleId,
+  ) async {
+    final row = _schedulesOf(deviceId)
+        .where((s) => s['id'] == scheduleId)
+        .firstOrNull;
+    if (row == null) {
+      throw _Reply(
+        _error(
+          request,
+          requestId,
+          404,
+          'HEATING_SCHEDULE_NOT_FOUND',
+          'Heating schedule not found.',
+        ),
+      );
+    }
+    return row;
+  }
+
+  Future<Response> _updateSchedule(
+    Request request,
+    String requestId,
+    String deviceId,
+    String scheduleId,
+  ) async {
+    final device = await _mutableDevice(request, requestId, deviceId);
+    final body = await _typedBody(request, requestId, valid: _scheduleFields);
+    final row = await _scheduleRow(request, requestId, deviceId, scheduleId);
+    row
+      ..addAll(body)
+      ..['updatedAt'] = _now().toUtc().toIso8601String();
+    _reconcileSchedules(device);
+    return _json(row);
+  }
+
+  Future<Response> _removeSchedule(
+    Request request,
+    String requestId,
+    String deviceId,
+    String scheduleId,
+  ) async {
+    final device = await _mutableDevice(request, requestId, deviceId);
+    final row = await _scheduleRow(request, requestId, deviceId, scheduleId);
+    _schedulesOf(deviceId).remove(row);
+    _reconcileSchedules(device);
+    return Response(204);
+  }
+
+  /// GI Core's reconcile with schedules on the UTC clock: suspended wins
+  /// (mode OFF), else the first enabled matching schedule (by createdAt)
+  /// sets target and hysteresis over the base, else the base.
+  void _reconcileSchedules(Map<String, Object?> device) {
+    _reconcile(device);
+    final base = device['baseControlStrategy'];
+    if (base is! Map<String, Object?> || device['heatingSuspended'] == true) {
+      return;
+    }
+    final now = _now().toUtc();
+    final minutes = now.hour * 60 + now.minute;
+    final today = now.weekday % 7;
+    final yesterday = (today + 6) % 7;
+    bool matches(Map<String, Object?> s) {
+      final start = HeatingScheduleRules.minutesOf('${s['startTime']}')!;
+      final end = HeatingScheduleRules.minutesOf('${s['endTime']}')!;
+      final days = (s['daysOfWeek']! as List<Object?>).cast<int>();
+      if (start == end) return days.contains(today);
+      if (start < end) {
+        return days.contains(today) && minutes >= start && minutes < end;
+      }
+      return (days.contains(today) && minutes >= start) ||
+          (days.contains(yesterday) && minutes < end);
+    }
+
+    final active = _schedulesOf('${device['id']}')
+        .where((s) => s['enabled'] == true && matches(s))
+        .firstOrNull;
+    if (active == null) return;
+    device['controlStrategy'] = {
+      ...base,
+      'targetTemperatureCelsius': active['targetTemperatureCelsius'],
+      'hysteresisCelsius': active['hysteresisCelsius'],
+    };
   }
 
   /// Reads a JSON body with exactly the [required] string fields.

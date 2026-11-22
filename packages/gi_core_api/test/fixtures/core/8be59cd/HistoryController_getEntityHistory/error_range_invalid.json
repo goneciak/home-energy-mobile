@@ -1,0 +1,8 @@
+{
+  "statusCode": 400,
+  "code": "HISTORY_RANGE_INVALID",
+  "message": "History time range is invalid.",
+  "path": "/api/v1/devices/4e574b55-4fe0-4e31-8d4f-52814e0b1e72/entities/cmwrajeuk000901o63lt2onh7/history?from=2026-01-02T00:00:00Z&to=2026-01-01T00:00:00Z",
+  "requestId": "0d2539ed-1887-44aa-bf61-ad92695bf404",
+  "timestamp": "2026-11-22T03:51:55.941Z"
+}

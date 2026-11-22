@@ -207,4 +207,39 @@ void main() {
     expect(ApplianceProfileStore(prefs).read(), isNull);
     verifyZeroInteractions(secureStorage);
   });
+
+  testWidgets('demo: account screens, recovery code and logout-all (plan '
+      'M3.5)', (tester) async {
+    final (container, _) = await pumpApp(tester);
+    await tester.ensureVisible(find.byKey(const ValueKey('demo-enter')));
+    await tester.tap(find.byKey(const ValueKey('demo-enter')));
+    await waitFor(tester, find.text('Sterownik kotłowni'));
+
+    container.read(goRouterProvider).go(AppRoutes.accountSessions);
+    await waitFor(tester, find.text(l10n.sessionsThisPhone));
+
+    container.read(goRouterProvider).go(AppRoutes.accountRecoveryCode);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('recovery-code-generate')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('recovery-code-confirm')));
+    await waitFor(tester, find.byKey(const ValueKey('recovery-code-value')));
+    await tester.tap(find.byKey(const ValueKey('recovery-code-acknowledge')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('recovery-code-done')));
+    await tester.pumpAndSettle();
+
+    container.read(goRouterProvider).go(AppRoutes.accountSessions);
+    await waitFor(tester, find.text(l10n.sessionsThisPhone));
+    final logoutAll = find.byKey(const ValueKey('sessions-logout-all'));
+    await tester.ensureVisible(logoutAll);
+    await tester.pumpAndSettle();
+    await tester.tap(logoutAll);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('sessions-confirm')));
+    await tester.pumpAndSettle();
+
+    // Logging out of every device ends the demo.
+    expect(container.read(demoModeProvider), isNull);
+  });
 }

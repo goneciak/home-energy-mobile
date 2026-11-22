@@ -198,4 +198,4 @@ final class GiCoreClientProvider
   }
 }
 
-String _$giCoreClientHash() => r'053992c9257c6b5e6068bef0cea543ccdd45dae6';
+String _$giCoreClientHash() => r'd490aeca131c733fdfdbea35ae8a3d2b0cee8d59';

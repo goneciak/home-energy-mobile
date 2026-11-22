@@ -123,7 +123,8 @@ abstract class _$LanguagePreference extends $Notifier<Locale?> {
 /// Best-effort running GI Core version from `GET /appliance/updates/status`
 /// (plan §16), for OWNER/ADMIN only, so other roles never cause a 403.
 /// `null` when unknown: another role, no check yet, or any failure. Nothing
-/// is gated on it. Read each time Settings opens.
+/// is gated on it, but a change of version re-runs the capability probes
+/// ([coreCapabilitiesProvider]). Read each time Settings opens.
 
 @ProviderFor(applianceRunningVersion)
 final applianceRunningVersionProvider = ApplianceRunningVersionProvider._();
@@ -131,7 +132,8 @@ final applianceRunningVersionProvider = ApplianceRunningVersionProvider._();
 /// Best-effort running GI Core version from `GET /appliance/updates/status`
 /// (plan §16), for OWNER/ADMIN only, so other roles never cause a 403.
 /// `null` when unknown: another role, no check yet, or any failure. Nothing
-/// is gated on it. Read each time Settings opens.
+/// is gated on it, but a change of version re-runs the capability probes
+/// ([coreCapabilitiesProvider]). Read each time Settings opens.
 
 final class ApplianceRunningVersionProvider
     extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
@@ -139,7 +141,8 @@ final class ApplianceRunningVersionProvider
   /// Best-effort running GI Core version from `GET /appliance/updates/status`
   /// (plan §16), for OWNER/ADMIN only, so other roles never cause a 403.
   /// `null` when unknown: another role, no check yet, or any failure. Nothing
-  /// is gated on it. Read each time Settings opens.
+  /// is gated on it, but a change of version re-runs the capability probes
+  /// ([coreCapabilitiesProvider]). Read each time Settings opens.
   ApplianceRunningVersionProvider._()
     : super(
         from: null,
@@ -166,7 +169,7 @@ final class ApplianceRunningVersionProvider
 }
 
 String _$applianceRunningVersionHash() =>
-    r'7dbc7f1c84b8e7eb44cb57fae1bb2241891ad331';
+    r'74858327add0fe38401bd0772b2ff89bf78575be';
 
 /// `GET /settings/system` (device name, time zone) for OWNER/ADMIN/SERVICE,
 /// or `null` for other roles and on any failure: Settings then just leave

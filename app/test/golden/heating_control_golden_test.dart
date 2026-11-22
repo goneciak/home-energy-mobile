@@ -14,8 +14,10 @@ import 'package:gi_home/src/features/devices/domain/heating_command_state.dart';
 import 'package:gi_home/src/features/devices/presentation/device_detail_screen.dart';
 import 'package:gi_home/src/features/devices/presentation/widgets/heating_control_panel.dart';
 import 'package:gi_home/src/features/devices/presentation/widgets/strategy_editor_sheet.dart';
+import 'package:gi_home/src/features/environment/application/environment_providers.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../support/environment_fixtures.dart';
 import '../support/fake_device_source.dart';
 import '../support/fixtures.dart';
 import '../support/golden.dart';
@@ -31,6 +33,7 @@ void main() {
 
   List<Override> ownerOverrides(FakeDeviceSource source) => [
     deviceReadSourceProvider.overrideWithValue(source),
+    environmentSourceProvider.overrideWithValue(FakeEnvironmentSource()),
     deviceCommandSourceProvider.overrideWithValue(FakeCommandSource()),
     currentUserProvider.overrideWithValue(
       const CurrentUser(

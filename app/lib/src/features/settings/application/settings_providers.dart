@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
+import 'package:gi_home/src/features/appliance/application/core_capabilities.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/settings/data/language_preference_store.dart';
@@ -39,7 +40,8 @@ class LanguagePreference extends _$LanguagePreference {
 /// Best-effort running GI Core version from `GET /appliance/updates/status`
 /// (plan §16), for OWNER/ADMIN only, so other roles never cause a 403.
 /// `null` when unknown: another role, no check yet, or any failure. Nothing
-/// is gated on it. Read each time Settings opens.
+/// is gated on it, but a change of version re-runs the capability probes
+/// ([coreCapabilitiesProvider]). Read each time Settings opens.
 @riverpod
 Future<String?> applianceRunningVersion(Ref ref) async {
   final role = ref.watch(currentUserProvider.select((user) => user?.role));
@@ -51,7 +53,11 @@ Future<String?> applianceRunningVersion(Ref ref) async {
   }
   try {
     final status = await client.applianceUpdateStatus();
-    return status.runningVersion();
+    final version = status.runningVersion();
+    if (ref.mounted) {
+      ref.read(coreVersionChangesProvider.notifier).note(version);
+    }
+    return version;
   } on Object {
     return null;
   }

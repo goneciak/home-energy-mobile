@@ -138,6 +138,7 @@ Pole `message` jest po polsku tylko dla kodów z tabeli `common/i18n/api-message
   - `/auth/logout` wymaga Bearer;
   - `mustChangePassword` nie jest egzekwowane przez serwer;
   - logowanie: 5 prób na 60 s na IP; `recovery/reset`: 5 na 15 min.
+- **Unieważnienie sesji działa natychmiast** (korekta M3): `AuthGuard` sprawdza wiersz sesji przy każdym żądaniu (`auth.guard.ts:46-58`), więc access token odwołanej sesji dostaje od razu 401 `AUTH_SESSION_REVOKED`, a nie dopiero po 900 s.
 
 ### 3.6 Domena urządzeń
 - **`GET /devices`** (lista) zwraca dla każdego elementu (`device.dto.ts` `DeviceResponseDto` l.84-226; `device-response.mapper.ts:10-20` rozwija cały `device.toSnapshot()`):
@@ -227,16 +228,16 @@ Inne istotne fakty (**zweryfikowane** w `infrastructure/compose.yml`):
 | Element | Endpoint(y) | Rola |
 |---|---|---|
 | Harmonogramy | `GET /devices/:deviceId/schedules` (model ręczny) | R |
-| Zmiany harmonogramów | `POST`, `PATCH`, `DELETE` `/devices/:deviceId/schedules/:sid` | W |
-| Pogoda i słońce | `/weather/current`, `/weather/daily`, `/weather/hourly`, `/solar/current`. Kod 503 oznacza „brak danych”. | R |
-| Prognoza PV | `GET /pv/forecast`. Kod 400 oznacza „nie skonfigurowano”, więc karta jest ukryta. | R |
+| Zmiany harmonogramów | `POST` → **201** (brak `@HttpCode`), `PATCH` → 200, `DELETE` → 204 `/devices/:deviceId/schedules/:sid` | W |
+| Pogoda i słońce | `/weather/current`, `/weather/daily`, `/weather/hourly`: 503 `HTTP_503` oznacza „brak danych”. `/solar/current` bez współrzędnych domu zwraca **400 `HTTP_400`** („Set house coordinates first.”), nie 503 (korekta M3). | R |
+| Prognoza PV | `GET /pv/forecast`. Kod 400 `HTTP_400` oznacza „nie skonfigurowano” (brak współrzędnych albo PV), więc karta jest ukryta. Awaria Open-Meteo kończy się **500 `INTERNAL_SERVER_ERROR`** (błąd nieprzechwycony w Core); traktujemy to jak „brak danych”, nie jak awarię aplikacji (korekta M3). | R |
 | Plan grzania PV | `GET /devices/:id/pv-heating-plan` | R |
 | Historia | `GET /devices/:d/entities/:e/history?from=&to=&limit=` | R |
 | Uwaga | wyliczane z `GET /devices` | R |
-| Sesje | `GET /auth/sessions`, `DELETE /auth/sessions/:id`, `POST /auth/logout-all` | dowolna |
-| Reset hasła | `POST /auth/recovery/reset` → 204 | publiczne |
+| Sesje | `GET /auth/sessions`, `DELETE /auth/sessions/:id` (204; odwołanie działa natychmiast), `POST /auth/logout-all` (204; unieważnia **wszystkie** sesje, także bieżącą, więc klient traktuje to jak lokalne wylogowanie) | dowolna |
+| Reset hasła | `POST /auth/recovery/reset` → 204. Unieważnia wszystkie sesje użytkownika, ale **nie zużywa i nie rotuje kodu**, więc po resecie aplikacja proponuje regenerację (korekta M3). | publiczne |
 | Regeneracja kodu odzyskiwania | `POST /auth/recovery/regenerate` → `{recoveryCode}` | dowolna |
-| Profil | `GET`/`PATCH /users/me/profile`, `POST /users/me/change-password` | dowolna |
+| Profil | `GET`/`PATCH /users/me/profile`, `POST /users/me/change-password` → **200 `{revokedSessions}`** (nie 204; unieważnia pozostałe sesje, bieżąca zostaje; tryb demo poprawiony w M3) | dowolna |
 | Strefa czasowa domu | `GET /settings/system` → `{timezone}` | OWNER/ADMIN/SERVICE (o dostępie decyduje katalog). USER dostaje strefę telefonu z etykietą. |
 | Wersja Core (best effort) | `GET /appliance/updates/status` | OWNER/ADMIN (§16) |
 
@@ -487,7 +488,7 @@ Obsłużone pułapki:
 
 ### 7.7 Odzyskiwanie i hasło (v1.0)
 
-**Reset.** Normalizujemy kod, wysyłamy `POST /auth/recovery/reset` (204) i logujemy użytkownika. `AUTH_RECOVERY_INVALID` mapujemy po kodzie.
+**Reset.** Normalizujemy kod (trim, wielkie litery, bez białych znaków; myślniki zostają, bo Core ich nie usuwa), wysyłamy `POST /auth/recovery/reset` (204) i logujemy użytkownika. `AUTH_RECOVERY_INVALID` mapujemy po kodzie. Reset unieważnia wszystkie sesje, ale kodu nie rotuje (korekta M3), dlatego po resecie proponujemy regenerację.
 
 **Regeneracja** prowadzi do **kroku sejfu**. Kod pokazujemy raz; trzeba go skopiować, udostępnić do menedżera haseł albo przepisać dwie ostatnie grupy. Kod nie jest zapisywany. Nie ma pozornego pytania o hasło, bo Core go nie weryfikuje (L25). Kod daje pełne przejęcie konta, dlatego dopóki ekran sejfu jest widoczny:
 - **Android:** `FLAG_SECURE` przez mały kanał platformowy (blokada zrzutów ekranu i miniatury w przełączniku aplikacji). Kopiowanie z `ClipDescription.EXTRA_IS_SENSITIVE` (Android 13+).
@@ -1143,6 +1144,21 @@ Zakładany zespół: 1 senior Flutter, od M2 dodatkowo 0,5 FTE design/QA. Warto�
 | 6 | Sondowanie funkcji (§16); best-effort `runningVersion` | 0,5 d |
 | 7 | (tylko przy D1 = B) lista profili: dodaj, zmień nazwę, przełącz, usuń z czyszczeniem; polling, snapshot i Uwaga tylko dla aktywnego profilu; nazwa profilu w pasku aplikacji | 1 d |
 | 8 | Fixture'y, testy kontraktowe, goldeny | 0,5–1 d |
+
+**Status M3 (2026-11-22, gałąź `feat/m3`):**
+
+| # | Status |
+|---|---|
+| 1 | Zrobione: `ApiWeekday`, `ScheduleClock`, CRUD, ostrzeżenie o nakładaniu, podwójny czas; konwersja na czas domu za flagą `scheduleClockConversion` (ADR [0010](decisions/0010-schedule-clock-utc.md)) |
+| 2 | Zrobione: pogoda, słońce, PV, plan PV; kształty 200 tylko z fixture'ów `_handwritten` (stos kontraktowy nie ma lokalizacji) |
+| 3 | Zrobione: LTTB w izolacie, wykres schodkowy, tabela, 7 d w plastrach dobowych (ADR [0011](decisions/0011-history-lttb-step-chart.md)) |
+| 4 | Zrobione: Uwaga, ETag za flagą `conditionalGet` (ADR [0012](decisions/0012-etag-non-authoritative-cache.md)), snapshot |
+| 5 | Zrobione: sesje, logout-all, reset, regeneracja z ochroną ekranu (ADR [0014](decisions/0014-recovery-code-secure-display.md)), profil i język |
+| 6 | Zrobione: sondowanie funkcji (ADR [0013](decisions/0013-feature-probing.md)), `runningVersion` |
+| 7 | Poza zakresem: D1 = A (jeden profil) |
+| 8 | Zrobione: fixture'y, testy kontraktowe, goldeny |
+
+Zablokowane poza repozytorium: **pomiar historii 7 d na fizycznym Androidzie** (benchmark `app/integration_test/perf/history_7d_benchmark_test.dart` jest gotowy, wynik z urządzenia czeka na telefon; benchmark hosta `lttb_benchmark_test.dart` przechodzi) oraz **zamknięty test Play** (≥ 12 testerów przez 14 dni wymaga konta Play i testerów; decyzja właściciela, nie kod).
 
 **Exit M3:**
 - CRUD harmonogramów przechodzi pełny cykl na Core w Dockerze;

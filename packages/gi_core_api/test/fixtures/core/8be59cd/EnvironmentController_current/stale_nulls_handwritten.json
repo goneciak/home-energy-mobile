@@ -1,0 +1,18 @@
+{
+  "data": {
+    "observedAt": null,
+    "temperatureC": null,
+    "apparentTemperatureC": null,
+    "relativeHumidityPercent": null,
+    "pressureHpa": null,
+    "windSpeedMps": null,
+    "windDirectionDegrees": null,
+    "windGustMps": null,
+    "cloudCoveragePercent": null,
+    "symbolCode": null,
+    "precipitationMm": null
+  },
+  "fetchedAt": "2026-11-22T06:05:12.331Z",
+  "stale": true,
+  "lastError": "Weather provider temporarily unavailable."
+}
