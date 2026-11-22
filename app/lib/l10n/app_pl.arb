@@ -96,6 +96,7 @@
   "errorValidation": "Sprawdź wprowadzone dane.",
   "errorRateLimited": "Zbyt wiele prób. Spróbuj ponownie za chwilę.",
   "errorServer": "Wystąpił błąd po stronie GI Home. Spróbuj ponownie.",
+  "errorMaintenance": "GI Home jest chwilowo niedostępny – uruchamia się lub trwa konserwacja. Spróbuj ponownie za kilka minut.",
   "errorUnexpectedResponse": "GI Home zwrócił nieoczekiwaną odpowiedź. Sprawdź adres urządzenia.",
   "errorUnexpectedShape": "Nie udało się odczytać odpowiedzi GI Home. Aplikacja może wymagać aktualizacji.",
   "errorUnauthorized": "GI Home odrzucił żądanie. Spróbuj ponownie.",
@@ -551,7 +552,7 @@
   "heatingCardPumpOn": "Pracuje",
   "heatingCardPumpOff": "Zatrzymana",
   "heatingCardRelayNote": "Stan przekaźników według polecenia sterownika",
-  "heatingCardControllerUnknown": "Sterownik: brak danych",
+  "heatingCardControllerUnknown": "Czekamy na dane ze sterownika",
   "heatingCardLoading": "Pobieranie szczegółów…",
   "heatingCardDataFrom": "Dane z {time}",
   "@heatingCardDataFrom": {
@@ -616,6 +617,9 @@
       }
     }
   },
+  "freshnessWaitingForReading": "Czekamy na pierwszy odczyt",
+  "schedulesOfflineBanner": "Brak połączenia z GI Home. Widzisz ostatnio pobraną listę – możesz ją odświeżyć.",
+  "schedulesRefreshFailedBanner": "Nie udało się odświeżyć harmonogramów. Widzisz ostatnio pobraną listę – możesz spróbować ponownie.",
   "staleAppTitle": "Zaktualizuj aplikację",
   "@staleAppTitle": {
     "description": "Non-blocking banner shown when GI Core keeps sending responses this app version cannot read (plan §16 point 4)."
@@ -766,8 +770,8 @@
       }
     }
   },
-  "switchCommandNotReported": "nie zgłoszono",
-  "@switchCommandNotReported": {
+  "switchValueAwaitingReport": "czeka na raport",
+  "@switchValueAwaitingReport": {
     "description": "Switch command (plan §12.2). Never claims the relay physically switched."
   },
   "switchConfirmOnTitle": "Wysłać polecenie włączenia: {name}?",
@@ -1950,6 +1954,8 @@
   "offlineSnapshotReadOnly": "Tylko do odczytu: stan urządzeń z ostatniego połączenia.",
   "flagConditionalGetTitle": "Warunkowe pobieranie urządzeń (ETag)",
   "flagConditionalGetDescription": "Lista i szczegóły urządzeń są pobierane z nagłówkiem If-None-Match; odpowiedź 304 oszczędza transfer. Zmiana działa od następnej sesji.",
+  "flagMdnsFallbackTitle": "Wyszukiwanie urządzenia przez multicast DNS",
+  "flagMdnsFallbackDescription": "Tylko Android. Gdy system nie rozpoznaje nazwy .local, aplikacja pyta o nią bezpośrednio sieć lokalną. Zmiana działa przy następnym wyszukiwaniu.",
   "settingsAccountManage": "Profil i bezpieczeństwo",
   "accountTitle": "Profil i bezpieczeństwo",
   "accountProfileSection": "Profil",

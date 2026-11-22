@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/core/polling/foreground_poller.dart';
+import 'package:gi_home/src/core/polling/polling_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 extension RefPolling on Ref {
@@ -17,17 +18,30 @@ extension RefPolling on Ref {
   /// jitter (plan §11). The first run starts right after the provider's
   /// build, so [task] may set the provider's state. The poller measures
   /// time on [clockProvider], like the screens.
+  ///
+  /// The poller shares its backoff with every other poller of the appliance
+  /// ([applianceReachabilityProvider]) and is refreshed with them after a
+  /// network change ([pollCoordinatorProvider]). While another poller probes
+  /// an unreachable appliance this one sends nothing and hands the shared
+  /// error to [onSharedFailure] instead, to publish like its own failure.
+  /// [phase] offsets the poller within its cadence ([ForegroundPoller]).
   ForegroundPoller pollWhileWatched({
     required Duration interval,
     required Future<void> Function() task,
+    void Function(Object error)? onSharedFailure,
+    Duration phase = Duration.zero,
   }) {
     final active = _PollingActivity(watch(appForegroundProvider));
     final poller = ForegroundPoller(
       foreground: active,
       interval: interval,
+      phase: phase,
       task: task,
+      onSharedFailure: onSharedFailure,
+      reachability: read(applianceReachabilityProvider),
       now: read(clockProvider),
     );
+    onDispose(read(pollCoordinatorProvider).register(poller));
     // A dependent provider that rebuilds drops its subscription and adds it
     // back on the scheduler's next flush, which fires onCancel and then
     // onResume. Only a provider still paused once pending rebuilds are done

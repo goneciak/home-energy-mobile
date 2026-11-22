@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/config/config_providers.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/appliance/data/host_resolver.dart';
+import 'package:gi_home/src/features/appliance/data/multicast_dns_host_resolver.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_candidate.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -278,8 +281,17 @@ HostResolver hostResolver(Ref ref) {
   final mock =
       ref.watch(appFlavorProvider) == AppFlavor.dev &&
       ref.watch(featureFlagsProvider.select((f) => f.mockCore));
-  return mock
-      ? const StaticHostResolver({'gi-home.local'})
+  if (mock) return const StaticHostResolver({'gi-home.local'});
+  // The multicast DNS fallback asks only after the system gave up, and only
+  // on Android: iOS resolves `.local` names itself (spike S3).
+  final mdns =
+      defaultTargetPlatform == TargetPlatform.android &&
+      ref.watch(featureFlagsProvider.select((f) => f.mdnsFallback));
+  return mdns
+      ? const FirstHostResolver([
+          SystemHostResolver(),
+          MulticastDnsHostResolver(),
+        ])
       : const SystemHostResolver();
 }
 

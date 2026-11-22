@@ -34,6 +34,9 @@ class DeviceDetailNotifier extends _$DeviceDetailNotifier {
     late final ForegroundPoller poller;
     poller = _poller = ref.pollWhileWatched(
       interval: FreshnessPolicy.deviceDetail.interval,
+      onSharedFailure: (error) {
+        if (buildRef.mounted) state = state.failed(error);
+      },
       task: () async {
         state = state.refreshing();
         try {

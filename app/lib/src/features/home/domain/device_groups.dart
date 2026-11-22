@@ -67,3 +67,8 @@ int _compareDevices(DeviceListItem a, DeviceListItem b) {
   if (a.isHeating != b.isHeating) return a.isHeating ? -1 : 1;
   return a.name.toLowerCase().compareTo(b.name.toLowerCase());
 }
+
+/// Enabled heating devices (recognised from the list) get a card; disabled
+/// ones are shown, but not polled.
+bool hasHeatingCard(DeviceListItem device) =>
+    device.enabled && device.isHeating;

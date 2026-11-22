@@ -81,7 +81,7 @@ final class DeviceListNotifierProvider
 }
 
 String _$deviceListNotifierHash() =>
-    r'22caa93ca981e0ee23cddd98499ff31512687c00';
+    r'7f9c9d8a3a8416d928e0c1c616d4fef7a032dde9';
 
 /// `GET /devices`, polled every 30 s while Home or device details are
 /// visible and the app is in the foreground (plan §11). It is the shared

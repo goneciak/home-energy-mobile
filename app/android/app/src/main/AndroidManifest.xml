@@ -2,10 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Only the multicast DNS fallback (mdnsFallback flag, off by default)
+         holds the multicast lock; it needs this permission to take it. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <!-- Local network protection (plan §9.4): requested at runtime on
          Android 13+ only while the androidLocalNetworkPermissionRequest flag
-         is on. Never used for location. CHANGE_WIFI_MULTICAST_STATE is only
-         for the multicast_dns fallback, which waits for spike S3. -->
+         is on. Never used for location. -->
     <uses-permission
         android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation"

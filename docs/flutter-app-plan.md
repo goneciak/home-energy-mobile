@@ -665,7 +665,7 @@ Dodatkowe przeszkody:
 | Dane | Endpoint | Kadencja (pierwszy plan) |
 |---|---|---|
 | Lista urządzeń (wspólny cache dla Domu, Urządzeń i Uwagi) | `GET /devices?limit=100` | 30 s, pull-to-refresh i przy wznowieniu |
-| Karty ogrzewania na Domu | `GET /devices/:id` tylko dla **widocznych** urządzeń grzewczych (rozpoznanych z listy) | 15 s, współbieżność ≤ 3 |
+| Karty ogrzewania na Domu | `GET /devices/:id` dla urządzeń grzewczych z ostatniej listy | max(15 s, n × 6 s), gdzie n = liczba urządzeń grzewczych na liście (nie widocznych kart); współbieżność ≤ 3; zob. [ADR 0016](decisions/0016-home-card-cadence-request-budget.md) |
 | Otwarte szczegóły | `GET /devices/:id` | 5 s; 2 s przez 30–45 s po poleceniu; 15 s po 2 min bezczynności |
 | Pokoje | `GET /rooms` | przy otwarciu |
 | Pogoda i słońce | `/weather/*`, `/solar/current` | 15 min |
@@ -678,10 +678,10 @@ Dodatkowe przeszkody:
 - Tyknięcie jest pomijane, jeśli poprzednie żądanie jeszcze trwa.
 - Maksymalnie 4 współbieżne żądania na urządzenie GI Home.
 - Backoff 5 → 10 → 30 → 60 s.
-- Banner „Dane z HH:MM”, gdy dane są starsze niż 2× interwał.
+- Banner „Dane z HH:MM”, gdy dane są starsze niż 2× interwał (dla kart: 2× ich własna kadencja).
 
 **Budżet obciążenia (Exit M4):**
-- ≤ 12 żądań/min na telefon na ekranie Dom (lista 2/min + 2 karty × 4/min);
+- ≤ 12 żądań/min na telefon na ekranie Dom (lista 2/min + karty łącznie ≤ 10/min: każda karta co max(15 s, n × 6 s); np. 18 s przy 3 kartach, 30 s przy 5); szczegóły w [budżecie obciążenia](load-budget.md);
 - ≤ 30 żądań/min średnio na szczegółach (z krótkimi szczytami po poleceniu);
 - CPU gi-core na Pi < 50% przy 3 telefonach i panelu web przez 30 min.
 
@@ -1184,6 +1184,19 @@ Zablokowane poza repozytorium: **pomiar historii 7 d na fizycznym Androidzie** (
 - budżet obciążenia spełniony (≤ 12 żądań/min na Domu, ≤ 30 na szczegółach, CPU gi-core < 50%);
 - ścieżki „logowanie”, „wstrzymanie ogrzewania”, „zmiana celu” i „odczyt historii” wykonane przez testera z VoiceOver (pl) i TalkBack (pl), zapisane w liście kontrolnej wydania;
 - oba zgłoszenia do sklepów zaakceptowane.
+
+**Status realizacji M4 (2026-11-22):** nic poniżej nie jest oznaczone jako zmierzone, jeśli nie zostało zmierzone. Szczegóły i dowody: [lista wyjścia M4](templates/m4-exit-checklist.md). Przekazanie: [m4-handoff.md](m4-handoff.md).
+
+| Kryterium Exit M4 | Status | Artefakty |
+|---|---|---|
+| budżet żądań na Domu i szczegółach | zrobione (automatycznie, test budżetu) | [load-budget.md](load-budget.md), [ADR 0016](decisions/0016-home-card-cadence-request-budget.md) |
+| skala tekstu 200%, 48 dp, kontrast, audyt stanów | zrobione (automatycznie); zrzuty Linux do ponownego nagrania z CI | [state-audit.md](state-audit.md), [ADR 0017](decisions/0017-accessibility-verification-strategy.md) |
+| zmiany sieci bez ponawiania zapisów | zrobione (automatycznie); mDNS za flagą do wyniku S3 | [ADR 0015](decisions/0015-network-change-no-write-replay.md) |
+| artefakty sklepowe i prywatności | przygotowane; raport prywatności Xcode, dane operatora i konsole sklepów czekają | [docs/store](store/review-notes.md), [compatibility.md](compatibility.md) |
+| zimny start p90 ≤ 5 s, CPU gi-core < 50% | przygotowane, zablokowane (Pi i telefon) | [cold-start-p90](templates/cold-start-p90.md), [raport obciążenia](templates/load-test-pi-report.md) |
+| VoiceOver i TalkBack (pl) | przygotowane, zablokowane (urządzenia i tester) | [lista wydania](release-checklist.md) |
+| sesje bez awarii, wymuszone logowanie | przygotowane, zablokowane (beta 14 dni) | [runbook, sekcja 8](release-runbook.md), [ADR 0018](decisions/0018-beta-programme-and-metrics.md) |
+| oba zgłoszenia zaakceptowane | przygotowane, zablokowane (sklepy) | [runbook, sekcja 7](release-runbook.md) |
 
 **Sumy:**
 - MVP: ok. 27–33 osobodni (koniec M2);

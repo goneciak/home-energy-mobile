@@ -8,5 +8,8 @@ import 'package:flutter/services.dart';
 /// * `openAppSettings` → opens the app's page in the system settings
 ///   (`Settings.ACTION_APPLICATION_DETAILS_SETTINGS`), `true` if it opened;
 /// * `requestNearbyWifiDevices` → asks for `NEARBY_WIFI_DEVICES` and answers
-///   `granted`, `denied` or `permanentlyDenied`.
+///   `granted`, `denied` or `permanentlyDenied`;
+/// * `acquireMulticastLock` / `releaseMulticastLock` → hold or drop Android's
+///   Wi-Fi multicast lock, which the multicast DNS fallback needs to receive
+///   answers (`true` if the lock is held).
 const giPlatformChannel = MethodChannel('pl.gihome.gi_home/platform');

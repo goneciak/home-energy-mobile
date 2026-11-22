@@ -1,6 +1,7 @@
 @Tags(['golden'])
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_core_api/gi_core_api.dart';
@@ -70,6 +71,31 @@ void main() {
     fileName: 'schedules_owner',
     screen: () => const SchedulesScreen(deviceId: 'd1'),
     overrides: () => overrides(FakeScheduleSource({'d1': filled()})),
+  );
+
+  // Every scenario holds its own source: the last one set below fails.
+  final sources = <FakeScheduleSource>[];
+  screenGoldens(
+    'Schedules: GI Home unreachable, the last list stays',
+    fileName: 'schedules_offline',
+    devices: const [GoldenDevice.smallPhone, GoldenDevice.largePhone],
+    screen: () => const SchedulesScreen(deviceId: 'd1'),
+    overrides: () {
+      final source = FakeScheduleSource({'d1': filled()});
+      sources.add(source);
+      return overrides(source);
+    },
+    act: (tester) async {
+      for (final source in sources) {
+        source.listFailure = const ApiFailure.unreachable();
+      }
+      for (final element in find.byType(SchedulesScreen).evaluate()) {
+        await ProviderScope.containerOf(element)
+            .read(schedulesProvider('d1').notifier)
+            .refresh();
+      }
+      await tester.pumpAndSettle();
+    },
   );
 
   screenGoldens(

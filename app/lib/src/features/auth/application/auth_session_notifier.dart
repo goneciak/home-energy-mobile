@@ -5,7 +5,7 @@ import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/features/account/application/account_controllers.dart';
 import 'package:gi_home/src/features/account/application/account_providers.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
-import 'package:gi_home/src/features/appliance/application/connection_ladder.dart';
+import 'package:gi_home/src/features/appliance/application/appliance_rebinder.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
 import 'package:gi_home/src/features/demo/application/demo_mode.dart';
@@ -86,15 +86,9 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
   /// session kept (plan §9.3). Best effort: on any failure the original
   /// restore error stands.
   Future<void> _rebindMovedAppliance() async {
-    final profile = ref.read(applianceProfileProvider);
-    if (profile == null) return;
-    try {
-      final moved = await ref.read(connectionLadderProvider).findMoved(profile);
-      if (moved == null || !ref.mounted) return;
-      await ref.read(applianceProfileProvider.notifier).rebind(moved.host);
-    } on Object {
-      // Nothing found; the restore error is shown with "Try again".
-    }
+    await ref
+        .read(applianceRebinderProvider)
+        .rebindIfMoved(stillWanted: () => ref.mounted);
   }
 
   void _reloadUserOnResume(GiCoreClient client) {

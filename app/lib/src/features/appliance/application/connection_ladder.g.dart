@@ -58,7 +58,7 @@ final class HostResolverProvider
   }
 }
 
-String _$hostResolverHash() => r'45fac2ada53737c8294e0f53f543f582079ff503';
+String _$hostResolverHash() => r'ac8e2411c8a2315858edf5880a6be1495836a897';
 
 /// Kept alive: the session restore uses it to rebind (plan §9.3).
 

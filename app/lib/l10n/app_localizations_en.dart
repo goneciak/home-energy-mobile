@@ -193,6 +193,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorServer => 'GI Home reported an error. Please try again.';
 
   @override
+  String get errorMaintenance =>
+      'GI Home is briefly unavailable – it is starting up or under maintenance. Please try again in a few minutes.';
+
+  @override
   String get errorUnexpectedResponse =>
       'GI Home returned an unexpected response. Check the appliance address.';
 
@@ -1010,7 +1014,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Relay states as commanded by the controller';
 
   @override
-  String get heatingCardControllerUnknown => 'Controller: no data';
+  String get heatingCardControllerUnknown =>
+      'Waiting for data from the controller';
 
   @override
   String get heatingCardLoading => 'Fetching details…';
@@ -1114,6 +1119,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String freshnessUpdatedStale(String time) {
     return 'Updated $time, data may be out of date';
   }
+
+  @override
+  String get freshnessWaitingForReading => 'Waiting for the first reading';
+
+  @override
+  String get schedulesOfflineBanner =>
+      'No connection to GI Home. You are seeing the last list loaded – you can refresh it.';
+
+  @override
+  String get schedulesRefreshFailedBanner =>
+      'Could not refresh the schedules. You are seeing the last list loaded – you can try again.';
 
   @override
   String get staleAppTitle => 'Update the app';
@@ -1243,7 +1259,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get switchCommandNotReported => 'not reported';
+  String get switchValueAwaitingReport => 'waiting for a report';
 
   @override
   String switchConfirmOnTitle(String name) {
@@ -2189,6 +2205,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get flagConditionalGetDescription =>
       'The device list and details are requested with If-None-Match; a 304 response saves data. The change applies from the next session.';
+
+  @override
+  String get flagMdnsFallbackTitle => 'Find the appliance over multicast DNS';
+
+  @override
+  String get flagMdnsFallbackDescription =>
+      'Android only. When the system cannot resolve a .local name, the app asks the local network for it directly. Applies from the next search.';
 
   @override
   String get settingsAccountManage => 'Profile and security';

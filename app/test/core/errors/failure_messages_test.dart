@@ -20,6 +20,19 @@ void main() {
     expect(failureMessage(en, failure), contains('Settings'));
   });
 
+  test(
+    'a 503 reads as maintenance with a next step, other 5xx as an error',
+    () {
+      const unavailable = ApiFailure.server(statusCode: 503);
+      const broken = ApiFailure.server(statusCode: 500);
+
+      expect(failureMessage(pl, unavailable), pl.errorMaintenance);
+      expect(failureMessage(pl, unavailable), contains('Spróbuj ponownie'));
+      expect(failureMessage(en, unavailable), en.errorMaintenance);
+      expect(failureMessage(pl, broken), pl.errorServer);
+    },
+  );
+
   test('a reset appliance asks to finish its setup', () {
     const failure = ApiFailure.applianceReset();
 

@@ -4,6 +4,7 @@ import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/core/polling/foreground_poller.dart';
+import 'package:gi_home/src/core/polling/polling_budget.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/devices/application/device_detail_notifier.dart';
 import 'package:gi_home/src/features/devices/application/device_repositories.dart';
@@ -36,7 +37,7 @@ part 'heating_suspension_controller.g.dart';
 /// * Nothing is retried automatically; a submit while busy is ignored.
 @riverpod
 class HeatingSuspensionController extends _$HeatingSuspensionController {
-  static const pollInterval = Duration(seconds: 2);
+  static const Duration pollInterval = PollingBudget.postCommandPoll;
 
   /// How long the flag (and, on resume, the restored mode) is waited for.
   static const confirmTimeout = Duration(seconds: 30);

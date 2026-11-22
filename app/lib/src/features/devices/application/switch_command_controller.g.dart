@@ -123,7 +123,7 @@ final class SwitchCommandControllerProvider
 }
 
 String _$switchCommandControllerHash() =>
-    r'7a4e08749cb69a80aa0be62959f2210add8106e4';
+    r'0d047203febb534e1acf889dcf199767201cb909';
 
 /// One switch command of entity [entityId] on device [deviceId], without
 /// optimism (plan §12.2, M2 item 2).

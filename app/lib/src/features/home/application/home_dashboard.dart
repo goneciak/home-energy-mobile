@@ -9,6 +9,9 @@ import 'package:gi_home/src/features/home/domain/device_groups.dart';
 import 'package:gi_home/src/features/home/domain/home_condition.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+export 'package:gi_home/src/features/home/domain/device_groups.dart'
+    show hasHeatingCard;
+
 part 'home_dashboard.g.dart';
 
 /// Everything the Home screen shows, derived from the device list, the
@@ -88,8 +91,3 @@ HomeDashboard homeDashboard(Ref ref) {
     heatingCards: heatingCards,
   );
 }
-
-/// Enabled heating devices (recognised from the list) get a card; disabled
-/// ones are shown, but not polled.
-bool hasHeatingCard(DeviceListItem device) =>
-    device.enabled && device.isHeating;

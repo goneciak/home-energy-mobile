@@ -98,6 +98,7 @@ class ExperimentalFeaturesScreen extends ConsumerWidget {
         FeatureFlag.androidLocalNetworkPermissionRequest =>
           l10n.flagAndroidLocalNetworkPermissionRequestTitle,
         FeatureFlag.conditionalGet => l10n.flagConditionalGetTitle,
+        FeatureFlag.mdnsFallback => l10n.flagMdnsFallbackTitle,
       };
 
   static String _flagDescription(AppLocalizations l10n, FeatureFlag flag) =>
@@ -110,5 +111,6 @@ class ExperimentalFeaturesScreen extends ConsumerWidget {
         FeatureFlag.androidLocalNetworkPermissionRequest =>
           l10n.flagAndroidLocalNetworkPermissionRequestDescription,
         FeatureFlag.conditionalGet => l10n.flagConditionalGetDescription,
+        FeatureFlag.mdnsFallback => l10n.flagMdnsFallbackDescription,
       };
 }

@@ -7,6 +7,7 @@ import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/theme/app_theme.dart';
 import 'package:gi_home/src/features/account/application/account_providers.dart';
+import 'package:gi_home/src/features/appliance/application/network_recovery.dart';
 import 'package:gi_home/src/features/demo/presentation/demo_banner_host.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
 import 'package:gi_home/src/features/diagnostics/presentation/stale_app_banner.dart';
@@ -29,7 +30,11 @@ class _GiHomeAppState extends ConsumerState<GiHomeApp> {
     _foreground = ref.read(appForegroundProvider)
       ..addListener(_onForegroundChanged);
     // Kept alive: requests follow the app language from now on.
-    ref.read(syncedRequestLanguageProvider);
+    ref
+      ..read(syncedRequestLanguageProvider)
+      // Kept alive: a network change refreshes the pollers and looks for a
+      // moved appliance.
+      ..read(networkRecoveryProvider);
     _watchColdStart();
   }
 

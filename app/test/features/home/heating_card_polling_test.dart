@@ -39,7 +39,11 @@ void main() {
   late _ConcurrencySource source;
   late AppForeground foreground;
 
-  const heatingIds = ['heat-1', 'heat-2', 'heat-3', 'heat-4', 'heat-5'];
+  const allHeatingIds = ['heat-1', 'heat-2', 'heat-3', 'heat-4', 'heat-5'];
+
+  /// Two heating devices keep every card at the base 15 s cadence; a test
+  /// of a larger Home calls [useHeatingDevices].
+  var heatingIds = allHeatingIds.take(2).toList();
 
   ProviderContainer createContainer(FakeAsync async) {
     final start = DateTime.utc(2026, 11, 18, 7, 41);
@@ -60,8 +64,9 @@ void main() {
   /// own provider (the dashboard never does).
   Map<String, ProviderSubscription<PolledData<DeviceDetail>>> showHome(
     ProviderContainer container, {
-    List<String> ids = heatingIds,
+    List<String>? ids,
   }) {
+    ids ??= heatingIds;
     container.listen(homeDashboardProvider, (_, _) {});
     return {
       for (final id in ids)
@@ -82,7 +87,8 @@ void main() {
       .where((c) => id == null ? c.startsWith('device:') : c == 'device:$id')
       .length;
 
-  setUp(() {
+  void useHeatingDevices(int count) {
+    heatingIds = allHeatingIds.take(count).toList();
     source = _ConcurrencySource(
       deviceList: [
         // The recorded devices: none of them heats.
@@ -108,6 +114,10 @@ void main() {
           id: fixtureDetail({...entityRichDetailJson(), 'id': id}),
       },
     );
+  }
+
+  setUp(() {
+    useHeatingDevices(2);
     foreground = AppForeground();
     addTearDown(foreground.dispose);
   });
@@ -131,6 +141,7 @@ void main() {
   });
 
   test('only cards on screen are fetched, at most 3 at a time', () {
+    useHeatingDevices(5);
     fakeAsync((async) {
       final pending = Completer<void>();
       source.detailGate = pending.future;
@@ -174,6 +185,32 @@ void main() {
       expect(source.calls.where((c) => c == 'devices').length - listBefore, 2);
       expect(detailCalls() - cardBefore, 4);
       expect(detailCalls(), detailCalls('heat-1'));
+    });
+  });
+
+  test('five cards poll every 30 s, spread over the cadence (ADR 0016)', () {
+    useHeatingDevices(5);
+    fakeAsync((async) {
+      final container = createContainer(async);
+      showHome(container);
+      settle(async);
+      expect(detailCalls(), 5, reason: 'every card loads at once');
+      expect(
+        container.read(heatingCardPolicyProvider).interval,
+        const Duration(seconds: 30),
+      );
+
+      // Cards 2..5 wait 6, 12, 18 and 24 s on top of the cadence once.
+      async.elapse(const Duration(seconds: 29));
+      expect(detailCalls(), 5);
+      async.elapse(const Duration(seconds: 1));
+      expect(detailCalls(), 6, reason: 'only the first card is due at 30 s');
+      async.elapse(const Duration(seconds: 6));
+      expect(detailCalls(), 7);
+
+      final before = detailCalls();
+      async.elapse(const Duration(minutes: 5));
+      expect(detailCalls() - before, 5 * 10);
     });
   });
 
@@ -345,7 +382,7 @@ void main() {
       final container = createContainer(async);
       showHome(container);
       settle(async);
-      expect(container.read(homeDashboardProvider).heatingCards, hasLength(5));
+      expect(container.read(homeDashboardProvider).heatingCards, hasLength(2));
 
       source.deviceList = [
         for (final device in source.deviceList)

@@ -47,6 +47,50 @@ void main() {
     });
   });
 
+  test('a phase delays the first regular run once, then the cadence holds', () {
+    fakeAsync((async) {
+      final p = poller()
+        ..phase = const Duration(seconds: 10)
+        ..start();
+      async.flushMicrotasks();
+      expect(runs, 1, reason: 'the first run is not delayed');
+
+      async.elapse(const Duration(seconds: 39));
+      expect(runs, 1);
+      async.elapse(const Duration(seconds: 1));
+      expect(runs, 2, reason: 'interval plus phase');
+      async.elapse(const Duration(seconds: 29));
+      expect(runs, 2);
+      async.elapse(const Duration(seconds: 1));
+      expect(runs, 3, reason: 'then the plain interval');
+      p.dispose();
+    });
+  });
+
+  test('the phase applies again after a return to the foreground', () {
+    fakeAsync((async) {
+      final p = poller()
+        ..phase = const Duration(seconds: 10)
+        ..start();
+      async.elapse(const Duration(seconds: 40));
+      expect(runs, 2);
+
+      foreground.value = false;
+      async.elapse(const Duration(minutes: 5));
+      foreground.value = true;
+      async
+        ..elapse(Duration.zero)
+        ..flushMicrotasks();
+      expect(runs, 3, reason: 'the run on return is not delayed');
+
+      async.elapse(const Duration(seconds: 39));
+      expect(runs, 3);
+      async.elapse(const Duration(seconds: 1));
+      expect(runs, 4);
+      p.dispose();
+    });
+  });
+
   test('stops in the background and runs once on return', () {
     fakeAsync((async) {
       final p = poller()..start();

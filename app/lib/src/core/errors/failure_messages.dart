@@ -55,6 +55,8 @@ String _genericFailureMessage(AppLocalizations l10n, Object error) =>
       ValidationFailure() => l10n.errorValidation,
       RateLimitedFailure() => l10n.errorRateLimited,
       DomainFailure() => l10n.errorGeneric,
+      // 503: starting up or being updated; the same state as maintenance.
+      ServerFailure(statusCode: 503) => l10n.errorMaintenance,
       ServerFailure() => l10n.errorServer,
       UnexpectedResponseFailure() => l10n.errorUnexpectedResponse,
       UnexpectedShapeFailure() => l10n.errorUnexpectedShape,

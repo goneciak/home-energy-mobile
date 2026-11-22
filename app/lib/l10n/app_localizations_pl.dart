@@ -193,6 +193,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wystąpił błąd po stronie GI Home. Spróbuj ponownie.';
 
   @override
+  String get errorMaintenance =>
+      'GI Home jest chwilowo niedostępny – uruchamia się lub trwa konserwacja. Spróbuj ponownie za kilka minut.';
+
+  @override
   String get errorUnexpectedResponse =>
       'GI Home zwrócił nieoczekiwaną odpowiedź. Sprawdź adres urządzenia.';
 
@@ -1019,7 +1023,7 @@ class AppLocalizationsPl extends AppLocalizations {
       'Stan przekaźników według polecenia sterownika';
 
   @override
-  String get heatingCardControllerUnknown => 'Sterownik: brak danych';
+  String get heatingCardControllerUnknown => 'Czekamy na dane ze sterownika';
 
   @override
   String get heatingCardLoading => 'Pobieranie szczegółów…';
@@ -1124,6 +1128,17 @@ class AppLocalizationsPl extends AppLocalizations {
   String freshnessUpdatedStale(String time) {
     return 'Zaktualizowano $time, dane mogą być nieaktualne';
   }
+
+  @override
+  String get freshnessWaitingForReading => 'Czekamy na pierwszy odczyt';
+
+  @override
+  String get schedulesOfflineBanner =>
+      'Brak połączenia z GI Home. Widzisz ostatnio pobraną listę – możesz ją odświeżyć.';
+
+  @override
+  String get schedulesRefreshFailedBanner =>
+      'Nie udało się odświeżyć harmonogramów. Widzisz ostatnio pobraną listę – możesz spróbować ponownie.';
 
   @override
   String get staleAppTitle => 'Zaktualizuj aplikację';
@@ -1254,7 +1269,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get switchCommandNotReported => 'nie zgłoszono';
+  String get switchValueAwaitingReport => 'czeka na raport';
 
   @override
   String switchConfirmOnTitle(String name) {
@@ -2206,6 +2221,14 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get flagConditionalGetDescription =>
       'Lista i szczegóły urządzeń są pobierane z nagłówkiem If-None-Match; odpowiedź 304 oszczędza transfer. Zmiana działa od następnej sesji.';
+
+  @override
+  String get flagMdnsFallbackTitle =>
+      'Wyszukiwanie urządzenia przez multicast DNS';
+
+  @override
+  String get flagMdnsFallbackDescription =>
+      'Tylko Android. Gdy system nie rozpoznaje nazwy .local, aplikacja pyta o nią bezpośrednio sieć lokalną. Zmiana działa przy następnym wyszukiwaniu.';
 
   @override
   String get settingsAccountManage => 'Profil i bezpieczeństwo';

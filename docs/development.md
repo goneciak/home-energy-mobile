@@ -433,6 +433,13 @@ fvm flutter build appbundle --flavor prod -t lib/main.dart --dart-define-from-fi
 - `FF_MOCK_CORE` (tylko dev) podmienia GI Core na atrapę w procesie
   (`MockCoreAdapter`): dowolny adres z sieci domowej i dowolne dane logowania
   prowadzą do przykładowego domu. Atrapa nigdy nie trafia do beta ani prod.
+- `FF_MDNS_FALLBACK` (domyślnie `false` w każdym flavorze) włącza na Androidzie
+  zapasowe wyszukiwanie nazw `.local` przez multicast DNS, gdy system ich nie
+  rozwiązuje (`MulticastDnsHostResolver`; wymaga uprawnienia
+  `CHANGE_WIFI_MULTICAST_STATE`, wpisanego w manifest). W dev i beta można ją
+  przełączyć na ekranie „Funkcje eksperymentalne”. Czy ma być domyślnie
+  włączona, rozstrzygnie spike S3 na fizycznych telefonach
+  ([ADR 0015](decisions/0015-network-change-no-write-replay.md)).
 - Ikony dev i beta mają wstążkę. Po zmianie `assets/icon/icon*.png`:
   `cd app; fvm dart run tool/make_flavor_icons.dart; fvm dart run flutter_launcher_icons`
   (pliki `flutter_launcher_icons-{dev,beta}.yaml`, zasoby w
@@ -650,6 +657,94 @@ zakaz znacznika TODO dla backendu, plan G5) i ten sam Flutter z `.fvmrc` (`.gith
 
 Procedura wydania (tagi, zapis refu backendu, phased release / staged rollout jako
 wyłącznik): [`docs/release-runbook.md`](release-runbook.md).
+
+## Obciążenie GI Core (`tools/load`)
+
+Budżet żądań i kadencje opisuje [load-budget.md](load-budget.md). Narzędzie
+`tools/load/simulate_clients.dart` odtwarza kadencje aplikacji dla N telefonów z
+otwartym Home (tylko GET; jedyny inny ruch to jedno logowanie) i zapisuje
+raport. Kadencje czyta z `app/lib/src/core/polling/polling_budget.dart`, więc
+nie ma ich w narzędziu drugi raz.
+
+Przeciw stosowi kontraktowemu (z `-Seed`, żeby były urządzenia):
+
+```powershell
+.\tools\dev-up.ps1 -Contract -RunId load1 -Seed
+# GI_CORE_URL=http://127.0.0.1:<port>
+dart run tools/load/simulate_clients.dart --base-url http://127.0.0.1:<port> `
+  --run-id load1 --clients 3 --cards 3 --duration 600
+.\tools\dev-up.ps1 -Contract -RunId load1 -Down
+```
+
+| Opcja | Znaczenie |
+|---|---|
+| `--clients` | liczba telefonów (domyślnie 3) |
+| `--cards` | karty ogrzewania na Home każdego telefonu (domyślnie 2) |
+| `--duration` | czas w sekundach (domyślnie 600) |
+| `--base-url` | adres GI Core (albo zmienna `GI_CORE_URL`) |
+| `--run-id` | RunId stosu kontraktowego; próbkuje kontener `gi-core` projektu `gi-mobile-contract-<RunId>` (`--container-filter` podaje projekt wprost) |
+| `--out-dir` | katalog raportu (domyślnie `build/load-report/<znacznik czasu>`, poza gitem) |
+| `--email`, `--password`, `--token` | konto do logowania (domyślnie ADMIN z `tools/seed_accounts*.json`) albo gotowy token |
+| `--dry-run` | zamiast Core uruchamia atrapę w procesie i przyspiesza czas (`--time-scale`, domyślnie 30); sprawdza samo narzędzie |
+
+Wynik to `report.json` i `report.md`: żądania na minutę na telefon (ustalone,
+bez pierwszej rundy startowej), szczyt minuty, kody odpowiedzi, odsetek 304,
+percentyle opóźnień p50, p90 i p99 oraz, gdy docker jest dostępny, średnie i
+szczytowe CPU kontenera `gi-core` (próbka co 5 s z `docker stats`). Bez
+dockera albo bez `--run-id` narzędzie ostrzega w raporcie i pomija próbkowanie.
+Kod wyjścia to 0, gdy każdy telefon mieści się w 12 żądaniach na minutę, a 1,
+gdy nie.
+
+Jak czytać wynik: żądania na minutę są wiarygodne (to te same kadencje co w
+aplikacji), CPU z komputera deweloperskiego mówi tylko, jak obciążenie rośnie z
+liczbą telefonów, nie ile zużyje Raspberry Pi. Pomiar na Pi (trzy telefony i
+panel www przez 30 minut, CPU poniżej 50%) wymaga sprzętu i jest jeszcze do
+zrobienia; wynik zapisuje się według
+[templates/load-test-pi-report.md](templates/load-test-pi-report.md).
+
+Test samego narzędzia (liczenie percentyli, werdykt, przebieg na atrapie)
+działa w `tools/`: `dart test test/load_simulator_test.dart`.
+
+### Zimny start (p90 z 20 uruchomień, limit 5 s)
+
+Szkielet pomiaru to `app/integration_test/perf/cold_start_benchmark_test.dart`:
+mierzy część aplikacji (od `runGiHome` do pierwszej listy urządzeń na Home,
+po jednym logowaniu) i wypisuje `COLD_START_MS=<n>` dla każdego uruchomienia.
+Do czasu od ikony do Home, razem ze startem procesu, zmierz prawdziwe
+uruchomienia wydaniowej wersji na telefonie w sieci Pi:
+`adb shell am force-stop <pakiet>` i `adb shell am start -W <pakiet>/.MainActivity`
+(pole `TotalTime`) powtórzone 20 razy. Liczby (po jednej w wierszu, albo
+wiersze logu `COLD_START_MS=`) liczy:
+
+```sh
+dart run tools/load/cold_start_p90.dart runs.txt
+```
+
+Wynik (min, mediana, średnia, p90, maks. i werdykt) wklejasz do
+[templates/cold-start-p90.md](templates/cold-start-p90.md). Pomiar wymaga
+telefonu i prawdziwego Pi; bez tego zostaje szkielet.
+
+## Kontrola wyrównania 16 KB (`tools/ci/check-16kb-alignment.sh`)
+
+Play wymaga od aplikacji kierowanych na Androida 15 i nowszy bibliotek
+natywnych wyrównanych do 16 KB. Skrypt sprawdza segmenty LOAD bibliotek
+`arm64-v8a` i `x86_64` w AAB albo APK. CI uruchamia go na AAB w
+`.github/workflows/build.yml`. Lokalnie, w Git Bash na Windows:
+
+```bash
+cd app
+flutter build apk --release --flavor prod -t lib/main.dart --dart-define-from-file=config/prod.json
+cd ..
+bash tools/ci/check-16kb-alignment.sh app/build/app/outputs/flutter-apk/app-prod-release.apk
+```
+
+Potrzebne są `unzip` (jest w Git Bash) i `readelf` albo `llvm-readelf`. Git
+Bash nie ma `readelf`; wystarczy ten z binutils (na przykład z pakietu WinLibs
+`mingw64/bin`) albo `llvm-readelf` z NDK, dodany do `PATH`. Wynik zerowy
+oznacza, że wszystkie biblioteki mają wyrównanie co najmniej 16384; kod 1 to
+biblioteka niewyrównana, kod 2 to brak narzędzi albo pliku. Wynik z 2026-11-22
+na APK prod (Windows): osiem bibliotek, najmniejsze wyrównanie 16384
+(`libdartjni.so`, `libdatastore_shared_counter.so`), pozostałe 65536.
 
 ## Bramka pokrycia (plan §17.2)
 

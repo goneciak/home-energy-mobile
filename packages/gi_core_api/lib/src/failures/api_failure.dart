@@ -105,9 +105,11 @@ sealed class ApiFailure with _$ApiFailure implements Exception {
   }) = DomainFailure;
 
   /// 5xx. [errorCode] is `null` when the body was not an envelope.
+  /// [retryAfter] comes from `Retry-After` (a 503 may send it).
   const factory server({
     required int statusCode,
     String? errorCode,
+    Duration? retryAfter,
     ApiErrorEnvelope? envelope,
   }) = ServerFailure;
 

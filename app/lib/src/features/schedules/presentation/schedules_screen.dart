@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/app/router/route_guard.dart';
+import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
+import 'package:gi_home/src/core/widgets/open_app_settings_button.dart';
 import 'package:gi_home/src/core/widgets/state_views.dart';
 import 'package:gi_home/src/core/widgets/status_chip.dart';
 import 'package:gi_home/src/features/devices/presentation/device_labels.dart';
@@ -43,6 +47,8 @@ class SchedulesScreen extends ConsumerWidget {
           clock: clock,
           now: now,
           canEdit: canEdit,
+          refreshError: schedules.error,
+          onRefresh: refresh,
           onOpen: (schedule) =>
               context.go(AppRoutes.editSchedule(deviceId, schedule.id)),
         ),
@@ -55,12 +61,19 @@ class SchedulesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.schedulesTitle)),
-      floatingActionButton: canEdit && schedules.hasValue
-          ? FloatingActionButton.extended(
-              key: const ValueKey('schedule-add'),
-              onPressed: () => context.go(AppRoutes.newSchedule(deviceId)),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.schedulesAdd),
+      // A bar below the list, not a floating button: at large text sizes
+      // a floating button would cover the banners and cards beneath it.
+      bottomNavigationBar: canEdit && schedules.hasValue
+          ? SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(GiTokens.of(context).gap),
+                child: FilledButton.icon(
+                  key: const ValueKey('schedule-add'),
+                  onPressed: () => context.go(AppRoutes.newSchedule(deviceId)),
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.schedulesAdd),
+                ),
+              ),
             )
           : null,
       body: body,
@@ -77,8 +90,18 @@ class ScheduleList extends StatelessWidget {
     required this.now,
     required this.canEdit,
     required this.onOpen,
+    this.refreshError,
+    this.onRefresh,
     super.key,
   });
+
+  /// Why the latest reload failed while this (older) list stays on screen;
+  /// `null` when the list is current.
+  final Object? refreshError;
+
+  /// Reloads the list; offered as a button on the stale-list banner, so the
+  /// refresh does not depend on the pull gesture.
+  final Future<void> Function()? onRefresh;
 
   /// Oldest first, as GI Core returns them.
   final List<HeatingSchedule> schedules;
@@ -86,6 +109,23 @@ class ScheduleList extends StatelessWidget {
   final DateTime now;
   final bool canEdit;
   final ValueChanged<HeatingSchedule> onOpen;
+
+  Widget? _refreshAction(BuildContext context, Object error) {
+    final onRefresh = this.onRefresh;
+    final extra = failureAction(error);
+    if (onRefresh == null) return extra;
+    return Wrap(
+      children: [
+        TextButton.icon(
+          key: const ValueKey('schedules-refresh'),
+          onPressed: () => unawaited(onRefresh()),
+          icon: const Icon(Icons.refresh),
+          label: Text(context.l10n.actionRetry),
+        ),
+        ?extra,
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,9 +135,23 @@ class ScheduleList extends StatelessWidget {
     final edge = EdgeInsets.symmetric(horizontal: tokens.gap);
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      // Room for the floating "Dodaj harmonogram" button.
-      padding: EdgeInsets.only(top: tokens.gap / 2, bottom: tokens.gap * 6),
+      padding: EdgeInsets.symmetric(vertical: tokens.gap / 2),
       children: [
+        if (refreshError case final error?)
+          Padding(
+            padding: edge.add(const EdgeInsets.only(bottom: 8)),
+            child: MessageBanner(
+              key: const ValueKey('schedules-refresh-failed'),
+              tone: MessageTone.warning,
+              message: error is UnreachableFailure || error is TimeoutFailure
+                  ? l10n.schedulesOfflineBanner
+                  : l10n.schedulesRefreshFailedBanner,
+              detail: error is UnreachableFailure || error is TimeoutFailure
+                  ? null
+                  : failureMessage(l10n, error),
+              action: _refreshAction(context, error),
+            ),
+          ),
         if (!canEdit)
           Padding(
             padding: edge.add(const EdgeInsets.only(bottom: 8)),

@@ -164,3 +164,117 @@ diagnostyczne od użytkowników (plan §8.4), awarie w Play Console / Xcode Orga
 - Uzupełnij tabelę z sekcji 2.
 - Jeśli przypięty ref backendu się zmienia (D15), zrób to osobnym PR z ponownie
   nagranymi fixture'ami (`contract/backend.lock`).
+
+## 7. Kalendarz M4 i śledzenie czasu oczekiwania
+
+Terminy zależą od sklepów i testerów, więc tabela zawiera przesunięcia względne
+(T = dzień wysłania pierwszego buildu do testerów wewnętrznych), a nie daty.
+Kolumny „Data faktyczna”, „Status” i „Dowód” uzupełnia osoba odpowiedzialna po
+każdym kroku. Role to symbole: **Właściciel** (konta sklepowe, treści prawne),
+**Dev** (build i wydanie), **QA** (testy ręczne), **Koordynator bety**
+(program z sekcji 8).
+
+| Krok | Rola | Najwcześniejszy start | Oczekiwany czas | Data faktyczna | Status | Dowód |
+|---|---|---|---|---|---|---|
+| Play: zamknięty test (12 testerów) | Dev, Właściciel | T | 14 dni nieprzerwanie | | | |
+| TestFlight, testerzy wewnętrzni | Dev | T | do kilku godzin przetwarzania | | | |
+| Lista kontrolna wydania, ścieżki czytników ekranu | QA | T + 3 dni | 1–2 dni pracy | | | |
+| Beta z gospodarstwami (sekcja 8) | Koordynator bety | T + 3 dni | co najmniej 14 dni | | | |
+| TestFlight, testerzy zewnętrzni (Beta App Review) | Dev | T + 3 dni | zwykle 1–2 dni | | | |
+| Play: wniosek o dostęp produkcyjny | Właściciel | koniec 14-dniowego testu | do kilku dni | | | |
+| App Review | Dev, Właściciel | po zamknięciu listy kontrolnej | zwykle 1–3 dni plus bufor na odrzucenie | | | |
+| Pętla odrzucenia (jeśli wystąpi) | Dev | dzień odrzucenia | 1–3 dni na poprawkę i ponowne zgłoszenie | | | |
+| Play: wdrożenie etapowe 10% → 50% → 100% | Dev | po akceptacji | min. 24 h między krokami | | | |
+| App Store: wydanie etapowe | Dev | po akceptacji | 7 dni | | | |
+
+Zasady prowadzenia tabeli:
+
+- Kopię tabeli prowadzimy w zgłoszeniu wydania; każdy krok z czasem
+  oczekiwania ma datę wysłania i datę odpowiedzi.
+- Treści zgłoszeń i odpowiedzi odnotowujemy w
+  [dzienniku zgłoszeń](templates/store-submission-log.md), odpowiedzi na
+  odrzucenia według [szablonu](templates/rejection-response-template.md).
+- Zgłoszenie do sklepu wymaga zamkniętej [listy kontrolnej wydania](release-checklist.md)
+  oraz materiałów z [docs/store](store/review-notes.md).
+
+## 8. Program beta: 3–5 gospodarstw na prawdziwych Raspberry Pi
+
+### 8.1 Dobór uczestników
+
+- Gospodarstwo z działającym GI Core na Raspberry Pi w tej samej sieci Wi-Fi co
+  telefon i z co najmniej jednym urządzeniem grzewczym.
+- Mieszanka platform (co najmniej jedno gospodarstwo z iPhone'em i jedno z
+  Androidem) i wersji Androida.
+- Osoba z rolą właściciela lub administratora, gotowa raz w tygodniu przesłać
+  raport.
+- Przynajmniej jedno gospodarstwo z więcej niż dwoma urządzeniami grzewczymi,
+  żeby sprawdzić budżet żądań na ekranie Dom.
+
+### 8.2 Wdrożenie uczestnika
+
+1. Zaproszenie do TestFlight (iOS) albo do zamkniętego testu w Google Play
+   (Android).
+2. Instalacja aplikacji i połączenie z GI Home zgodnie z opisem na ekranie
+   łączenia.
+3. Zgoda na raporty diagnostyczne: uczestnik dostaje link do polityki
+   prywatności ([site/privacy.md](../site/privacy.md)) i potwierdza, co raport
+   zawiera. Raport nie zawiera haseł, tokenów ani kodów odzyskiwania.
+4. Krótka rozmowa kontrolna po pierwszym dniu: czy aplikacja znalazła
+   urządzenie, czy logowanie przeszło bez pytań o hasło.
+
+### 8.3 Cotygodniowy raport
+
+Uczestnik wysyła raport diagnostyczny z aplikacji raz w tygodniu, koordynator
+wypełnia [tygodniowy raport bety](templates/weekly-beta-report.md) (po jednym
+wierszu na gospodarstwo). Znaczenie pól:
+
+| Pole | Znaczenie |
+|---|---|
+| Wersja aplikacji | numer wersji i builda z ekranu Ustawienia |
+| Wersja firmware | wersja sterownika w szczegółach urządzenia |
+| Dni aktywności | liczba dni z co najmniej jedną sesją w aplikacji |
+| Awarie | zgłoszenia z Play Android vitals lub Xcode Organizer plus zgłoszone ręcznie |
+| Wymuszone ponowne logowania | sesje zakończone koniecznością podania hasła z powodu klienta (ponowne użycie tokenu odświeżania, niejednoznaczny refresh) |
+| Nieudane połączenia | próby połączenia z urządzeniem zakończone błędem, wraz z przyczyną |
+| Obserwacje obciążenia | wrażenia o szybkości, liczba telefonów używanych jednocześnie, panel www otwarty lub nie |
+
+### 8.4 Metryki
+
+| Metryka | Definicja | Próg |
+|---|---|---|
+| Sesje bez awarii | sesje bez awarii podzielone przez wszystkie sesje, z konsol sklepów | co najmniej 99,5% przez co najmniej 14 dni |
+| Użytkownicy bez awarii | użytkownicy bez awarii podzieleni przez wszystkich | co najmniej 99,5% przez co najmniej 14 dni |
+| Wymuszone ponowne logowanie | sesje zakończone wymuszonym logowaniem z winy klienta podzielone przez wszystkie sesje | poniżej 1% |
+| Skuteczność łączenia | udane pierwsze połączenia podzielone przez próby | obserwowana, bez progu |
+| Obciążenie | żądań na minutę na Home i szczegółach oraz CPU gi-core ([budżet](load-budget.md)) | zgodnie z budżetem |
+
+### 8.5 Eskalacja i zatrzymanie
+
+- Awaria sterowania ogrzewaniem, niepotwierdzone wstrzymanie lub zgłoszenie
+  fałszywego potwierdzenia stanu przekaźnika zatrzymuje betę: koordynator
+  informuje uczestników i postępuje według [procedury zatrzymania](#5-zatrzymanie-halt).
+- Spadek poniżej progów z sekcji 8.4 otwiera zgłoszenie z priorytetem wydania;
+  nie rozpoczynamy zgłoszenia do sklepów, dopóki metryki nie wrócą do normy
+  przez pełne okno.
+- Okno 14 dni liczymy od ostatniej zmiany kodu aplikacji w buildzie bety.
+
+### 8.6 Kanał bety i jego skutki
+
+Testerzy dostają build `prod`, nie `beta` (zapis w
+[decyzjach sklepowych](decisions/store-and-product-decisions.md)). Skutki:
+nie ma flag eksperymentalnych w bezpośrednim kanale testowym, identyfikator
+aplikacji jest produkcyjny, więc betę i wersję sklepową instaluje się nie
+równolegle, a raporty z konsol dotyczą tego samego wariantu, który trafi do
+użytkowników. Wolniejsza strona tej decyzji to brak odrębnych liczników bety:
+wersje bety odróżniamy numerem builda.
+
+## 9. Listy kontrolne wydania
+
+- [Lista kontrolna wydania](release-checklist.md): kroki techniczne i ręczne
+  ścieżki czytników ekranu.
+- [Przekazanie M4](m4-handoff.md) i [ponowne nagranie zrzutów golden](m4-golden-rerecord.md)
+- [Lista kontrolna wyjścia M4](templates/m4-exit-checklist.md): kryteria v1.0,
+  sposób pomiaru i dowody.
+- Audyt stanów: [state-audit.md](state-audit.md); budżet obciążenia:
+  [load-budget.md](load-budget.md); kompatybilność:
+  [compatibility.md](compatibility.md).

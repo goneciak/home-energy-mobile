@@ -428,6 +428,12 @@ abstract class AppLocalizations {
   /// **'Wystąpił błąd po stronie GI Home. Spróbuj ponownie.'**
   String get errorServer;
 
+  /// No description provided for @errorMaintenance.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home jest chwilowo niedostępny – uruchamia się lub trwa konserwacja. Spróbuj ponownie za kilka minut.'**
+  String get errorMaintenance;
+
   /// No description provided for @errorUnexpectedResponse.
   ///
   /// In pl, this message translates to:
@@ -1793,7 +1799,7 @@ abstract class AppLocalizations {
   /// No description provided for @heatingCardControllerUnknown.
   ///
   /// In pl, this message translates to:
-  /// **'Sterownik: brak danych'**
+  /// **'Czekamy na dane ze sterownika'**
   String get heatingCardControllerUnknown;
 
   /// No description provided for @heatingCardLoading.
@@ -1963,6 +1969,24 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Zaktualizowano {time}, dane mogą być nieaktualne'**
   String freshnessUpdatedStale(String time);
+
+  /// No description provided for @freshnessWaitingForReading.
+  ///
+  /// In pl, this message translates to:
+  /// **'Czekamy na pierwszy odczyt'**
+  String get freshnessWaitingForReading;
+
+  /// No description provided for @schedulesOfflineBanner.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak połączenia z GI Home. Widzisz ostatnio pobraną listę – możesz ją odświeżyć.'**
+  String get schedulesOfflineBanner;
+
+  /// No description provided for @schedulesRefreshFailedBanner.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie udało się odświeżyć harmonogramów. Widzisz ostatnio pobraną listę – możesz spróbować ponownie.'**
+  String get schedulesRefreshFailedBanner;
 
   /// Non-blocking banner shown when GI Core keeps sending responses this app version cannot read (plan §16 point 4).
   ///
@@ -2159,8 +2183,8 @@ abstract class AppLocalizations {
   /// Switch command (plan §12.2). Never claims the relay physically switched.
   ///
   /// In pl, this message translates to:
-  /// **'nie zgłoszono'**
-  String get switchCommandNotReported;
+  /// **'czeka na raport'**
+  String get switchValueAwaitingReport;
 
   /// Switch command (plan §12.2). Never claims the relay physically switched.
   ///
@@ -3697,6 +3721,18 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Lista i szczegóły urządzeń są pobierane z nagłówkiem If-None-Match; odpowiedź 304 oszczędza transfer. Zmiana działa od następnej sesji.'**
   String get flagConditionalGetDescription;
+
+  /// No description provided for @flagMdnsFallbackTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyszukiwanie urządzenia przez multicast DNS'**
+  String get flagMdnsFallbackTitle;
+
+  /// No description provided for @flagMdnsFallbackDescription.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tylko Android. Gdy system nie rozpoznaje nazwy .local, aplikacja pyta o nią bezpośrednio sieć lokalną. Zmiana działa przy następnym wyszukiwaniu.'**
+  String get flagMdnsFallbackDescription;
 
   /// No description provided for @settingsAccountManage.
   ///

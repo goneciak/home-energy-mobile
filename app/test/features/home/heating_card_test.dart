@@ -265,7 +265,7 @@ void main() {
   testWidgets('without controller data the card says so', (tester) async {
     await pumpCard(tester);
 
-    expect(find.text('Sterownik: brak danych'), findsOneWidget);
+    expect(find.text('Czekamy na dane ze sterownika'), findsOneWidget);
   });
 
   testWidgets('needs configuration from the details is shown', (tester) async {

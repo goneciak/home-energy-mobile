@@ -86,7 +86,7 @@ final class DeviceDetailNotifierProvider
 }
 
 String _$deviceDetailNotifierHash() =>
-    r'41afef2e549ec4a56109e32165659ee16ce9e4f3';
+    r'3ff177ac820c8c4d0bf311bac4d175aef81ba471';
 
 /// `GET /devices/:id`, polled while the device details screen is visible
 /// and the app is in the foreground (plan §11): every 5 s, and every 15 s

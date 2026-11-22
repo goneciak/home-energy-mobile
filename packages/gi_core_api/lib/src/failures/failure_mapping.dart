@@ -127,7 +127,12 @@ ApiFailure failureFromResponse({
     if (statusCode == 429) {
       return ApiFailure.rateLimited(retryAfter: parseRetryAfter(headers));
     }
-    if (statusCode >= 500) return ApiFailure.server(statusCode: statusCode);
+    if (statusCode >= 500) {
+      return ApiFailure.server(
+        statusCode: statusCode,
+        retryAfter: parseRetryAfter(headers),
+      );
+    }
     return ApiFailure.unexpectedResponse(
       statusCode: statusCode,
       contentType: headers?.value(Headers.contentTypeHeader),
@@ -151,6 +156,7 @@ ApiFailure failureFromResponse({
     >= 500 => ApiFailure.server(
       statusCode: statusCode,
       errorCode: code,
+      retryAfter: parseRetryAfter(headers),
       envelope: envelope,
     ),
     _ => ApiFailure.domain(

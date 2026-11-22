@@ -37,6 +37,9 @@ class DeviceListNotifier extends _$DeviceListNotifier {
     late final ForegroundPoller poller;
     poller = _poller = ref.pollWhileWatched(
       interval: FreshnessPolicy.deviceList.interval,
+      onSharedFailure: (error) {
+        if (buildRef.mounted) state = state.failed(error);
+      },
       task: () async {
         state = state.refreshing();
         try {
