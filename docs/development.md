@@ -490,7 +490,7 @@ fvm flutter test --tags golden                   # porównanie z goldenami CI
 fvm flutter test --update-goldens --tags golden  # aktualizacja po zmianie UI
 ```
 
-- `goldens/ci/` (**commitowane**): niezależne od platformy — tekst rysowany
+- `goldens/ci/` (**commitowane**, renderowane na Linuxie jak w CI; poza Linuxem porównanie dopuszcza 0,3% pikseli różnicy z powodu antyaliasingu): tekst rysowany
   jako bloki, bez cieni. Porównuje je każde `flutter test`, także w CI.
 - `goldens/windows|macos|linux/` (**w `.gitignore`**): podgląd z prawdziwym
   tekstem w dołączonych fontach. Powstaje tylko lokalnie przy
