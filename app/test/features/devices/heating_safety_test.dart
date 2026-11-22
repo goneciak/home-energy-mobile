@@ -425,8 +425,13 @@ void main() {
     const sheet = ConfirmationKind.sheet;
 
     test('suspend: hold to confirm, names the effect and recovery', () {
+      // Built at runtime on purpose: a `const` instance is canonicalised at
+      // compile time and never runs the constructor, which the 100% coverage
+      // gate on ConfirmationPolicy would count as uncovered.
+      // ignore: prefer_const_constructors
+      final suspend = SuspendHeating();
       for (final dryRun in [false, true]) {
-        final requirement = of(const SuspendHeating(), dryRun: dryRun);
+        final requirement = of(suspend, dryRun: dryRun);
         expect(
           requirement,
           const ConfirmationRequirement(ConfirmationKind.hold, [
