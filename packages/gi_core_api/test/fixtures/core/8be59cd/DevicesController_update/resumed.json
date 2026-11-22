@@ -1,0 +1,44 @@
+{
+  "id": "ed430911-765c-493f-bc58-e9a648c5d057",
+  "name": "Fake kotłownia",
+  "description": null,
+  "serialNumber": null,
+  "manufacturer": "GI Contract Fakes",
+  "model": "fake-esphome",
+  "firmwareVersion": "0.1.0-fake",
+  "status": "ONLINE",
+  "type": "ESP32",
+  "roomId": "2d1dddff-f0c5-4d76-8159-4ea0f286c85e",
+  "createdAt": "2026-11-21T18:20:16.917Z",
+  "updatedAt": "2026-11-21T18:20:17.326Z",
+  "lastSeenAt": "2026-11-21T18:20:16.952Z",
+  "enabled": true,
+  "communicationMode": "LEGACY_ESPHOME",
+  "lastConnectionError": null,
+  "lastConnectionAttemptAt": "2026-11-21T18:20:16.943Z",
+  "lastKnownIp": "fake-esphome",
+  "heatingRelayEntityId": "cmwqqgr16000901nw0uwn46ob",
+  "controlTemperatureEntityId": "cmwqqgr1e000a01nw5if6wima",
+  "pumpRelayEntityId": null,
+  "pumpComparisonEntityId": null,
+  "inverterIntegrationMode": "DISABLED",
+  "inverterVendorProfileId": null,
+  "heatingSuspended": false,
+  "fallbackThresholdMs": 120000,
+  "boilerEstimateWindowMinutes": 10,
+  "localControlTemperatureSource": "SUPPLY",
+  "dryRun": false,
+  "activeFaultCount": 0,
+  "currentState": null,
+  "capabilities": [
+    {
+      "id": "383e0e31-7e6a-4cf0-baf2-a3576ee77b71",
+      "type": "RELAY"
+    },
+    {
+      "id": "fdd97449-9664-4b6a-9426-f63c9ad7b598",
+      "type": "TEMPERATURE"
+    }
+  ],
+  "connectivityState": "ONLINE"
+}

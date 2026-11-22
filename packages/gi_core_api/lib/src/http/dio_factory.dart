@@ -4,10 +4,12 @@ import 'package:gi_core_api/src/catalog/endpoint.dart';
 import 'package:gi_core_api/src/failures/failure_mapping.dart';
 import 'package:gi_core_api/src/http/client_info.dart';
 import 'package:gi_core_api/src/http/concurrency_limiter.dart';
+import 'package:gi_core_api/src/http/conditional_get.dart';
 import 'package:gi_core_api/src/http/interceptors.dart';
 
 /// Builds a [Dio] for `<origin>/api/v1` with the standard interceptor chain:
-/// transport policy → headers → [auth] (optional) → error mapping → logger.
+/// transport policy → headers → [auth] (optional) → [conditionalGet]
+/// (optional) → error mapping → logger.
 ///
 /// Redirects are never followed: a redirect is either a proxy or a captive
 /// portal and must not receive credentials.
@@ -21,6 +23,7 @@ Dio createCoreDio({
   required ClientInfo clientInfo,
   String Function()? acceptLanguage,
   AuthInterceptor? auth,
+  ConditionalGetInterceptor? conditionalGet,
   HttpLogSink? log,
   HttpClientAdapter? httpClientAdapter,
   ConcurrencyLimiter? limiter,
@@ -47,6 +50,7 @@ Dio createCoreDio({
       acceptLanguage: acceptLanguage ?? () => 'pl',
     ),
     ?auth,
+    ?conditionalGet,
     ErrorMappingInterceptor(localNetworkDenied: localNetworkDenied),
     if (log != null) RedactingLogInterceptor(log),
   ]);

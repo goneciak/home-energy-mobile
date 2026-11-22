@@ -9,12 +9,16 @@ import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/centered_form.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/features/auth/application/change_password_controller.dart';
-import 'package:gi_home/src/features/auth/domain/password_policy.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// Forced password change when `mustChangePassword` is set (plan §4.1).
+/// Password change (plan §4.1): forced when `mustChangePassword` is set, or
+/// [voluntary] from "Profil i bezpieczeństwo" (plan §20 M3.5), which
+/// returns there once the password is changed.
 class ChangePasswordScreen extends ConsumerStatefulWidget {
-  const new({super.key});
+  const new({super.key, this.voluntary = false});
+
+  final bool voluntary;
 
   @override
   ConsumerState<ChangePasswordScreen> createState() =>
@@ -59,6 +63,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
           ),
         );
         ref.read(changePasswordControllerProvider.notifier).finish();
+        if (widget.voluntary && context.canPop()) context.pop();
       }
     });
 
@@ -72,7 +77,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       body: CenteredForm(
         children: [
           Text(
-            l10n.changePasswordIntro,
+            widget.voluntary
+                ? l10n.changePasswordVoluntaryIntro
+                : l10n.changePasswordIntro,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           SizedBox(height: tokens.gap * 1.5),
@@ -90,7 +97,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _PasswordField(
+                  PasswordField(
                     controller: _current,
                     enabled: !busy,
                     label: l10n.changePasswordCurrentLabel,
@@ -99,17 +106,19 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                         (value ?? '').isEmpty ? l10n.passwordRequired : null,
                   ),
                   SizedBox(height: tokens.gap),
-                  _PasswordField(
+                  PasswordField(
                     controller: _new,
                     enabled: !busy,
                     label: l10n.changePasswordNewLabel,
                     helper: l10n.changePasswordRules,
                     autofillHints: const [AutofillHints.newPassword],
-                    validator: (value) =>
-                        _policyMessage(l10n, PasswordPolicy.check(value ?? '')),
+                    validator: (value) => passwordPolicyMessage(
+                      l10n,
+                      PasswordPolicy.check(value ?? ''),
+                    ),
                   ),
                   SizedBox(height: tokens.gap),
-                  _PasswordField(
+                  PasswordField(
                     controller: _repeat,
                     enabled: !busy,
                     label: l10n.changePasswordRepeatLabel,
@@ -130,25 +139,16 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     dimension: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(l10n.changePasswordSubmit),
+                : Text(
+                    widget.voluntary
+                        ? l10n.changePasswordVoluntarySubmit
+                        : l10n.changePasswordSubmit,
+                  ),
           ),
         ],
       ),
     );
   }
-
-  static String? _policyMessage(
-    AppLocalizations l10n,
-    PasswordProblem? problem,
-  ) => switch (problem) {
-    null => null,
-    PasswordProblem.empty => l10n.passwordRequired,
-    PasswordProblem.tooShort => l10n.passwordTooShort,
-    PasswordProblem.tooLong => l10n.passwordTooLong,
-    PasswordProblem.noLowercase => l10n.passwordNeedsLowercase,
-    PasswordProblem.noUppercase => l10n.passwordNeedsUppercase,
-    PasswordProblem.noDigit => l10n.passwordNeedsDigit,
-  };
 
   static String _errorMessage(AppLocalizations l10n, Object error) =>
       switch (error) {
@@ -160,13 +160,29 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       };
 }
 
-class _PasswordField extends StatefulWidget {
+/// The message for a broken [PasswordPolicy] rule, or `null`.
+String? passwordPolicyMessage(
+  AppLocalizations l10n,
+  PasswordProblem? problem,
+) => switch (problem) {
+  null => null,
+  PasswordProblem.empty => l10n.passwordRequired,
+  PasswordProblem.tooShort => l10n.passwordTooShort,
+  PasswordProblem.tooLong => l10n.passwordTooLong,
+  PasswordProblem.noLowercase => l10n.passwordNeedsLowercase,
+  PasswordProblem.noUppercase => l10n.passwordNeedsUppercase,
+  PasswordProblem.noDigit => l10n.passwordNeedsDigit,
+};
+
+/// A password field with a show/hide toggle, filled by password managers.
+class PasswordField extends StatefulWidget {
   const new({
     required this.controller,
     required this.enabled,
     required this.label,
     required this.autofillHints,
     required this.validator,
+    super.key,
     this.helper,
     this.onSubmitted,
   });
@@ -180,10 +196,10 @@ class _PasswordField extends StatefulWidget {
   final VoidCallback? onSubmitted;
 
   @override
-  State<_PasswordField> createState() => _PasswordFieldState();
+  State<PasswordField> createState() => _PasswordFieldState();
 }
 
-class _PasswordFieldState extends State<_PasswordField> {
+class _PasswordFieldState extends State<PasswordField> {
   bool _obscure = true;
 
   @override

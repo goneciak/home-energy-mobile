@@ -7,8 +7,10 @@ import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/status_chip.dart';
 import 'package:gi_home/src/features/devices/domain/controller_status.dart';
 import 'package:gi_home/src/features/devices/domain/freshness_policy.dart';
+import 'package:gi_home/src/features/devices/domain/heating_permission.dart';
 import 'package:gi_home/src/features/devices/presentation/device_labels.dart';
 import 'package:gi_home/src/features/home/domain/heating_readings.dart';
+import 'package:gi_home/src/features/home/presentation/widgets/heating_strategy_section.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Read-only heating card on Home (plan §4.1, §11, M1): the device of the
@@ -17,7 +19,9 @@ import 'package:material_ui/material_ui.dart';
 /// relay states and the control temperature from `GET /devices/:id`, and
 /// how fresh those details are. Tapping opens the device details.
 ///
-/// There are no controls in this milestone (plan §12 comes in M2).
+/// Below the readings, [HeatingStrategySection] shows the effective and
+/// default control settings, a PV boost, the suspension with its next
+/// action, dry-run and a latched fault (plan §12.5, M2 item 3).
 class HeatingCard extends StatelessWidget {
   const new({
     required this.device,
@@ -26,8 +30,18 @@ class HeatingCard extends StatelessWidget {
     required this.roomName,
     required this.now,
     required this.onTap,
+    this.permission = viewOnly,
+    this.onResume,
+    this.commandStatus,
     super.key,
   });
+
+  /// No heating control at all (role unknown, USER, SERVICE).
+  static const viewOnly = HeatingPermission(
+    canSwitch: false,
+    canSuspend: false,
+    canEditStrategy: false,
+  );
 
   /// The device as listed; heating, suspension and dry-run come from here.
   final DeviceListItem device;
@@ -42,6 +56,15 @@ class HeatingCard extends StatelessWidget {
 
   final DateTime now;
   final VoidCallback onTap;
+
+  /// What the signed-in user may do with heating (plan §12.8).
+  final HeatingPermission permission;
+
+  /// Resumes suspended heating; see [HeatingStrategySection.onResume].
+  final VoidCallback? onResume;
+
+  /// The outcome of a suspend/resume started from the card, shown last.
+  final Widget? commandStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +169,20 @@ class HeatingCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               _Readings(detail: detail, now: now),
+              if (fetched != null) ...[
+                const SizedBox(height: 8),
+                HeatingStrategySection(
+                  detail: fetched,
+                  permission: permission,
+                  faultLatched: state?.isCritical ?? false,
+                  now: now,
+                  onResume: onResume,
+                ),
+              ],
+              if (commandStatus case final status?) ...[
+                const SizedBox(height: 8),
+                status,
+              ],
             ],
           ),
         ),

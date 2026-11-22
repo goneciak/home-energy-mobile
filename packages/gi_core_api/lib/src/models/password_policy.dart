@@ -9,8 +9,10 @@ enum PasswordProblem {
 }
 
 /// Client-side copy of the server rule for new passwords
-/// (`ChangePasswordDto`): 8–256 characters with a lowercase letter, an
-/// uppercase letter and a digit. The server stays the authority.
+/// (`ChangePasswordDto`, `ResetPasswordWithRecoveryDto`): 8-256 characters
+/// with a lowercase letter, an uppercase letter and a digit. Shared by the
+/// client (checks before sending) and the app's forms. The server stays the
+/// authority.
 abstract final class PasswordPolicy {
   static const minLength = 8;
   static const maxLength = 256;

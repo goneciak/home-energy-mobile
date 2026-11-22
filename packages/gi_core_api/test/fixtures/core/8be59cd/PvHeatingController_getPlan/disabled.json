@@ -1,0 +1,8 @@
+{
+  "deviceId": "4e574b55-4fe0-4e31-8d4f-52814e0b1e72",
+  "generatedAt": "2026-11-22T03:51:55.910Z",
+  "mode": "DISABLED",
+  "safeMaxTemperatureCelsius": 60,
+  "baseTargetCelsius": 55,
+  "hours": []
+}

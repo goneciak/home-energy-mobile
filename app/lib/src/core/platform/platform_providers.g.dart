@@ -156,7 +156,8 @@ String _$secureStorageHash() => r'b9d7a386898dfd6d17ed7d315a68c5e898e156eb';
 /// Transport used by every GI Core request; `null` means the real network.
 /// This is the seam for the in-process demo adapter (plan §19.5) and tests.
 ///
-/// In the dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
+/// Demo mode (any flavor) always uses its own in-process adapter. In the
+/// dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
 /// the clients watch this provider, so switching the flag rebuilds them.
 /// Beta and prod never get the mock, whatever the flags say.
 
@@ -166,7 +167,8 @@ final coreHttpClientAdapterProvider = CoreHttpClientAdapterProvider._();
 /// Transport used by every GI Core request; `null` means the real network.
 /// This is the seam for the in-process demo adapter (plan §19.5) and tests.
 ///
-/// In the dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
+/// Demo mode (any flavor) always uses its own in-process adapter. In the
+/// dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
 /// the clients watch this provider, so switching the flag rebuilds them.
 /// Beta and prod never get the mock, whatever the flags say.
 
@@ -181,7 +183,8 @@ final class CoreHttpClientAdapterProvider
   /// Transport used by every GI Core request; `null` means the real network.
   /// This is the seam for the in-process demo adapter (plan §19.5) and tests.
   ///
-  /// In the dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
+  /// Demo mode (any flavor) always uses its own in-process adapter. In the
+  /// dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
   /// the clients watch this provider, so switching the flag rebuilds them.
   /// Beta and prod never get the mock, whatever the flags say.
   CoreHttpClientAdapterProvider._()
@@ -219,7 +222,7 @@ final class CoreHttpClientAdapterProvider
 }
 
 String _$coreHttpClientAdapterHash() =>
-    r'753897635b8cca8949145a394cfeb30b7f254b1e';
+    r'e7abc783e90596dfda197a971e4a782ba70a4942';
 
 /// The phone's OS and model, read once in `main` (`readDeviceIdentity`);
 /// `null` when it could not be read (and in tests unless overridden).

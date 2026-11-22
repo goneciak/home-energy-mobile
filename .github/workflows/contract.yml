@@ -2,7 +2,7 @@
 # §17.5, §19.1 step 2, G5). Builds the backend from a temporary checkout of the
 # ref pinned in contract/backend.lock, starts the throwaway contract stack
 # (contract/compose.contract.yml via tools/dev-up.sh --contract), seeds it
-# through the public API, runs `dart test -t contract` and the spec drift
+# through the public API, runs `dart test -t contract -j 1` and the spec drift
 # check, uploads the recorded fixtures and logs, and always tears the stack
 # down (down -v).
 #
@@ -146,7 +146,7 @@ jobs:
       - name: Contract tests
         working-directory: packages/gi_core_api
         run: |
-          dart test -t contract --reporter expanded \
+          dart test -t contract -j 1 --reporter expanded \
             --file-reporter "json:$ARTIFACTS/contract-tests.json"
 
       - name: Spec drift (spec_diff against contract/openapi)

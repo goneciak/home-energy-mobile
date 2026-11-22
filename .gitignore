@@ -21,7 +21,10 @@ tools/seed_accounts.json
 tools/out/
 
 # Test coverage (tools/check_coverage.dart reads it; CI uploads it).
-coverage/
+/coverage/
+/app/coverage/
+/packages/*/coverage/
+/tools/coverage/
 
 # Release signing (plan §19.4): the upload keystore and its properties never
 # enter the repo. CI and Codemagic pass them as secrets (README, "CI/CD").

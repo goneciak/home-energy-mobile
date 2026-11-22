@@ -147,7 +147,7 @@ GI_CORE_URL=$core_url
 FAKE_ESPHOME_URL=$fake_url
 
 Contract tests (packages/gi_core_api):
-  GI_CORE_URL=$core_url FAKE_ESPHOME_URL=$fake_url dart test -t contract
+  GI_CORE_URL=$core_url FAKE_ESPHOME_URL=$fake_url dart test -t contract -j 1
 Remove: tools/dev-up.sh --contract --run-id $run_id --down
 EOF
   exit 0

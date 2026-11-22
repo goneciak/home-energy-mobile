@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
+import 'package:gi_home/src/features/devices/data/device_command_source.dart';
 import 'package:gi_home/src/features/devices/data/device_read_source.dart';
 import 'package:gi_home/src/features/devices/data/devices_repository.dart';
 import 'package:gi_home/src/features/devices/data/rooms_repository.dart';
@@ -14,8 +15,17 @@ part 'device_repositories.g.dart';
 @Riverpod(keepAlive: true)
 DeviceReadSource deviceReadSource(Ref ref) {
   final client = ref.watch(giCoreClientProvider);
-  if (client == null) throw StateError('No appliance profile');
+  if (client == null) return const _Detached();
   return GiCoreDeviceReadSource(client);
+}
+
+/// Device write endpoints of the saved appliance (plan §12). Only read once
+/// signed in, i.e. when a client exists.
+@Riverpod(keepAlive: true)
+DeviceCommandSource deviceCommandSource(Ref ref) {
+  final client = ref.watch(giCoreClientProvider);
+  if (client == null) return const _Detached();
+  return GiCoreDeviceCommandSource(client);
 }
 
 /// Shared device cache. A new appliance gets a new repository; a different
@@ -45,4 +55,17 @@ RoomsRepository roomsRepository(Ref ref) {
     (_, _) => repository.clear(),
   );
   return repository;
+}
+
+/// The sources while there is no client: for the frame between leaving demo
+/// mode (or forgetting the appliance) and the router's redirect, screens
+/// still mounted rebuild. Failing each call, not the provider, lets them
+/// show an error state for that frame instead of throwing during build.
+/// Nothing is ever sent.
+final class _Detached implements DeviceReadSource, DeviceCommandSource {
+  const new();
+
+  @override
+  Object? noSuchMethod(Invocation invocation) =>
+      Future<Never>.error(StateError('No appliance profile'));
 }

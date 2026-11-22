@@ -1,0 +1,8 @@
+{
+  "statusCode": 400,
+  "code": "HTTP_400",
+  "message": "Set house coordinates first.",
+  "path": "/api/v1/solar/current",
+  "requestId": "318d1363-48cd-4b87-a697-ee2c01362f92",
+  "timestamp": "2026-11-22T03:51:55.995Z"
+}

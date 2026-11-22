@@ -1,0 +1,16 @@
+{
+  "statusCode": 400,
+  "code": "VALIDATION_FAILED",
+  "message": "Validation failed.",
+  "path": "/api/v1/devices/5f0c1b9e-3a7d-4c2e-8b6f-0d1e2f3a4b5c/schedules",
+  "requestId": "0d6f3e2a-8b1c-4d5e-9f7a-1b2c3d4e5f60",
+  "timestamp": "2026-11-22T10:15:00.000Z",
+  "details": {
+    "endTime": [
+      "endTime must match /^([01]\\d|2[0-3]):[0-5]\\d$/ regular expression"
+    ],
+    "daysOfWeek": [
+      "All daysOfWeek's elements must be unique"
+    ]
+  }
+}

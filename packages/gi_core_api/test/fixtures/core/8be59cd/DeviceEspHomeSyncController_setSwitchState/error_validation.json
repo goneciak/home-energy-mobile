@@ -1,0 +1,13 @@
+{
+  "statusCode": 400,
+  "code": "VALIDATION_FAILED",
+  "message": "Validation failed.",
+  "path": "/api/v1/devices/ed430911-765c-493f-bc58-e9a648c5d057/entities/cmwqqgr16000901nw0uwn46ob/state",
+  "requestId": "e6f9b8bd-5776-4162-bf34-8f5e5d76197e",
+  "timestamp": "2026-11-21T18:20:17.310Z",
+  "details": {
+    "state": [
+      "state must be a boolean value"
+    ]
+  }
+}

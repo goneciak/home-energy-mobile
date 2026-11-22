@@ -1,0 +1,14 @@
+{
+  "sunrise": null,
+  "sunset": null,
+  "dawn": null,
+  "dusk": null,
+  "solarNoon": "2026-12-21T10:40:00.000Z",
+  "solarMidnight": "2026-12-20T22:40:00.000Z",
+  "nextSunrise": null,
+  "nextSunset": null,
+  "currentElevationDegrees": -2.5,
+  "currentAzimuthDegrees": 180,
+  "aboveHorizon": false,
+  "dayLengthSeconds": null
+}

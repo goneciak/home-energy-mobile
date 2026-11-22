@@ -482,6 +482,66 @@ abstract class AppLocalizations {
   /// **'Coś poszło nie tak. Spróbuj ponownie.'**
   String get errorGeneric;
 
+  /// No description provided for @errorDeviceEntityNotFound.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten element nie należy już do urządzenia. Odśwież widok.'**
+  String get errorDeviceEntityNotFound;
+
+  /// No description provided for @errorDeviceNotFound.
+  ///
+  /// In pl, this message translates to:
+  /// **'Urządzenie zostało usunięte lub zmienione. Odśwież widok.'**
+  String get errorDeviceNotFound;
+
+  /// No description provided for @errorHeatingSuspended.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie jest wstrzymane, więc nie można niczego włączyć. Najpierw wznów ogrzewanie.'**
+  String get errorHeatingSuspended;
+
+  /// No description provided for @errorEntityDisabled.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten element jest wyłączony w konfiguracji urządzenia.'**
+  String get errorEntityDisabled;
+
+  /// No description provided for @errorEntityNotWritable.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tym elementem nie można sterować z aplikacji.'**
+  String get errorEntityNotWritable;
+
+  /// No description provided for @errorDeviceOffline.
+  ///
+  /// In pl, this message translates to:
+  /// **'Urządzenie jest offline. Polecenie nie zostało wysłane.'**
+  String get errorDeviceOffline;
+
+  /// No description provided for @errorDeviceUnreachable.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home nie zna adresu sterownika. Polecenie nie zostało wysłane.'**
+  String get errorDeviceUnreachable;
+
+  /// No description provided for @errorCommandUnconfirmed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sterownik nie potwierdził polecenia. Stan jest nieznany – odśwież widok i sprawdź go przed kolejną próbą.'**
+  String get errorCommandUnconfirmed;
+
+  /// No description provided for @errorCommandTimeout.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sterownik nie odpowiedział na czas. Nie wiadomo, czy polecenie zostało wykonane – odśwież widok przed kolejną próbą.'**
+  String get errorCommandTimeout;
+
+  /// No description provided for @errorDeviceHostForbidden.
+  ///
+  /// In pl, this message translates to:
+  /// **'Adres sterownika jest poza siecią domową, więc GI Home go zablokował. Sprawdź konfigurację urządzenia w panelu GI Home.'**
+  String get errorDeviceHostForbidden;
+
   /// No description provided for @errorRequestId.
   ///
   /// In pl, this message translates to:
@@ -1927,6 +1987,2154 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Ukryj komunikat'**
   String get staleAppDismiss;
+
+  /// Shown instead of heating controls to USER/SERVICE roles (plan §12.8).
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmiany ogrzewania może wprowadzić właściciel.'**
+  String get heatingViewOnlyHint;
+
+  /// Amber banner while the device is in dry-run (plan §12.3).
+  ///
+  /// In pl, this message translates to:
+  /// **'Tryb testowy: polecenia są zapisywane, ale przekaźniki pozostają wyłączone.'**
+  String get heatingDryRunBanner;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmiany ogrzewania może wprowadzić właściciel lub administrator. Poproś go o zmianę.'**
+  String get lockNotOwnerAdmin;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Przekaźnikiem kotła i pompy steruje sterownik. W aplikacji jest tylko podgląd.'**
+  String get lockHeatingOrPumpRelay;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Tego elementu nie ma już w urządzeniu. Odśwież widok.'**
+  String get lockEntityMissing;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Tego elementu nie da się przełączać z aplikacji.'**
+  String get lockNotWritableSwitch;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Element jest wyłączony. Włącz go w panelu GI Home, aby nim sterować.'**
+  String get lockEntityDisabled;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Element jest niedostępny. Sprawdź połączenie urządzenia i spróbuj ponownie.'**
+  String get lockEntityUnavailable;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Dane są nieaktualne, więc sterowanie jest zablokowane. Poczekaj na odświeżenie. Wstrzymanie ogrzewania działa nadal.'**
+  String get lockStaleData;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie jest wstrzymane. Wznów je, aby móc włączać przełączniki.'**
+  String get lockSuspendedOnRequest;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Sterownik zgłasza usterkę lub tryb bezpieczny. Wymaga to autoryzowanego, ręcznego resetu na urządzeniu – w razie zagrożenia wezwij serwis.'**
+  String get lockFaultLatched;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home wyłączy ogrzewanie. Możesz je później wznowić.'**
+  String get consequenceStopsHeating;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Kocioł może się włączyć w ciągu ~30 s.'**
+  String get consequenceBoilerMayStartSoon;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Wróci ustawienie domyślne lub aktywny harmonogram.'**
+  String get consequenceRestoresBaseOrSchedule;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Polecenie zostanie wysłane, ale aplikacja nie potwierdza fizycznego przełączenia przekaźnika.'**
+  String get consequenceCommandNotPhysicallyVerified;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura docelowa wzrośnie o ponad 10 °C.'**
+  String get consequenceLargeTargetRaise;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home znów zacznie sterować kotłem i może go włączyć.'**
+  String get consequenceLeavesOffMode;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura docelowa przekracza bezpieczne maksimum ustawione dla nadwyżki PV.'**
+  String get consequenceAboveSafeMax;
+
+  /// Heating SafetyPolicy/ConfirmationPolicy text (plan §12, PRD §8.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'Tryb testowy: polecenie zostanie zapisane, ale przekaźniki pozostaną wyłączone.'**
+  String get consequenceDryRunOutputsStayOff;
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wysyłanie…'**
+  String get switchCommandSending;
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Urządzenie potwierdziło polecenie: {state}, {time}. Fizyczny stan przekaźnika nie jest weryfikowany.'**
+  String switchCommandLegacyConfirmed(String state, String time);
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zlecono · czeka na raport sterownika'**
+  String get switchCommandAwaitingHeartbeat;
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Po poleceniu sterownik zgłosił: polecenie {commanded}, wyjście {output} – to nie potwierdza fizycznego stanu przekaźnika.'**
+  String switchCommandHeartbeatObserved(String commanded, String output);
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisano w trybie testowym: polecenie {commanded}, wyjście pozostaje wyłączone.'**
+  String switchCommandDryRunRecorded(String commanded);
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sterownik nie zgłosił się w ciągu 45 s – stan jest nieznany. Odśwież widok przed kolejną próbą.'**
+  String get switchCommandTimedOut;
+
+  /// GI Edge switch value written by GI Core on enqueue, not yet reported by a heartbeat (plan §12.2). Never shows the requested state.
+  ///
+  /// In pl, this message translates to:
+  /// **'czeka na raport sterownika'**
+  String get entitySwitchAwaitingReport;
+
+  /// Read-only commanded state of a boiler/pump relay from diagnostics.relayN.commanded (plan §12.4).
+  ///
+  /// In pl, this message translates to:
+  /// **'Polecenie sterownika: {state}'**
+  String switchControllerCommanded(String state);
+
+  /// Dry-run hint from diagnostics.relayN.commanded (plan §12.3); the output does not switch.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sterownik chciałby: {state}'**
+  String switchDryRunWouldSet(String state);
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'nie zgłoszono'**
+  String get switchCommandNotReported;
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wysłać polecenie włączenia: {name}?'**
+  String switchConfirmOnTitle(String name);
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyślij polecenie'**
+  String get switchConfirmSend;
+
+  /// Switch command (plan §12.2). Never claims the relay physically switched.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odśwież'**
+  String get actionRefresh;
+
+  /// Effective control strategy (controlStrategy, what the firmware gets), plan §12.5.
+  ///
+  /// In pl, this message translates to:
+  /// **'Cel {temperature} °C, histereza {hysteresis} °C'**
+  String heatingStrategyTarget(String temperature, String hysteresis);
+
+  /// No description provided for @heatingStrategyModeAuto.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home steruje kotłem'**
+  String get heatingStrategyModeAuto;
+
+  /// No description provided for @heatingStrategyModeOff.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sterowanie wyłączone – GI Home nie będzie włączać kotła'**
+  String get heatingStrategyModeOff;
+
+  /// No description provided for @heatingStrategyModeManual.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home nie steruje automatycznie'**
+  String get heatingStrategyModeManual;
+
+  /// No description provided for @heatingStrategyModeUnknown.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nieznany tryb sterowania'**
+  String get heatingStrategyModeUnknown;
+
+  /// Both controlStrategy and baseControlStrategy are null.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak ustawień sterowania – skonfiguruj je w panelu web GI Home'**
+  String get heatingStrategyNone;
+
+  /// Effective target or hysteresis differs from the base one. The API does not say which schedule (plan §12.5 M2).
+  ///
+  /// In pl, this message translates to:
+  /// **'Harmonogram aktywny'**
+  String get heatingScheduleActive;
+
+  /// baseControlStrategy, shown next to the schedule-active hint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustawienie domyślne: {temperature} °C, histereza {hysteresis} °C'**
+  String heatingStrategyDefault(String temperature, String hysteresis);
+
+  /// No description provided for @heatingSuspendedTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wstrzymane'**
+  String get heatingSuspendedTitle;
+
+  /// No description provided for @heatingSuspendedEffect.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home nie włączy kotła, dopóki ogrzewanie nie zostanie wznowione.'**
+  String get heatingSuspendedEffect;
+
+  /// Next action for OWNER/ADMIN when no resume action is wired.
+  ///
+  /// In pl, this message translates to:
+  /// **'Aby wznowić ogrzewanie, otwórz szczegóły urządzenia.'**
+  String get heatingSuspendedResumeHint;
+
+  /// Next action for USER/SERVICE.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wznowić ogrzewanie może właściciel lub administrator.'**
+  String get heatingSuspendedAskOwner;
+
+  /// No description provided for @heatingResumeAction.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wznów ogrzewanie'**
+  String get heatingResumeAction;
+
+  /// pvBoostActive; the target is pvHeatingConfig.safeMaxTemperatureCelsius, not exposed directly.
+  ///
+  /// In pl, this message translates to:
+  /// **'PV boost: grzanie do {temperature} °C'**
+  String heatingPvBoost(String temperature);
+
+  /// No description provided for @heatingPvBoostDerived.
+  ///
+  /// In pl, this message translates to:
+  /// **'Cel wyliczony z limitu bezpieczeństwa PV'**
+  String get heatingPvBoostDerived;
+
+  /// pvBoostActive without pvHeatingConfig.
+  ///
+  /// In pl, this message translates to:
+  /// **'PV boost aktywny – cel nieznany'**
+  String get heatingPvBoostUnknownTarget;
+
+  /// Source and freshness of the strategy values.
+  ///
+  /// In pl, this message translates to:
+  /// **'Według GI Core · dane z {time}'**
+  String heatingStrategySource(String time);
+
+  /// No description provided for @heatingControlSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sterowanie ogrzewaniem'**
+  String get heatingControlSection;
+
+  /// No description provided for @strategyEditAction.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmień ustawienia sterowania'**
+  String get strategyEditAction;
+
+  /// No description provided for @strategyEditorTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustawienia sterowania'**
+  String get strategyEditorTitle;
+
+  /// No description provided for @strategyEditorIntro.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmieniasz ustawienie domyślne. Aktywny harmonogram może je czasowo zastąpić.'**
+  String get strategyEditorIntro;
+
+  /// No description provided for @strategyTargetLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura docelowa (°C)'**
+  String get strategyTargetLabel;
+
+  /// No description provided for @strategyHysteresisLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Histereza (°C)'**
+  String get strategyHysteresisLabel;
+
+  /// No description provided for @strategyModeLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tryb sterowania'**
+  String get strategyModeLabel;
+
+  /// No description provided for @strategyModeAutoShort.
+  ///
+  /// In pl, this message translates to:
+  /// **'Auto'**
+  String get strategyModeAutoShort;
+
+  /// No description provided for @strategyModeOffShort.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wył.'**
+  String get strategyModeOffShort;
+
+  /// No description provided for @strategyModeManualShort.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ręczny'**
+  String get strategyModeManualShort;
+
+  /// No description provided for @strategyErrorNotANumber.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wpisz liczbę'**
+  String get strategyErrorNotANumber;
+
+  /// No description provided for @strategyErrorRange.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dozwolony zakres: {min}–{max} °C'**
+  String strategyErrorRange(String min, String max);
+
+  /// No description provided for @strategyErrorStep.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj wartość co {step} °C'**
+  String strategyErrorStep(String step);
+
+  /// No description provided for @strategyAboveSafeMaxWarning.
+  ///
+  /// In pl, this message translates to:
+  /// **'To więcej niż bezpieczne maksimum dla nadwyżki PV ({temperature} °C).'**
+  String strategyAboveSafeMaxWarning(String temperature);
+
+  /// No description provided for @strategySuspendedNote.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu tryb efektywny to Wył.'**
+  String get strategySuspendedNote;
+
+  /// No description provided for @strategySave.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisz'**
+  String get strategySave;
+
+  /// No description provided for @strategyChecking.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sprawdzanie aktualnych ustawień…'**
+  String get strategyChecking;
+
+  /// No description provided for @strategySaving.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisywanie…'**
+  String get strategySaving;
+
+  /// No description provided for @strategyConflictTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ktoś zmienił ustawienia w międzyczasie'**
+  String get strategyConflictTitle;
+
+  /// No description provided for @strategyConflictBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nic nie zostało zapisane. Sprawdź, co się zmieniło, i zdecyduj, co dalej.'**
+  String get strategyConflictBody;
+
+  /// No description provided for @strategyConflictRow.
+  ///
+  /// In pl, this message translates to:
+  /// **'{field}: {before} → {after}'**
+  String strategyConflictRow(String field, String before, String after);
+
+  /// No description provided for @strategyFieldTarget.
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura docelowa'**
+  String get strategyFieldTarget;
+
+  /// No description provided for @strategyFieldHysteresis.
+  ///
+  /// In pl, this message translates to:
+  /// **'Histereza'**
+  String get strategyFieldHysteresis;
+
+  /// No description provided for @strategyFieldMode.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tryb'**
+  String get strategyFieldMode;
+
+  /// No description provided for @strategyFieldSuspended.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie'**
+  String get strategyFieldSuspended;
+
+  /// No description provided for @strategyValueNone.
+  ///
+  /// In pl, this message translates to:
+  /// **'brak'**
+  String get strategyValueNone;
+
+  /// No description provided for @strategyValueSuspended.
+  ///
+  /// In pl, this message translates to:
+  /// **'wstrzymane'**
+  String get strategyValueSuspended;
+
+  /// No description provided for @strategyValueActive.
+  ///
+  /// In pl, this message translates to:
+  /// **'aktywne'**
+  String get strategyValueActive;
+
+  /// No description provided for @strategyConflictReapply.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisz moje zmiany mimo to'**
+  String get strategyConflictReapply;
+
+  /// No description provided for @strategyConflictDiscard.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odrzuć moje zmiany'**
+  String get strategyConflictDiscard;
+
+  /// No description provided for @strategySavedTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisano w GI Core'**
+  String get strategySavedTitle;
+
+  /// No description provided for @strategySavedBase.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustawienie domyślne: {value}'**
+  String strategySavedBase(String value);
+
+  /// No description provided for @strategySavedEffective.
+  ///
+  /// In pl, this message translates to:
+  /// **'Obowiązuje teraz: {value}'**
+  String strategySavedEffective(String value);
+
+  /// No description provided for @strategySavedSuspended.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie jest wstrzymane, więc tryb efektywny pozostaje Wył. do czasu wznowienia.'**
+  String get strategySavedSuspended;
+
+  /// No description provided for @strategyValue.
+  ///
+  /// In pl, this message translates to:
+  /// **'{target} °C, histereza {hysteresis} °C, {mode}'**
+  String strategyValue(String target, String hysteresis, String mode);
+
+  /// No description provided for @strategyConfirmTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Potwierdź zmianę ustawień'**
+  String get strategyConfirmTitle;
+
+  /// No description provided for @strategyConfirmSave.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisz zmiany'**
+  String get strategyConfirmSave;
+
+  /// No description provided for @suspendHoldAction.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przytrzymaj, aby wstrzymać ogrzewanie'**
+  String get suspendHoldAction;
+
+  /// No description provided for @suspendHoldHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przytrzymaj przycisk – zwykłe dotknięcie niczego nie zmienia.'**
+  String get suspendHoldHint;
+
+  /// No description provided for @suspendA11yHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'otwiera potwierdzenie wstrzymania'**
+  String get suspendA11yHint;
+
+  /// No description provided for @suspendConfirmTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wstrzymać ogrzewanie?'**
+  String get suspendConfirmTitle;
+
+  /// No description provided for @suspendConfirmAction.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wstrzymaj ogrzewanie'**
+  String get suspendConfirmAction;
+
+  /// No description provided for @suspendAwaiting.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wysłano · czekamy, aż GI Core potwierdzi wstrzymanie'**
+  String get suspendAwaiting;
+
+  /// No description provided for @resumeAwaiting.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wysłano · czekamy, aż GI Core potwierdzi wznowienie'**
+  String get resumeAwaiting;
+
+  /// No description provided for @suspendAppliedAwaitingHeartbeat.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników · czeka na raport sterownika'**
+  String get suspendAppliedAwaitingHeartbeat;
+
+  /// No description provided for @suspendAppliedOutputsOff.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wstrzymane. Raport sterownika z {time}: wyjścia przekaźników wyłączone. To nie potwierdza fizycznego stanu przekaźników.'**
+  String suspendAppliedOutputsOff(String time);
+
+  /// No description provided for @suspendAppliedOutputOn.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wstrzymane, ale raport sterownika z {time} wciąż pokazuje włączone wyjście. Odśwież za chwilę, a w razie zagrożenia wyłącz kocioł ręcznie.'**
+  String suspendAppliedOutputOn(String time);
+
+  /// No description provided for @suspendAppliedNotReported.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie raportuje stanu wyjść.'**
+  String get suspendAppliedNotReported;
+
+  /// No description provided for @suspendAppliedNoHeartbeat.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie zgłosił się w ciągu 45 s – stan przekaźników jest nieznany.'**
+  String get suspendAppliedNoHeartbeat;
+
+  /// No description provided for @suspendAppliedLegacy.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wstrzymane w GI Core. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.'**
+  String get suspendAppliedLegacy;
+
+  /// No description provided for @resumeApplied.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wznowione. Znów obowiązuje ustawienie domyślne lub harmonogram.'**
+  String get resumeApplied;
+
+  /// No description provided for @resumeAppliedPending.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie wznowione. GI Core nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.'**
+  String get resumeAppliedPending;
+
+  /// No description provided for @suspendTimedOut.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Core nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.'**
+  String get suspendTimedOut;
+
+  /// No description provided for @resumeTimedOut.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Core nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.'**
+  String get resumeTimedOut;
+
+  /// No description provided for @resumeSheetTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wznowić ogrzewanie?'**
+  String get resumeSheetTitle;
+
+  /// No description provided for @resumeSheetWillApply.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zacznie obowiązywać: {value}'**
+  String resumeSheetWillApply(String value);
+
+  /// No description provided for @resumeSheetTemperature.
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura sterująca: {value} · dane z {time}'**
+  String resumeSheetTemperature(String value, String time);
+
+  /// No description provided for @resumeSheetTemperatureMissing.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak aktualnego odczytu temperatury sterującej.'**
+  String get resumeSheetTemperatureMissing;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Język'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsLanguageAutomatic.
+  ///
+  /// In pl, this message translates to:
+  /// **'Automatycznie'**
+  String get settingsLanguageAutomatic;
+
+  /// No description provided for @settingsLanguageAutomaticSubtitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Język z profilu GI Home, a bez niego język telefonu'**
+  String get settingsLanguageAutomaticSubtitle;
+
+  /// Language name in its own language; same in every locale.
+  ///
+  /// In pl, this message translates to:
+  /// **'Polski'**
+  String get settingsLanguagePolish;
+
+  /// Language name in its own language; same in every locale.
+  ///
+  /// In pl, this message translates to:
+  /// **'English'**
+  String get settingsLanguageEnglish;
+
+  /// No description provided for @settingsLanguageDialogTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Język aplikacji'**
+  String get settingsLanguageDialogTitle;
+
+  /// No description provided for @settingsCoreVersion.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wersja oprogramowania GI Home'**
+  String get settingsCoreVersion;
+
+  /// Best-effort running GI Core version (plan §16).
+  ///
+  /// In pl, this message translates to:
+  /// **'{version} (według ostatniego sprawdzenia aktualizacji)'**
+  String settingsCoreVersionSubtitle(String version);
+
+  /// No description provided for @settingsTimezone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Strefa czasowa urządzenia'**
+  String get settingsTimezone;
+
+  /// Shown from 3 days before the 30-day session ends (plan §7.6).
+  ///
+  /// In pl, this message translates to:
+  /// **'{days, plural, =0{Sesja wygasła – zaloguj się ponownie} =1{Za 1 dzień trzeba będzie zalogować się ponownie} few{Za {days} dni trzeba będzie zalogować się ponownie} many{Za {days} dni trzeba będzie zalogować się ponownie} other{Za {days} dnia trzeba będzie zalogować się ponownie}}'**
+  String settingsSessionRenewSoon(int days);
+
+  /// Connect screen: heading of the demo mode entry (plan §19.5).
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie masz jeszcze GI Home?'**
+  String get demoEntryTitle;
+
+  /// Connect screen: what demo mode is.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zobacz aplikację na przykładowym domu. Dane są zmyślone i zostają w pamięci telefonu, a polecenia nie trafiają do żadnego urządzenia.'**
+  String get demoEntryBody;
+
+  /// Visible demo mode entry button on the connect screen (plan §19.5, Guideline 2.3.1).
+  ///
+  /// In pl, this message translates to:
+  /// **'Wypróbuj wersję demonstracyjną'**
+  String get demoEnter;
+
+  /// Snackbar when the demo fixtures could not be loaded.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie udało się uruchomić wersji demonstracyjnej. Spróbuj ponownie.'**
+  String get demoStartFailed;
+
+  /// Badge of the permanent demo banner.
+  ///
+  /// In pl, this message translates to:
+  /// **'DEMO'**
+  String get demoBadge;
+
+  /// Screen reader label of the DEMO badge.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wersja demonstracyjna'**
+  String get demoBadgeSemantics;
+
+  /// Permanent demo banner text; never claims a device acted.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przykładowe dane – nic nie jest naprawdę sterowane.'**
+  String get demoBannerMessage;
+
+  /// Demo banner button: leaves demo mode and wipes its state.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zakończ demo'**
+  String get demoExit;
+
+  /// Title of the heating schedule list (plan §20 M3).
+  ///
+  /// In pl, this message translates to:
+  /// **'Harmonogramy'**
+  String get schedulesTitle;
+
+  /// Device details: row that opens the schedule list.
+  ///
+  /// In pl, this message translates to:
+  /// **'Harmonogramy ogrzewania'**
+  String get schedulesEntryTitle;
+
+  /// Device details: subtitle of the schedule list row.
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny i dni z inną temperaturą docelową'**
+  String get schedulesEntrySubtitle;
+
+  /// Schedule list without schedules.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak harmonogramów'**
+  String get schedulesEmptyTitle;
+
+  /// Schedule list without schedules: what that means.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie przez cały czas działa według strategii bazowej.'**
+  String get schedulesEmptyBody;
+
+  /// Button that opens the editor for a new schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dodaj harmonogram'**
+  String get schedulesAdd;
+
+  /// Chip on the schedule that GI Core applies now (inferred on the phone).
+  ///
+  /// In pl, this message translates to:
+  /// **'Aktywny teraz'**
+  String get scheduleActiveNow;
+
+  /// Chip on a disabled schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyłączony'**
+  String get scheduleDisabledChip;
+
+  /// Schedule whose start equals its end: the whole day.
+  ///
+  /// In pl, this message translates to:
+  /// **'Cała doba'**
+  String get scheduleWholeDay;
+
+  /// Time window of a schedule, e.g. 06:00–08:00.
+  ///
+  /// In pl, this message translates to:
+  /// **'{start}–{end}'**
+  String scheduleTimeRange(String start, String end);
+
+  /// Time window that ends after midnight.
+  ///
+  /// In pl, this message translates to:
+  /// **'{start}–{end} (następnego dnia)'**
+  String scheduleTimeRangeNextDay(String start, String end);
+
+  /// Target and hysteresis of a schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'{target} °C, histereza {hysteresis} °C'**
+  String scheduleTargetLine(String target, String hysteresis);
+
+  /// Schedule clock label without any other zone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny według zegara GI Home (UTC).'**
+  String get scheduleClockCoreOnly;
+
+  /// Schedule clock label with the home time today (plan §13.4).
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny według zegara GI Home (UTC). Dziś {core} UTC to {local} czasu domu.'**
+  String scheduleClockDualHome(String core, String local);
+
+  /// Schedule clock label with the phone time today, for roles that cannot read the home zone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny według zegara GI Home (UTC). Dziś {core} UTC to {local} na tym telefonie.'**
+  String scheduleClockDualPhone(String core, String local);
+
+  /// Schedule clock label when editing in home time (feature flag, D8).
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny w czasie domu ({zone}). Przeliczamy je na zegar GI Home (UTC) z dzisiejszym przesunięciem.'**
+  String scheduleClockConverting(String zone);
+
+  /// Banner before a DST change when editing in home time.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wkrótce zmiana czasu. Harmonogramy zostaną przy tej samej godzinie UTC, więc w czasie domu przesuną się o godzinę. Nic nie zmieniamy samodzielnie.'**
+  String get scheduleDstAhead;
+
+  /// Schedule list: how GI Core picks a schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'Gdy okna się nakładają, obowiązuje harmonogram dodany wcześniej. Wstrzymanie ogrzewania ma pierwszeństwo przed harmonogramami.'**
+  String get scheduleOrderHint;
+
+  /// HEATING_SCHEDULE_NOT_FOUND after a change or delete.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tego harmonogramu już nie ma. Lista została odświeżona.'**
+  String get scheduleGone;
+
+  /// Snackbar after a schedule was created or changed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Harmonogram zapisany.'**
+  String get scheduleSaved;
+
+  /// Snackbar after a schedule was deleted.
+  ///
+  /// In pl, this message translates to:
+  /// **'Harmonogram usunięty.'**
+  String get scheduleDeleted;
+
+  /// Editor opened for a schedule that is not in the list.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie znaleziono harmonogramu.'**
+  String get scheduleNotFound;
+
+  /// Editor title for a new schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nowy harmonogram'**
+  String get scheduleEditorNewTitle;
+
+  /// Editor title for an existing schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'Edytuj harmonogram'**
+  String get scheduleEditorEditTitle;
+
+  /// Editor field: schedule name.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nazwa'**
+  String get scheduleFieldName;
+
+  /// Editor field: days of the week.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dni'**
+  String get scheduleFieldDays;
+
+  /// Editor field: start time.
+  ///
+  /// In pl, this message translates to:
+  /// **'Od'**
+  String get scheduleFieldStart;
+
+  /// Editor field: end time.
+  ///
+  /// In pl, this message translates to:
+  /// **'Do'**
+  String get scheduleFieldEnd;
+
+  /// Editor field: target temperature.
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura docelowa (°C)'**
+  String get scheduleFieldTarget;
+
+  /// Editor field: hysteresis.
+  ///
+  /// In pl, this message translates to:
+  /// **'Histereza (°C)'**
+  String get scheduleFieldHysteresis;
+
+  /// Editor switch: schedule enabled.
+  ///
+  /// In pl, this message translates to:
+  /// **'Włączony'**
+  String get scheduleFieldEnabled;
+
+  /// Editor validation: name.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj nazwę, najwyżej 120 znaków.'**
+  String get scheduleErrorName;
+
+  /// Editor validation: days.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wybierz co najmniej jeden dzień.'**
+  String get scheduleErrorDays;
+
+  /// Editor validation: target temperature.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj wartość od 0 do 100 °C.'**
+  String get scheduleErrorTarget;
+
+  /// Editor validation: hysteresis.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj wartość od 1 do 20 °C.'**
+  String get scheduleErrorHysteresis;
+
+  /// Editor warning: start equals end.
+  ///
+  /// In pl, this message translates to:
+  /// **'Początek i koniec są takie same, więc harmonogram obowiązuje przez całą dobę w wybrane dni.'**
+  String get scheduleWarnWholeDay;
+
+  /// Editor note: the window runs past midnight.
+  ///
+  /// In pl, this message translates to:
+  /// **'Okno kończy się następnego dnia o {end}.'**
+  String scheduleWarnWraps(String end);
+
+  /// Editor warning: overlapping schedules (GI Core does not reject them).
+  ///
+  /// In pl, this message translates to:
+  /// **'Nakłada się na: {names}. Obowiązuje harmonogram dodany wcześniej.'**
+  String scheduleWarnOverlap(String names);
+
+  /// Editor button: save the schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisz'**
+  String get scheduleSave;
+
+  /// Editor button: delete the schedule.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuń harmonogram'**
+  String get scheduleDelete;
+
+  /// Delete confirmation title.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usunąć harmonogram?'**
+  String get scheduleDeleteConfirmTitle;
+
+  /// Delete confirmation body.
+  ///
+  /// In pl, this message translates to:
+  /// **'Harmonogram „{name}” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do strategii bazowej.'**
+  String scheduleDeleteConfirmBody(String name);
+
+  /// Delete confirmation button.
+  ///
+  /// In pl, this message translates to:
+  /// **'Usuń'**
+  String get scheduleDeleteConfirm;
+
+  /// Home: entry to the weather screen (plan §4.2).
+  ///
+  /// In pl, this message translates to:
+  /// **'Pogoda i słońce'**
+  String get weatherEntryTitle;
+
+  /// Home: subtitle of the weather screen entry.
+  ///
+  /// In pl, this message translates to:
+  /// **'Prognoza, wschód i zachód słońca, produkcja PV'**
+  String get weatherEntrySubtitle;
+
+  /// Weather screen title.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pogoda i słońce'**
+  String get weatherTitle;
+
+  /// Weather screen: title of the weather card (now, hours, days).
+  ///
+  /// In pl, this message translates to:
+  /// **'Pogoda'**
+  String get weatherSection;
+
+  /// Weather screen: hourly forecast strip.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najbliższe godziny'**
+  String get weatherHourlySection;
+
+  /// Weather screen: daily forecast list.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najbliższe dni'**
+  String get weatherDailySection;
+
+  /// Weather 503: the appliance has no weather data (G3: no internet in the appliance).
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak danych pogodowych'**
+  String get weatherNoDataTitle;
+
+  /// Weather 503 explanation; distinct from 'GI Home unreachable' and 'device offline' (G3).
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home nie ma teraz dostępu do internetu albo jeszcze nie pobrał prognozy. Aplikacja działa – sprawdź połączenie urządzenia z internetem.'**
+  String get weatherNoDataBody;
+
+  /// Weather envelope stale:true; the detail line holds the server's lastError.
+  ///
+  /// In pl, this message translates to:
+  /// **'Prognoza może być nieaktualna – GI Home nie mógł jej odświeżyć, bo nie ma dostępu do internetu.'**
+  String get weatherStaleBanner;
+
+  /// No description provided for @weatherHumidity.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wilgotność {value}%'**
+  String weatherHumidity(String value);
+
+  /// No description provided for @weatherWind.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wiatr {speed} m/s'**
+  String weatherWind(String speed);
+
+  /// No description provided for @weatherPressure.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ciśnienie {value} hPa'**
+  String weatherPressure(String value);
+
+  /// No description provided for @weatherPrecipitation.
+  ///
+  /// In pl, this message translates to:
+  /// **'Opady {value} mm'**
+  String weatherPrecipitation(String value);
+
+  /// A weather temperature with its unit.
+  ///
+  /// In pl, this message translates to:
+  /// **'{value} °C'**
+  String weatherTemperature(String value);
+
+  /// Screen reader label of one hour of the forecast strip.
+  ///
+  /// In pl, this message translates to:
+  /// **'{time}: {temperature}, {condition}'**
+  String weatherHourSemantics(
+    String time,
+    String temperature,
+    String condition,
+  );
+
+  /// Screen reader label of one day of the forecast.
+  ///
+  /// In pl, this message translates to:
+  /// **'{day}: od {min} do {max}, opady {precipitation} mm, {condition}'**
+  String weatherDaySemantics(
+    String day,
+    String min,
+    String max,
+    String precipitation,
+    String condition,
+  );
+
+  /// Weather hours (UTC from the API) are shown in the home time zone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny w strefie czasowej domu ({zone})'**
+  String weatherTimesHouseZone(String zone);
+
+  /// Weather hours are shown in the phone's zone (the home zone is not readable for this role).
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny w strefie czasowej telefonu'**
+  String get weatherTimesPhoneZone;
+
+  /// Daily weather rows are UTC days (plan §13.4).
+  ///
+  /// In pl, this message translates to:
+  /// **'Doby liczone według czasu UTC'**
+  String get weatherDaysUtc;
+
+  /// Weather condition (met.no clearsky).
+  ///
+  /// In pl, this message translates to:
+  /// **'Bezchmurnie'**
+  String get weatherGlyphClearSky;
+
+  /// Weather condition (met.no fair).
+  ///
+  /// In pl, this message translates to:
+  /// **'Pogodnie'**
+  String get weatherGlyphFair;
+
+  /// Weather condition (met.no partlycloudy).
+  ///
+  /// In pl, this message translates to:
+  /// **'Częściowe zachmurzenie'**
+  String get weatherGlyphPartlyCloudy;
+
+  /// Weather condition (met.no cloudy, partly cloudy at night).
+  ///
+  /// In pl, this message translates to:
+  /// **'Pochmurno'**
+  String get weatherGlyphCloudy;
+
+  /// Weather condition (met.no fog).
+  ///
+  /// In pl, this message translates to:
+  /// **'Mgła'**
+  String get weatherGlyphFog;
+
+  /// Weather condition (light rain, rain showers).
+  ///
+  /// In pl, this message translates to:
+  /// **'Przelotny deszcz'**
+  String get weatherGlyphShowers;
+
+  /// Weather condition (rain, heavy showers).
+  ///
+  /// In pl, this message translates to:
+  /// **'Deszcz'**
+  String get weatherGlyphRain;
+
+  /// Weather condition (anything with thunder).
+  ///
+  /// In pl, this message translates to:
+  /// **'Burza'**
+  String get weatherGlyphThunder;
+
+  /// Weather condition (sleet, snow showers, light snow).
+  ///
+  /// In pl, this message translates to:
+  /// **'Deszcz ze śniegiem lub przelotny śnieg'**
+  String get weatherGlyphSleetOrSnowShowers;
+
+  /// Weather condition (snow, heavy snow).
+  ///
+  /// In pl, this message translates to:
+  /// **'Śnieg'**
+  String get weatherGlyphSnow;
+
+  /// Weather condition (clear or fair at night).
+  ///
+  /// In pl, this message translates to:
+  /// **'Pogodna noc'**
+  String get weatherGlyphClearNight;
+
+  /// Weather condition the app does not know.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nieznany stan pogody'**
+  String get weatherGlyphUnknown;
+
+  /// Weather screen: sun card.
+  ///
+  /// In pl, this message translates to:
+  /// **'Słońce'**
+  String get solarSection;
+
+  /// Sun card: sunrise time.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wschód'**
+  String get solarSunrise;
+
+  /// Sun card: sunset time.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zachód'**
+  String get solarSunset;
+
+  /// Sun card: day length.
+  ///
+  /// In pl, this message translates to:
+  /// **'Długość dnia'**
+  String get solarDayLength;
+
+  /// No description provided for @solarAboveHorizon.
+  ///
+  /// In pl, this message translates to:
+  /// **'Słońce nad horyzontem ({elevation}°)'**
+  String solarAboveHorizon(String elevation);
+
+  /// Sun card: the sun is below the horizon.
+  ///
+  /// In pl, this message translates to:
+  /// **'Słońce pod horyzontem'**
+  String get solarBelowHorizon;
+
+  /// Solar 400: the appliance has no house coordinates.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustaw lokalizację domu w panelu GI Home, aby zobaczyć wschód i zachód słońca.'**
+  String get solarNotConfigured;
+
+  /// Solar: no data right now.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak danych o słońcu.'**
+  String get solarNoData;
+
+  /// Weather screen: PV forecast card (hidden when PV is not configured).
+  ///
+  /// In pl, this message translates to:
+  /// **'Prognoza produkcji PV'**
+  String get pvForecastSection;
+
+  /// No description provided for @pvForecastPeakPower.
+  ///
+  /// In pl, this message translates to:
+  /// **'Moc instalacji {power} kWp'**
+  String pvForecastPeakPower(String power);
+
+  /// PV forecast: estimated production of one day.
+  ///
+  /// In pl, this message translates to:
+  /// **'{energy} kWh'**
+  String pvForecastDayEnergy(String energy);
+
+  /// PV forecast: the day's highest hourly production and its house-local time.
+  ///
+  /// In pl, this message translates to:
+  /// **'szczyt {power} kW o {time}'**
+  String pvForecastDayPeak(String power, String time);
+
+  /// PV forecast 500: the appliance could not get a forecast.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak prognozy PV'**
+  String get pvForecastNoDataTitle;
+
+  /// PV forecast 500 explanation (G3: no internet in the appliance).
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home nie mógł pobrać prognozy produkcji – możliwe, że nie ma dostępu do internetu.'**
+  String get pvForecastNoDataBody;
+
+  /// PV times are house-local wall times, shown as they come (plan §13.4).
+  ///
+  /// In pl, this message translates to:
+  /// **'Godziny w czasie lokalnym domu'**
+  String get pvHouseTimeNote;
+
+  /// Device details: the PV heating plan.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan grzania PV'**
+  String get pvPlanSection;
+
+  /// PV heating plan mode DISABLED.
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan PV wyłączony'**
+  String get pvPlanDisabled;
+
+  /// PV heating plan mode DISABLED explanation.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ogrzewanie nie korzysta z prognozy produkcji PV.'**
+  String get pvPlanDisabledBody;
+
+  /// PV heating plan enabled but without hours (no forecast).
+  ///
+  /// In pl, this message translates to:
+  /// **'Plan PV bez prognozy'**
+  String get pvPlanNoHours;
+
+  /// PV heating plan enabled but without hours.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home nie ma teraz prognozy produkcji, więc nie planuje dogrzewania z PV.'**
+  String get pvPlanNoHoursBody;
+
+  /// No description provided for @pvPlanMode.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tryb: {mode}'**
+  String pvPlanMode(String mode);
+
+  /// PV control mode FORECAST_ONLY.
+  ///
+  /// In pl, this message translates to:
+  /// **'tylko prognoza'**
+  String get pvModeForecastOnly;
+
+  /// PV control mode LIVE_INVERTER_ONLY.
+  ///
+  /// In pl, this message translates to:
+  /// **'tylko odczyt z falownika'**
+  String get pvModeLiveInverterOnly;
+
+  /// PV control mode HYBRID.
+  ///
+  /// In pl, this message translates to:
+  /// **'hybrydowy (prognoza i falownik)'**
+  String get pvModeHybrid;
+
+  /// PV control mode the app does not know.
+  ///
+  /// In pl, this message translates to:
+  /// **'nieznany'**
+  String get pvModeUnknown;
+
+  /// No description provided for @pvPlanBaseTarget.
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura bazowa {temperature} °C'**
+  String pvPlanBaseTarget(String temperature);
+
+  /// No description provided for @pvPlanSafeMax.
+  ///
+  /// In pl, this message translates to:
+  /// **'Bezpieczne maksimum {temperature} °C'**
+  String pvPlanSafeMax(String temperature);
+
+  /// A plan hour with a predicted boost (favourable forecast).
+  ///
+  /// In pl, this message translates to:
+  /// **'Dogrzewanie do {temperature} °C'**
+  String pvPlanBoost(String temperature);
+
+  /// A plan hour without a boost; the predicted target.
+  ///
+  /// In pl, this message translates to:
+  /// **'Bez dogrzewania, {temperature} °C'**
+  String pvPlanNoBoost(String temperature);
+
+  /// No description provided for @pvPlanProduction.
+  ///
+  /// In pl, this message translates to:
+  /// **'{power} kW'**
+  String pvPlanProduction(String power);
+
+  /// Screen reader label of one plan hour.
+  ///
+  /// In pl, this message translates to:
+  /// **'{time}: produkcja {production}, {state}'**
+  String pvPlanHourSemantics(String time, String production, String state);
+
+  /// No description provided for @pvPlanShowAll.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pokaż wszystkie godziny ({count})'**
+  String pvPlanShowAll(int count);
+
+  /// Collapse the PV plan hours.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pokaż mniej'**
+  String get pvPlanShowLess;
+
+  /// The PV heating plan request failed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie udało się wczytać planu PV'**
+  String get pvPlanLoadFailed;
+
+  /// Entity history screen title.
+  ///
+  /// In pl, this message translates to:
+  /// **'Historia'**
+  String get historyTitle;
+
+  /// Device details: opens the history of the control temperature (last 24 h).
+  ///
+  /// In pl, this message translates to:
+  /// **'Co działo się w nocy?'**
+  String get historyNightEntryTitle;
+
+  /// Subtitle of the overnight history entry.
+  ///
+  /// In pl, this message translates to:
+  /// **'Temperatura sterująca z ostatniej doby'**
+  String get historyNightEntrySubtitle;
+
+  /// Screen reader hint of an entity row that opens its history.
+  ///
+  /// In pl, this message translates to:
+  /// **'pokaż historię'**
+  String get historyEntityHint;
+
+  /// Label of the history time range selector.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zakres'**
+  String get historyWindowLabel;
+
+  /// History range: last hour.
+  ///
+  /// In pl, this message translates to:
+  /// **'1 h'**
+  String get historyWindowHour;
+
+  /// History range: last 6 hours.
+  ///
+  /// In pl, this message translates to:
+  /// **'6 h'**
+  String get historyWindowSixHours;
+
+  /// History range: last 24 hours.
+  ///
+  /// In pl, this message translates to:
+  /// **'24 h'**
+  String get historyWindowDay;
+
+  /// History range: last 7 days.
+  ///
+  /// In pl, this message translates to:
+  /// **'7 dni'**
+  String get historyWindowWeek;
+
+  /// History range in a sentence: last hour.
+  ///
+  /// In pl, this message translates to:
+  /// **'ostatnia godzina'**
+  String get historyWindowHourLong;
+
+  /// History range in a sentence: last 6 hours.
+  ///
+  /// In pl, this message translates to:
+  /// **'ostatnie 6 godzin'**
+  String get historyWindowSixHoursLong;
+
+  /// History range in a sentence: last 24 hours.
+  ///
+  /// In pl, this message translates to:
+  /// **'ostatnia doba'**
+  String get historyWindowDayLong;
+
+  /// History range in a sentence: last 7 days.
+  ///
+  /// In pl, this message translates to:
+  /// **'ostatnie 7 dni'**
+  String get historyWindowWeekLong;
+
+  /// Switches the history chart to an accessible table.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pokaż jako tabelę'**
+  String get historyShowTable;
+
+  /// Switches the history table back to the chart.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pokaż wykres'**
+  String get historyShowChart;
+
+  /// History without samples in the range.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak zmian w tym okresie'**
+  String get historyEmptyTitle;
+
+  /// Why a history can be empty (samples are change events).
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home zapisuje odczyt tylko wtedy, gdy jego wartość się zmienia. Jeśli była stała, historia jest pusta.'**
+  String get historyEmptyBody;
+
+  /// Banner: the history was truncated by the server limit.
+  ///
+  /// In pl, this message translates to:
+  /// **'W tym okresie jest więcej zmian, niż aplikacja wczytuje naraz. Wykres pokazuje tylko ich część; wybierz krótszy zakres.'**
+  String get historyTruncated;
+
+  /// Text entities have no chart, only the table.
+  ///
+  /// In pl, this message translates to:
+  /// **'To odczyt tekstowy, więc jego historia jest pokazana jako tabela.'**
+  String get historyTextOnly;
+
+  /// Screen reader label while the chart is being downsampled.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przygotowywanie wykresu'**
+  String get historyChartLoading;
+
+  /// History summary: minimum value.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najniżej'**
+  String get historySummaryMin;
+
+  /// History summary: maximum value.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najwyżej'**
+  String get historySummaryMax;
+
+  /// History summary: latest value.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ostatnio'**
+  String get historySummaryLast;
+
+  /// History summary: number of recorded changes.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmiany'**
+  String get historySummaryChanges;
+
+  /// Screen reader summary of a numeric history chart.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wykres: {name}, {range}. Najniżej {min}, najwyżej {max}, ostatnio {last} o {time}. Zapisanych zmian: {count}.'**
+  String historyChartSemantics(
+    String name,
+    String range,
+    String min,
+    String max,
+    String last,
+    String time,
+    int count,
+  );
+
+  /// Screen reader summary of an on/off history chart.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wykres: {name}, {range}. Ostatnio {last} o {time}. Zapisanych przełączeń: {count}.'**
+  String historySwitchSemantics(
+    String name,
+    String range,
+    String last,
+    String time,
+    int count,
+  );
+
+  /// History table column: time.
+  ///
+  /// In pl, this message translates to:
+  /// **'Czas'**
+  String get historyTableTime;
+
+  /// History table column: value.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wartość'**
+  String get historyTableValue;
+
+  /// No description provided for @historyTableRowSemantics.
+  ///
+  /// In pl, this message translates to:
+  /// **'{time}: {value}'**
+  String historyTableRowSemantics(String time, String value);
+
+  /// No description provided for @historyTablePage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Strona {page} z {pages}'**
+  String historyTablePage(int page, int pages);
+
+  /// History table: previous page (newer samples).
+  ///
+  /// In pl, this message translates to:
+  /// **'Nowsze'**
+  String get historyTableNewer;
+
+  /// History table: next page (older samples).
+  ///
+  /// In pl, this message translates to:
+  /// **'Starsze'**
+  String get historyTableOlder;
+
+  /// HISTORY_RANGE_INVALID: the from/to range was rejected.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home odrzucił ten zakres czasu. Sprawdź datę i godzinę w telefonie.'**
+  String get errorHistoryRangeInvalid;
+
+  /// No description provided for @navAttention.
+  ///
+  /// In pl, this message translates to:
+  /// **'Uwaga'**
+  String get navAttention;
+
+  /// No description provided for @attentionTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Uwaga'**
+  String get attentionTitle;
+
+  /// No description provided for @attentionBadgeSemantics.
+  ///
+  /// In pl, this message translates to:
+  /// **'{count, plural, one{1 sprawa wymaga uwagi} few{{count} sprawy wymagają uwagi} many{{count} spraw wymaga uwagi} other{{count} sprawy wymaga uwagi}}'**
+  String attentionBadgeSemantics(int count);
+
+  /// No description provided for @attentionEmptyTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nic nie wymaga uwagi'**
+  String get attentionEmptyTitle;
+
+  /// No description provided for @attentionEmptyBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Urządzenia działają i mają kontakt z GI Home.'**
+  String get attentionEmptyBody;
+
+  /// No description provided for @attentionSectionCritical.
+  ///
+  /// In pl, this message translates to:
+  /// **'Krytyczne'**
+  String get attentionSectionCritical;
+
+  /// No description provided for @attentionSectionImportant.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ważne'**
+  String get attentionSectionImportant;
+
+  /// No description provided for @attentionSectionNotice.
+  ///
+  /// In pl, this message translates to:
+  /// **'Do sprawdzenia'**
+  String get attentionSectionNotice;
+
+  /// No description provided for @attentionSectionResolved.
+  ///
+  /// In pl, this message translates to:
+  /// **'Rozwiązane w ciągu 24 h'**
+  String get attentionSectionResolved;
+
+  /// No description provided for @attentionAccountTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Twoje konto'**
+  String get attentionAccountTitle;
+
+  /// No description provided for @attentionMustChangePassword.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wymagana zmiana hasła'**
+  String get attentionMustChangePassword;
+
+  /// No description provided for @attentionResolvedAt.
+  ///
+  /// In pl, this message translates to:
+  /// **'{what} · rozwiązane o {time}'**
+  String attentionResolvedAt(String what, String time);
+
+  /// No description provided for @offlineSnapshotReadOnly.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tylko do odczytu: stan urządzeń z ostatniego połączenia.'**
+  String get offlineSnapshotReadOnly;
+
+  /// No description provided for @flagConditionalGetTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Warunkowe pobieranie urządzeń (ETag)'**
+  String get flagConditionalGetTitle;
+
+  /// No description provided for @flagConditionalGetDescription.
+  ///
+  /// In pl, this message translates to:
+  /// **'Lista i szczegóły urządzeń są pobierane z nagłówkiem If-None-Match; odpowiedź 304 oszczędza transfer. Zmiana działa od następnej sesji.'**
+  String get flagConditionalGetDescription;
+
+  /// No description provided for @settingsAccountManage.
+  ///
+  /// In pl, this message translates to:
+  /// **'Profil i bezpieczeństwo'**
+  String get settingsAccountManage;
+
+  /// No description provided for @accountTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Profil i bezpieczeństwo'**
+  String get accountTitle;
+
+  /// No description provided for @accountProfileSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Profil'**
+  String get accountProfileSection;
+
+  /// No description provided for @accountFirstNameLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Imię'**
+  String get accountFirstNameLabel;
+
+  /// No description provided for @accountLastNameLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nazwisko (opcjonalnie)'**
+  String get accountLastNameLabel;
+
+  /// No description provided for @accountFirstNameRequired.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj imię.'**
+  String get accountFirstNameRequired;
+
+  /// No description provided for @accountNameTooLong.
+  ///
+  /// In pl, this message translates to:
+  /// **'Maksymalnie 100 znaków.'**
+  String get accountNameTooLong;
+
+  /// No description provided for @accountSave.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisz zmiany'**
+  String get accountSave;
+
+  /// No description provided for @accountSaved.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisano profil.'**
+  String get accountSaved;
+
+  /// No description provided for @accountLanguageSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Język konta'**
+  String get accountLanguageSection;
+
+  /// No description provided for @accountLanguageHint.
+  ///
+  /// In pl, this message translates to:
+  /// **'Po zalogowaniu aplikacja i panel WWW używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.'**
+  String get accountLanguageHint;
+
+  /// No description provided for @accountLanguagePolish.
+  ///
+  /// In pl, this message translates to:
+  /// **'Polski'**
+  String get accountLanguagePolish;
+
+  /// No description provided for @accountLanguageEnglish.
+  ///
+  /// In pl, this message translates to:
+  /// **'English'**
+  String get accountLanguageEnglish;
+
+  /// No description provided for @accountLanguageSaved.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmieniono język konta.'**
+  String get accountLanguageSaved;
+
+  /// No description provided for @accountSecuritySection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Bezpieczeństwo'**
+  String get accountSecuritySection;
+
+  /// No description provided for @accountChangePassword.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmień hasło'**
+  String get accountChangePassword;
+
+  /// No description provided for @accountChangePasswordSubtitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Inne urządzenia zostaną wylogowane'**
+  String get accountChangePasswordSubtitle;
+
+  /// No description provided for @accountSessions.
+  ///
+  /// In pl, this message translates to:
+  /// **'Aktywne sesje'**
+  String get accountSessions;
+
+  /// No description provided for @accountSessionsSubtitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Urządzenia zalogowane na Twoje konto'**
+  String get accountSessionsSubtitle;
+
+  /// No description provided for @accountRecoveryCode.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kod odzyskiwania'**
+  String get accountRecoveryCode;
+
+  /// No description provided for @accountRecoveryCodeSubtitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Pozwala ustawić nowe hasło, gdy zapomnisz obecnego'**
+  String get accountRecoveryCodeSubtitle;
+
+  /// No description provided for @changePasswordVoluntaryIntro.
+  ///
+  /// In pl, this message translates to:
+  /// **'Po zmianie hasła inne urządzenia zostaną wylogowane. Ten telefon pozostanie zalogowany.'**
+  String get changePasswordVoluntaryIntro;
+
+  /// No description provided for @changePasswordVoluntarySubmit.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zmień hasło'**
+  String get changePasswordVoluntarySubmit;
+
+  /// No description provided for @sessionsTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Aktywne sesje'**
+  String get sessionsTitle;
+
+  /// No description provided for @sessionsThisPhone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten telefon'**
+  String get sessionsThisPhone;
+
+  /// No description provided for @sessionsUnknownDevice.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nieznane urządzenie'**
+  String get sessionsUnknownDevice;
+
+  /// No description provided for @sessionsSignedIn.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zalogowano {date}'**
+  String sessionsSignedIn(DateTime date);
+
+  /// No description provided for @sessionsLastUsed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ostatnio aktywna {date}'**
+  String sessionsLastUsed(DateTime date);
+
+  /// No description provided for @sessionsIpAddress.
+  ///
+  /// In pl, this message translates to:
+  /// **'Adres IP: {ip}'**
+  String sessionsIpAddress(String ip);
+
+  /// No description provided for @sessionsRevokeTooltip.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyloguj tę sesję'**
+  String get sessionsRevokeTooltip;
+
+  /// No description provided for @sessionsRevokeTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wylogować to urządzenie?'**
+  String get sessionsRevokeTitle;
+
+  /// No description provided for @sessionsRevokeBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Urządzenie będzie musiało zalogować się ponownie.'**
+  String get sessionsRevokeBody;
+
+  /// No description provided for @sessionsRevokeCurrentTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wylogować ten telefon?'**
+  String get sessionsRevokeCurrentTitle;
+
+  /// No description provided for @sessionsRevokeCurrentBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sesja tego telefonu zostanie zakończona i wrócisz do ekranu logowania.'**
+  String get sessionsRevokeCurrentBody;
+
+  /// No description provided for @sessionsRevokeConfirm.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyloguj'**
+  String get sessionsRevokeConfirm;
+
+  /// No description provided for @sessionsRevoked.
+  ///
+  /// In pl, this message translates to:
+  /// **'Sesja została zakończona.'**
+  String get sessionsRevoked;
+
+  /// No description provided for @sessionsLogoutAll.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyloguj wszystkie urządzenia'**
+  String get sessionsLogoutAll;
+
+  /// No description provided for @sessionsLogoutAllTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wylogować wszystkie urządzenia?'**
+  String get sessionsLogoutAllTitle;
+
+  /// No description provided for @sessionsLogoutAllBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wszystkie sesje, również na tym telefonie, zostaną zakończone.'**
+  String get sessionsLogoutAllBody;
+
+  /// No description provided for @sessionsEmpty.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak aktywnych sesji.'**
+  String get sessionsEmpty;
+
+  /// No description provided for @sessionsReviewPrompt.
+  ///
+  /// In pl, this message translates to:
+  /// **'{count, plural, one{Na Twoim koncie jest jeszcze 1 aktywna sesja.} few{Na Twoim koncie są jeszcze {count} aktywne sesje.} many{Na Twoim koncie jest jeszcze {count} aktywnych sesji.} other{Na Twoim koncie jest jeszcze {count} aktywnej sesji.}}'**
+  String sessionsReviewPrompt(int count);
+
+  /// No description provided for @sessionsReviewAction.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przejrzyj'**
+  String get sessionsReviewAction;
+
+  /// No description provided for @recoveryCodeTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kod odzyskiwania'**
+  String get recoveryCodeTitle;
+
+  /// No description provided for @recoveryCodeIntro.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kod odzyskiwania pozwala ustawić nowe hasło na ekranie logowania, gdy zapomnisz obecnego. Nowy kod unieważnia poprzedni.'**
+  String get recoveryCodeIntro;
+
+  /// No description provided for @recoveryCodeGenerate.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wygeneruj nowy kod'**
+  String get recoveryCodeGenerate;
+
+  /// No description provided for @recoveryCodeConfirmTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wygenerować nowy kod?'**
+  String get recoveryCodeConfirmTitle;
+
+  /// No description provided for @recoveryCodeConfirmBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Poprzedni kod przestanie działać. Nowy kod zobaczysz tylko raz.'**
+  String get recoveryCodeConfirmBody;
+
+  /// No description provided for @recoveryCodeConfirm.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wygeneruj'**
+  String get recoveryCodeConfirm;
+
+  /// No description provided for @recoveryCodeShownOnce.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ten kod jest pokazywany tylko raz. Zapisz go w bezpiecznym miejscu, np. w menedżerze haseł.'**
+  String get recoveryCodeShownOnce;
+
+  /// No description provided for @recoveryCodeCopy.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kopiuj kod'**
+  String get recoveryCodeCopy;
+
+  /// No description provided for @recoveryCodeCopied.
+  ///
+  /// In pl, this message translates to:
+  /// **'Skopiowano. Schowek zostanie wyczyszczony za minutę.'**
+  String get recoveryCodeCopied;
+
+  /// No description provided for @recoveryCodeHidden.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kod jest ukryty, gdy ekran jest nagrywany lub aplikacja działa w tle.'**
+  String get recoveryCodeHidden;
+
+  /// No description provided for @recoveryCodeAcknowledge.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zapisałem kod w bezpiecznym miejscu'**
+  String get recoveryCodeAcknowledge;
+
+  /// No description provided for @recoveryCodeDone.
+  ///
+  /// In pl, this message translates to:
+  /// **'Gotowe'**
+  String get recoveryCodeDone;
+
+  /// No description provided for @recoveryCodeLeaveBlocked.
+  ///
+  /// In pl, this message translates to:
+  /// **'Najpierw potwierdź, że kod został zapisany.'**
+  String get recoveryCodeLeaveBlocked;
+
+  /// No description provided for @recoveryRotatePromptTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wygeneruj nowy kod odzyskiwania'**
+  String get recoveryRotatePromptTitle;
+
+  /// No description provided for @recoveryRotatePromptBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Hasło zostało ustawione kodem odzyskiwania, który nadal działa. Wygeneruj nowy kod, aby poprzedni przestał działać.'**
+  String get recoveryRotatePromptBody;
+
+  /// No description provided for @recoveryRotatePromptLater.
+  ///
+  /// In pl, this message translates to:
+  /// **'Później'**
+  String get recoveryRotatePromptLater;
+
+  /// No description provided for @loginForgotPassword.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie pamiętasz hasła?'**
+  String get loginForgotPassword;
+
+  /// No description provided for @recoveryResetTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Odzyskiwanie hasła'**
+  String get recoveryResetTitle;
+
+  /// Replaces the recovery reset form while the screen is recorded or the app is in the background.
+  ///
+  /// In pl, this message translates to:
+  /// **'Formularz jest ukryty, gdy ekran jest nagrywany lub aplikacja działa w tle.'**
+  String get recoveryResetHidden;
+
+  /// No description provided for @recoveryResetIntro.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj e-mail konta, kod odzyskiwania i nowe hasło. Po zmianie wszystkie urządzenia zostaną wylogowane.'**
+  String get recoveryResetIntro;
+
+  /// No description provided for @recoveryResetCodeLabel.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kod odzyskiwania'**
+  String get recoveryResetCodeLabel;
+
+  /// No description provided for @recoveryResetCodeHelper.
+  ///
+  /// In pl, this message translates to:
+  /// **'8 grup po 4 znaki oddzielonych myślnikami, np. 1A2B-3C4D-…'**
+  String get recoveryResetCodeHelper;
+
+  /// No description provided for @recoveryResetCodeRequired.
+  ///
+  /// In pl, this message translates to:
+  /// **'Podaj kod odzyskiwania.'**
+  String get recoveryResetCodeRequired;
+
+  /// No description provided for @recoveryResetCodeMalformed.
+  ///
+  /// In pl, this message translates to:
+  /// **'Kod ma postać 8 grup po 4 znaki (0–9, A–F) oddzielonych myślnikami.'**
+  String get recoveryResetCodeMalformed;
+
+  /// No description provided for @recoveryResetSubmit.
+  ///
+  /// In pl, this message translates to:
+  /// **'Ustaw nowe hasło'**
+  String get recoveryResetSubmit;
+
+  /// No description provided for @recoveryResetInvalid.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie udało się ustawić hasła. Sprawdź e-mail i kod odzyskiwania.'**
+  String get recoveryResetInvalid;
+
+  /// No description provided for @recoveryResetRateLimited.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zbyt wiele prób. Spróbuj za kilka minut.'**
+  String get recoveryResetRateLimited;
+
+  /// No description provided for @recoveryResetDoneTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Hasło zostało zmienione'**
+  String get recoveryResetDoneTitle;
+
+  /// No description provided for @recoveryResetDoneBody.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zaloguj się nowym hasłem. Po zalogowaniu wygeneruj nowy kod odzyskiwania, bo obecny nadal działa.'**
+  String get recoveryResetDoneBody;
+
+  /// No description provided for @recoveryResetGoToLogin.
+  ///
+  /// In pl, this message translates to:
+  /// **'Przejdź do logowania'**
+  String get recoveryResetGoToLogin;
+
+  /// No description provided for @recoveryResetBack.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wróć do logowania'**
+  String get recoveryResetBack;
 }
 
 class _AppLocalizationsDelegate

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
+import 'package:gi_home/src/app/router/route_guard.dart';
 import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
@@ -11,6 +12,7 @@ import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/auth/application/login_controller.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Email + password login with system autofill (plan §4.1, §7.5).
@@ -201,6 +203,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : Text(l10n.loginSubmit),
+          ),
+          SizedBox(height: tokens.gap / 2),
+          TextButton(
+            key: const ValueKey('login-forgot-password'),
+            onPressed: busy ? null : () => context.go(AppRoutes.recover),
+            child: Text(l10n.loginForgotPassword),
           ),
         ],
       ),

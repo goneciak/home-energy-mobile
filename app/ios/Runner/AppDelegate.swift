@@ -15,6 +15,66 @@ import UIKit
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "GiHomeBackupExclusion") {
       BackupExclusionChannel.register(with: registrar.messenger())
     }
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "GiHomeSecureDisplay") {
+      SecureDisplayChannel.shared.register(with: registrar.messenger())
+    }
+  }
+}
+
+/// `gi_home/secure` (plan §M3.5): iOS cannot block screenshots, so while a
+/// secret is shown it reports screen recording and mirroring
+/// (`UIScreen.isCaptured`) as `captureChanged` and the secret is hidden
+/// meanwhile; `copySensitive` puts text on the local-only pasteboard with an
+/// expiration date. Dart side: `lib/src/core/platform/secure_display.dart`.
+/// Unverified until built on macOS.
+final class SecureDisplayChannel {
+  static let shared = SecureDisplayChannel()
+
+  private var channel: FlutterMethodChannel?
+  private var observer: NSObjectProtocol?
+
+  func register(with messenger: FlutterBinaryMessenger) {
+    let channel = FlutterMethodChannel(name: "gi_home/secure", binaryMessenger: messenger)
+    self.channel = channel
+    channel.setMethodCallHandler { [weak self] call, result in
+      guard let self = self else { return }
+      let arguments = call.arguments as? [String: Any] ?? [:]
+      switch call.method {
+      case "setSecure":
+        self.setSecure((arguments["secure"] as? Bool) ?? false)
+        result(nil)
+      case "copySensitive":
+        let text = (arguments["text"] as? String) ?? ""
+        let milliseconds = (arguments["clearAfterMs"] as? NSNumber)?.doubleValue ?? 60_000
+        UIPasteboard.general.setItems(
+          [["public.utf8-plain-text": text]],
+          options: [
+            .localOnly: true,
+            .expirationDate: Date().addingTimeInterval(milliseconds / 1000),
+          ])
+        result(true)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+  }
+
+  private func setSecure(_ secure: Bool) {
+    if let observer = observer {
+      NotificationCenter.default.removeObserver(observer)
+      self.observer = nil
+    }
+    guard secure else { return }
+    observer = NotificationCenter.default.addObserver(
+      forName: UIScreen.capturedDidChangeNotification, object: nil, queue: .main
+    ) { [weak self] _ in
+      self?.reportCapture()
+    }
+    reportCapture()
+  }
+
+  private func reportCapture() {
+    channel?.invokeMethod("captureChanged", arguments: ["captured": UIScreen.main.isCaptured])
   }
 }
 

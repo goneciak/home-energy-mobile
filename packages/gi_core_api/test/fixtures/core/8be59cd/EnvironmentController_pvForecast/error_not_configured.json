@@ -1,0 +1,8 @@
+{
+  "statusCode": 400,
+  "code": "HTTP_400",
+  "message": "Set house coordinates first.",
+  "path": "/api/v1/pv/forecast",
+  "requestId": "3a39b98e-db2e-4b83-960c-9e3aece3673d",
+  "timestamp": "2026-11-22T03:51:56.004Z"
+}

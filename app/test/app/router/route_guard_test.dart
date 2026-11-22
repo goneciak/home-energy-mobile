@@ -21,6 +21,7 @@ const List<String> allLocations = [
   AppRoutes.restore,
   AppRoutes.login,
   AppRoutes.changePassword,
+  AppRoutes.recover,
   AppRoutes.home,
   AppRoutes.settings,
 ];
@@ -44,6 +45,28 @@ void main() {
       expect(resolveRedirect(state, AppRoutes.home), AppRoutes.connect);
       expect(resolveRedirect(state, AppRoutes.login), AppRoutes.connect);
       expect(resolveRedirect(state, AppRoutes.connect), isNull);
+    });
+
+    test('password recovery stays open only while signed out', () {
+      expect(
+        resolveRedirect(
+          guard(session: SessionPhase.signedOut),
+          AppRoutes.recover,
+        ),
+        isNull,
+      );
+      expect(resolveRedirect(guard(), AppRoutes.recover), AppRoutes.home);
+      expect(
+        resolveRedirect(
+          guard(session: SessionPhase.restoring),
+          AppRoutes.recover,
+        ),
+        AppRoutes.restore,
+      );
+      expect(
+        resolveRedirect(guard(initialized: false), AppRoutes.recover),
+        AppRoutes.setupRequired,
+      );
     });
 
     test('appliance not set up → setup required, before the session', () {

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
+import 'package:gi_home/src/features/history/domain/history_window.dart';
 
 /// Route paths of the app.
 abstract final class AppRoutes {
@@ -9,8 +10,14 @@ abstract final class AppRoutes {
   static const restore = '/restore';
   static const login = '/login';
   static const changePassword = '/change-password';
+
+  /// "Odzyskiwanie hasła" with the recovery code (public, from login).
+  static const recover = '/recover';
   static const home = '/home';
   static const settings = '/settings';
+
+  /// "Uwaga" (plan §15): its own tab.
+  static const attention = '/attention';
 
   /// "Znajdź GI Home" with a profile saved (plan §9.2): the connect screen,
   /// opened from a failed restore. It stays open in every session phase; a
@@ -21,8 +28,45 @@ abstract final class AppRoutes {
   /// Settings.
   static const experimental = '$settings/experimental';
 
+  /// "Profil i bezpieczeństwo" (plan §20 M3.5), under Settings.
+  static const account = '$settings/account';
+
+  /// Voluntary password change, under [account].
+  static const accountPassword = '$account/password';
+
+  /// The user's active sessions, under [account].
+  static const accountSessions = '$account/sessions';
+
+  /// Regenerating the recovery code, under [account].
+  static const accountRecoveryCode = '$account/recovery-code';
+
+  /// "Pogoda i słońce" (plan §4.2), nested under Home.
+  static const weather = '$home/weather';
+
   /// Read-only details of device [id], nested under Home.
   static String device(String id) => '$home/devices/${Uri.encodeComponent(id)}';
+
+  /// Heating schedules of device [id] (plan §20 M3).
+  static String deviceSchedules(String id) => '${device(id)}/schedules';
+
+  /// Editor of a new heating schedule of device [id].
+  static String newSchedule(String id) => '${deviceSchedules(id)}/new';
+
+  /// Editor of heating schedule [scheduleId] of device [id].
+  static String editSchedule(String id, String scheduleId) =>
+      '${deviceSchedules(id)}/${Uri.encodeComponent(scheduleId)}';
+
+  /// History of entity [entityId] of device [id] over [window] (plan §4.2).
+  static String entityHistory(
+    String id,
+    String entityId, {
+    HistoryWindow? window,
+  }) =>
+      '${device(id)}/history/${Uri.encodeComponent(entityId)}'
+      '${window == null ? '' : '?$historyWindowParam=${window.name}'}';
+
+  /// Query parameter of [entityHistory] naming the [HistoryWindow].
+  static const historyWindowParam = 'window';
 
   /// Query parameter of a gate holding the shell location the user was
   /// headed to (a deep link, or a cold start into device details).
@@ -35,6 +79,7 @@ abstract final class AppRoutes {
     if (uri == null || uri.hasScheme || uri.hasAuthority) return false;
     return uri.path == home ||
         uri.path.startsWith('$home/') ||
+        uri.path == attention ||
         uri.path == settings;
   }
 
@@ -45,6 +90,7 @@ abstract final class AppRoutes {
     restore,
     login,
     changePassword,
+    recover,
   };
 }
 
@@ -116,7 +162,8 @@ final class RouteGuardState {
 /// Guards apply in order: no profile → connect; "Znajdź GI Home" stays
 /// open while a profile exists; appliance not set up →
 /// setup required; session restoring or failed → restore; signed out →
-/// login; password change required → change password; otherwise the shell.
+/// login (password recovery stays open); password change required →
+/// change password; otherwise the shell.
 /// A shell location (other than Home) stopped by the session gates travels
 /// along as `?from=` and is opened once signed in. Each target is a fixed
 /// point for the same state, so redirects never loop.
@@ -149,6 +196,8 @@ String? resolveRedirect(RouteGuardState state, String location) {
     case SessionPhase.restoring || SessionPhase.restoreFailed:
       return goTo(AppRoutes.restore, keepFrom: true);
     case SessionPhase.signedOut:
+      // Recovering the password is the other way in.
+      if (uri.path == AppRoutes.recover) return null;
       return goTo(AppRoutes.login, keepFrom: true);
     case SessionPhase.signedIn:
       break;

@@ -206,6 +206,18 @@ Map<String, MockHandler> mockCoreRoutes() {
     }),
     'POST /api/v1/users/me/change-password': (_) =>
         jsonReply(null, status: 204),
+    'GET /api/v1/settings/system': (_) => jsonReply({
+      'deviceName': initializedSetup['deviceName'],
+      'locale': initializedSetup['locale'],
+      'timezone': initializedSetup['timezone'],
+    }),
+    // A dev appliance has no Supervisor (plan §16, §24).
+    'GET /api/v1/appliance/updates/status': (_) => jsonReply({
+      'configured': false,
+      'lastCheck': null,
+      'lastInstall': null,
+      'lastError': null,
+    }),
     'GET /api/v1/rooms': (_) => jsonReply([
       for (final (id, name) in [
         (_boilerRoomId, 'Kotłownia'),

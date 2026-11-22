@@ -1,0 +1,8 @@
+{
+  "statusCode": 422,
+  "code": "ENTITY_NOT_WRITABLE",
+  "message": "Entity is not a writable switch.",
+  "path": "/api/v1/devices/ed430911-765c-493f-bc58-e9a648c5d057/entities/cmwqqgr1e000a01nw5if6wima/state",
+  "requestId": "15c98cd2-df8a-4685-a976-174da6508491",
+  "timestamp": "2026-11-21T18:20:17.289Z"
+}

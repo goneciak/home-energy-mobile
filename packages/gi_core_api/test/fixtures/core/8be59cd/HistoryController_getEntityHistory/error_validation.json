@@ -1,0 +1,13 @@
+{
+  "statusCode": 400,
+  "code": "VALIDATION_FAILED",
+  "message": "Validation failed.",
+  "path": "/api/v1/devices/4e574b55-4fe0-4e31-8d4f-52814e0b1e72/entities/cmwrajeuk000901o63lt2onh7/history?limit=0",
+  "requestId": "04d08377-8ec1-4b8c-b7ef-c4051376ef98",
+  "timestamp": "2026-11-22T03:51:55.948Z",
+  "details": {
+    "limit": [
+      "limit must not be less than 1"
+    ]
+  }
+}

@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
+import 'package:gi_home/src/features/account/application/account_controllers.dart';
 import 'package:gi_home/src/features/account/application/account_providers.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/appliance/application/connection_ladder.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
+import 'package:gi_home/src/features/demo/application/demo_mode.dart';
+import 'package:gi_home/src/features/devices/application/device_snapshot.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostic_report_sharer.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -120,7 +123,21 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
     // `unknown` only precedes restore(); it never replaces a resolved state.
     if (next is AuthUnknown) return;
     if (next case AuthAuthenticated(:final user)) _rememberUser(user);
+    final wasAuthenticated = state.value is AuthAuthenticated;
     state = AsyncData(next);
+    // A session lost (revoked, expired, logout-all on another phone) or
+    // ended locally (logout-all, revoking this phone's session) takes the
+    // device list snapshot with it (plan §8.3).
+    if (next is AuthSessionLost ||
+        (next is AuthUnauthenticated && wasAuthenticated)) {
+      _wipeSnapshot();
+    }
+  }
+
+  void _wipeSnapshot() {
+    final profileId = ref.read(applianceProfileProvider)?.profileId;
+    if (profileId == null) return;
+    unawaited(ref.read(deviceSnapshotKeeperProvider).wipe(profileId));
   }
 
   void _rememberUser(CurrentUser user) {
@@ -148,23 +165,68 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
     await ref
         .read(applianceProfileProvider.notifier)
         .rememberUser(email: email, userId: user.id);
+    // Older sessions are offered for removal in the shell (plan M3.5).
+    if (ref.mounted) ref.read(accountPromptsProvider.notifier).loggedIn();
     return user;
   }
 
   /// Ends the session; local credentials (refresh cookie and access token)
   /// are always wiped, and so are the per-session preferences (the profile
   /// language) and the local diagnostics, including a report file left for
-  /// the share sheet (plan §8.3: logout clears secure storage, prefs and
-  /// files). The app returns to the phone language.
+  /// the share sheet, and the device list snapshot (plan §8.3: logout clears
+  /// secure storage, prefs and files). The app returns to the phone
+  /// language.
+  ///
+  /// In demo mode it only ends the demo: nothing real is wiped.
   Future<LogoutResult> logout() async {
+    if (_exitDemo()) return const LogoutResult(serverSessionEnded: true);
     final diagnostics = ref.read(diagnosticsServiceProvider);
     final reports = ref.read(reportDirectoryProvider);
     final locales = ref.read(sessionLocaleStoreProvider);
+    final snapshots = ref.read(deviceSnapshotKeeperProvider);
+    final profileId = ref.read(applianceProfileProvider)?.profileId;
     final result = await _client.logout();
+    // Not awaited: secure storage must never hold up leaving the session;
+    // the wipe never throws.
+    if (profileId != null) unawaited(snapshots.wipe(profileId));
     await locales.clear();
     await diagnostics.clear();
     await DiagnosticReportSharer.deleteReports(reports);
     return result;
+  }
+
+  /// Revokes [session] on the server (`DELETE /auth/sessions/:id`). When
+  /// it is this phone's, the session ends here as well and the per-session
+  /// data goes as after [logout]. Throws [ApiFailure]; nothing local changes
+  /// then.
+  Future<void> revokeSession(AuthSessionInfo session) async {
+    final wipe = _sessionDataWipe();
+    await _client.revokeSession(session.id, current: session.current);
+    if (session.current) await wipe();
+  }
+
+  /// `POST /auth/logout-all`: every session of the user ends, this one
+  /// included, so the per-session data goes as after [logout]. Throws
+  /// [ApiFailure]; nothing local changes then.
+  Future<void> logoutAll() async {
+    final wipe = _sessionDataWipe();
+    await _client.logoutAll();
+    await wipe();
+  }
+
+  /// What [logout] wipes besides the credentials (the snapshot goes with
+  /// the session state), captured while the providers are reachable. In
+  /// demo mode it ends the demo instead.
+  Future<void> Function() _sessionDataWipe() {
+    final diagnostics = ref.read(diagnosticsServiceProvider);
+    final reports = ref.read(reportDirectoryProvider);
+    final locales = ref.read(sessionLocaleStoreProvider);
+    return () async {
+      if (_exitDemo()) return;
+      await locales.clear();
+      await diagnostics.clear();
+      await DiagnosticReportSharer.deleteReports(reports);
+    };
   }
 
   /// After `POST /users/me/change-password` the server clears
@@ -181,7 +243,10 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
   /// Logs out (best effort) and removes the appliance and its stored
   /// session from this phone. Without an authenticated session (restore
   /// failed, appliance not set up) the cookie is only wiped locally.
+  ///
+  /// In demo mode it only ends the demo.
   Future<void> forgetAppliance() async {
+    if (_exitDemo()) return;
     await _endApplianceSession();
     await ref.read(applianceProfileProvider.notifier).forget();
   }
@@ -196,6 +261,9 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
     ProbeResult probe, {
     bool cleartextNoticeShown = false,
   }) async {
+    // A real appliance confirmed during the demo: the demo ends first, so
+    // the saved profile and its session are the ones replaced.
+    _exitDemo();
     final profiles = ref.read(applianceProfileProvider.notifier);
     await _endApplianceSession();
     await profiles.replaceWith(
@@ -206,10 +274,19 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
     );
   }
 
+  /// Ends demo mode; `false` when it was not on.
+  bool _exitDemo() {
+    if (ref.read(demoModeProvider) == null) return false;
+    ref.read(demoModeProvider.notifier).exit();
+    return true;
+  }
+
   Future<void> _endApplianceSession() async {
     final diagnostics = ref.read(diagnosticsServiceProvider);
     final reports = ref.read(reportDirectoryProvider);
     final locales = ref.read(sessionLocaleStoreProvider);
+    final snapshots = ref.read(deviceSnapshotKeeperProvider);
+    final profileId = ref.read(applianceProfileProvider)?.profileId;
     final client = ref.read(giCoreClientProvider);
     if (client != null && client.session.state is AuthAuthenticated) {
       await client.logout();
@@ -220,6 +297,9 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
       // A cookie left behind is scoped to the old profile id and never read
       // again.
     }
+    // Not awaited: secure storage must never hold up leaving the session;
+    // the wipe never throws.
+    if (profileId != null) unawaited(snapshots.wipe(profileId));
     await locales.clear();
     await diagnostics.clear();
     await DiagnosticReportSharer.deleteReports(reports);

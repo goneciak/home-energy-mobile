@@ -17,10 +17,19 @@ Future<ServerSocket> _echoServer() async {
 Future<List<int>> _roundTrip(int port, List<int> bytes) async {
   final socket = await Socket.connect(InternetAddress.loopbackIPv4, port);
   final received = BytesBuilder(copy: false);
-  final done = socket.listen(received.add).asFuture<void>();
-  socket.add(bytes);
-  await socket.flush();
-  await socket.close();
+  // A proxy that drops the connection may reset it (Linux does), which
+  // surfaces as a SocketException: nothing was delivered in that case.
+  final done = socket
+      .listen(received.add)
+      .asFuture<void>()
+      .catchError((Object _) {});
+  try {
+    socket.add(bytes);
+    await socket.flush();
+    await socket.close();
+  } on SocketException {
+    // Reset before the write finished.
+  }
   await done.timeout(const Duration(seconds: 10));
   socket.destroy();
   return received.takeBytes();

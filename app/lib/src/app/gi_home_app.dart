@@ -7,6 +7,7 @@ import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/theme/app_theme.dart';
 import 'package:gi_home/src/features/account/application/account_providers.dart';
+import 'package:gi_home/src/features/demo/presentation/demo_banner_host.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
 import 'package:gi_home/src/features/diagnostics/presentation/stale_app_banner.dart';
 import 'package:material_ui/material_ui.dart';
@@ -95,8 +96,9 @@ class _GiHomeAppState extends ConsumerState<GiHomeApp> {
       localizationsDelegates: appLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: ref.watch(goRouterProvider),
-      builder: (context, child) =>
-          StaleAppBannerHost(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => StaleAppBannerHost(
+        child: DemoBannerHost(child: child ?? const SizedBox.shrink()),
+      ),
     );
   }
 }

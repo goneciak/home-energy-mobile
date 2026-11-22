@@ -34,6 +34,8 @@ Future<void> main() async {
   group('fake device', skip: skip, () {
     late Dio raw;
     late GiCoreClient admin;
+    // Conditional GET of the list and details (plan §6.5 pt 4, spike S4).
+    final etags = EtagCache();
     late DeviceListItem listed;
     late String relayId;
     String? notSeeded;
@@ -67,6 +69,7 @@ Future<void> main() async {
         address: probe.address,
         vault: InMemoryTokenVault(),
         expectedInitializedAt: probe.setup.initializedAt,
+        etagCache: etags,
       );
       void notContractSeeded(String reason) {
         notSeeded = '$reason: not a Core seeded for contract use';
@@ -104,6 +107,26 @@ Future<void> main() async {
           }
           await body();
         });
+
+    seededTest(
+      'conditional GET: If-None-Match on /devices gets a 304 served from '
+      'the ETag cache',
+      () async {
+        // The list's ETag changes with every legacy poll (every 30 s, S4),
+        // so a pair of requests may straddle a change: try again.
+        for (var attempt = 0; attempt < 5; attempt++) {
+          final hits = etags.hits;
+          final first = await admin.devices();
+          final second = await admin.devices();
+          if (etags.hits > hits) {
+            expect(second, first);
+            return;
+          }
+          printOnFailure('ETag changed between requests; again');
+        }
+        fail('no 304 for GET /devices in 5 attempts');
+      },
+    );
 
     seededTest(
       'is ONLINE as LEGACY_ESPHOME despite 404 on /gi-provision',

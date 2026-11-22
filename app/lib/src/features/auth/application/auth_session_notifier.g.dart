@@ -109,7 +109,7 @@ final class AuthSessionNotifierProvider
 }
 
 String _$authSessionNotifierHash() =>
-    r'3ddd8ef24197785cbb1aea3d4d5bf133f2d3ac06';
+    r'e44312f8f55d3c04e99f40d9e099244e42c37ebc';
 
 /// The session state of the saved appliance, mirrored from
 /// [AuthSessionManager.states].

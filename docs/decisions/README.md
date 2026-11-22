@@ -15,6 +15,12 @@ jest zmieniany (ADR-y backendu, np. „ADR 006”, to osobna numeracja).
 | [0006](0006-secure-storage-access-token.md) | Sekrety w secure storage; zapisywany access token | Przyjęta; D3 czeka na potwierdzenie właściciela | §7.1, D3 |
 | [0007](0007-contract-stack-unmodified-backend.md) | Testy kontraktowe na własnym stosie Docker | Przyjęta, odstępstwo: tag `contract` zamiast `live` | §17.3, §18.2, D15, D20 |
 | [0008](0008-feature-flags.md) | Typowane flagi funkcji per flavor, bez zdalnej konfiguracji | Przyjęta | §19.6, D8 |
+| [0009](0009-switch-confirmation-semantics.md) | Potwierdzenia poleceń: LEGACY synchronicznie, GI Edge heartbeatem po `confirmedAt`, nigdy stan fizyczny | Przyjęta (okno 45 s, zgodnie z §12.2) | §12.2, §24 pkt 3, L15 |
+| [0010](0010-schedule-clock-utc.md) | Zegar harmonogramów w UTC procesu gi-core, `ApiWeekday` = `dartWeekday % 7` | Przyjęta, potwierdzona S7 | §12.5, §13.4, D8 |
+| [0011](0011-history-lttb-step-chart.md) | Historia: LTTB w izolacie po stronie klienta, wykres schodkowy, plastry dobowe | Przyjęta | §20 M3 pkt 3 |
+| [0012](0012-etag-non-authoritative-cache.md) | ETag jako nieautorytatywny cache za flagą `conditionalGet` | Przyjęta, domyślnie wyłączona | §6.5, S4 |
+| [0013](0013-feature-probing.md) | Sondowanie funkcji: tylko `HTTP_404` ukrywa funkcję | Przyjęta | §16 |
+| [0014](0014-recovery-code-secure-display.md) | Bezpieczne wyświetlanie i kopiowanie kodu odzyskiwania | Przyjęta, odstępstwo: formularz resetu bez `SecureContent` | §7.7 |
 
 ## Odstępstwa od planu zapisane w ADR-ach
 
@@ -25,6 +31,9 @@ jest zmieniany (ADR-y backendu, np. „ADR 006”, to osobna numeracja).
    nie inne urządzenie** ([0005](0005-appliance-fingerprint-single-profile.md)).
 3. **Tag testów na żywo to `contract`, nie `live`**
    ([0007](0007-contract-stack-unmodified-backend.md)).
+4. **Okno oczekiwania na heartbeat GI Edge to 45 s (jak w planie), nie 30 s;
+   heartbeat liczy się, gdy `relayN.commanded` zgadza się z żądaniem**
+   ([0009](0009-switch-confirmation-semantics.md)).
 
 ## Decyzje produktowe i sklepowe
 
@@ -33,6 +42,6 @@ właściciela: [store-and-product-decisions.md](store-and-product-decisions.md).
 
 ## Nowy ADR
 
-Kolejny numer (`0009-…`), plik `NNNN-krotki-tytul.md` z sekcjami Status,
+Kolejny numer (`0010-…`), plik `NNNN-krotki-tytul.md` z sekcjami Status,
 Kontekst, Decyzja, Konsekwencje i odniesieniami do planu; dopisz wiersz do
 tabeli powyżej.

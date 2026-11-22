@@ -97,6 +97,7 @@ class ExperimentalFeaturesScreen extends ConsumerWidget {
           l10n.flagSwitchControlByIntegrationTitle,
         FeatureFlag.androidLocalNetworkPermissionRequest =>
           l10n.flagAndroidLocalNetworkPermissionRequestTitle,
+        FeatureFlag.conditionalGet => l10n.flagConditionalGetTitle,
       };
 
   static String _flagDescription(AppLocalizations l10n, FeatureFlag flag) =>
@@ -108,5 +109,6 @@ class ExperimentalFeaturesScreen extends ConsumerWidget {
           l10n.flagSwitchControlByIntegrationDescription,
         FeatureFlag.androidLocalNetworkPermissionRequest =>
           l10n.flagAndroidLocalNetworkPermissionRequestDescription,
+        FeatureFlag.conditionalGet => l10n.flagConditionalGetDescription,
       };
 }

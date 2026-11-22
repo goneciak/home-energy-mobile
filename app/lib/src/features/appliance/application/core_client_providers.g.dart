@@ -59,21 +59,24 @@ String _$applianceProbeHash() => r'fbf567e1262bf86488333b44c40fba53b31ae5be';
 
 /// Secure storage of the current profile's refresh cookie. Failed reads are
 /// counted across restarts; the third in a row wipes the entry (plan §7.1),
-/// and each one feeds the local diagnostic counters.
+/// and each one feeds the local diagnostic counters. Demo mode keeps its
+/// session in memory and never touches secure storage.
 
 @ProviderFor(tokenVault)
 final tokenVaultProvider = TokenVaultProvider._();
 
 /// Secure storage of the current profile's refresh cookie. Failed reads are
 /// counted across restarts; the third in a row wipes the entry (plan §7.1),
-/// and each one feeds the local diagnostic counters.
+/// and each one feeds the local diagnostic counters. Demo mode keeps its
+/// session in memory and never touches secure storage.
 
 final class TokenVaultProvider
     extends $FunctionalProvider<TokenVault?, TokenVault?, TokenVault?>
     with $Provider<TokenVault?> {
   /// Secure storage of the current profile's refresh cookie. Failed reads are
   /// counted across restarts; the third in a row wipes the entry (plan §7.1),
-  /// and each one feeds the local diagnostic counters.
+  /// and each one feeds the local diagnostic counters. Demo mode keeps its
+  /// session in memory and never touches secure storage.
   TokenVaultProvider._()
     : super(
         from: null,
@@ -107,7 +110,7 @@ final class TokenVaultProvider
   }
 }
 
-String _$tokenVaultHash() => r'7dcce8c5e4e7928b8973afe7bf5cccd4dfebf901';
+String _$tokenVaultHash() => r'ea5e59d7d4f07af804a690a11f467b01d4f1c8a3';
 
 /// The GI Core client (and its single [AuthSessionManager]) for the saved
 /// appliance; `null` without a profile.
@@ -195,4 +198,4 @@ final class GiCoreClientProvider
   }
 }
 
-String _$giCoreClientHash() => r'053992c9257c6b5e6068bef0cea543ccdd45dae6';
+String _$giCoreClientHash() => r'd490aeca131c733fdfdbea35ae8a3d2b0cee8d59';

@@ -1,0 +1,30 @@
+{
+  "peakPowerKw": 6.5,
+  "hourly": [
+    {
+      "time": "2026-11-22T00:00",
+      "shortwaveRadiationWm2": 0,
+      "estimatedProductionKw": 0
+    },
+    {
+      "time": "2026-11-22T12:00",
+      "shortwaveRadiationWm2": 312.5,
+      "estimatedProductionKw": 1.83
+    },
+    {
+      "time": "2026-11-22T13:00",
+      "shortwaveRadiationWm2": null,
+      "estimatedProductionKw": null
+    }
+  ],
+  "daily": [
+    {
+      "date": "2026-11-22",
+      "estimatedProductionKwh": 7.42
+    },
+    {
+      "date": "2026-11-23",
+      "estimatedProductionKwh": 3.1
+    }
+  ]
+}

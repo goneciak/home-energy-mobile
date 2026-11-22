@@ -154,8 +154,8 @@ String _$featureFlagOverridesStoreHash() =>
 /// never reads or writes overrides, and a flag that does not exist in the
 /// flavor stays off.
 ///
-/// The merge with the capability probe results (plan §16) comes with the
-/// probes in M3; until then the flags alone decide.
+/// The capability probe results (plan §16) gate screens next to these
+/// flags: see `coreCapabilityAvailableProvider`.
 
 @ProviderFor(FeatureFlagsNotifier)
 final featureFlagsProvider = FeatureFlagsNotifierProvider._();
@@ -165,8 +165,8 @@ final featureFlagsProvider = FeatureFlagsNotifierProvider._();
 /// never reads or writes overrides, and a flag that does not exist in the
 /// flavor stays off.
 ///
-/// The merge with the capability probe results (plan §16) comes with the
-/// probes in M3; until then the flags alone decide.
+/// The capability probe results (plan §16) gate screens next to these
+/// flags: see `coreCapabilityAvailableProvider`.
 final class FeatureFlagsNotifierProvider
     extends $NotifierProvider<FeatureFlagsNotifier, FeatureFlags> {
   /// The feature flags in effect (plan §19.6): the flavor defaults from the
@@ -174,8 +174,8 @@ final class FeatureFlagsNotifierProvider
   /// never reads or writes overrides, and a flag that does not exist in the
   /// flavor stays off.
   ///
-  /// The merge with the capability probe results (plan §16) comes with the
-  /// probes in M3; until then the flags alone decide.
+  /// The capability probe results (plan §16) gate screens next to these
+  /// flags: see `coreCapabilityAvailableProvider`.
   FeatureFlagsNotifierProvider._()
     : super(
         from: null,
@@ -211,8 +211,8 @@ String _$featureFlagsNotifierHash() =>
 /// never reads or writes overrides, and a flag that does not exist in the
 /// flavor stays off.
 ///
-/// The merge with the capability probe results (plan §16) comes with the
-/// probes in M3; until then the flags alone decide.
+/// The capability probe results (plan §16) gate screens next to these
+/// flags: see `coreCapabilityAvailableProvider`.
 
 abstract class _$FeatureFlagsNotifier extends $Notifier<FeatureFlags> {
   FeatureFlags build();

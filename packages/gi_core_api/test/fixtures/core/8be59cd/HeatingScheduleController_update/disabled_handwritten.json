@@ -1,0 +1,19 @@
+{
+  "id": "cmi9x2k7d0001qz8h3v5b6n7m",
+  "deviceId": "5f0c1b9e-3a7d-4c2e-8b6f-0d1e2f3a4b5c",
+  "name": "Poranek w tygodniu",
+  "daysOfWeek": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "startTime": "05:30",
+  "endTime": "07:00",
+  "targetTemperatureCelsius": 58.5,
+  "hysteresisCelsius": 3,
+  "enabled": false,
+  "createdAt": "2026-11-20T08:00:00.000Z",
+  "updatedAt": "2026-11-22T09:00:00.000Z"
+}

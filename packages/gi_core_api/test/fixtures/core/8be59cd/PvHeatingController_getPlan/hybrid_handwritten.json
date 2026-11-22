@@ -1,0 +1,23 @@
+{
+  "deviceId": "5f0c1b9e-3a7d-4c2e-8b6f-0d1e2f3a4b5c",
+  "generatedAt": "2026-11-22T10:15:00.000Z",
+  "mode": "HYBRID",
+  "safeMaxTemperatureCelsius": 65,
+  "baseTargetCelsius": 55,
+  "hours": [
+    {
+      "time": "2026-11-22T11:00",
+      "estimatedProductionKw": 2.9,
+      "forecastFavorable": true,
+      "predictedBoostActive": true,
+      "predictedTargetCelsius": 65
+    },
+    {
+      "time": "2026-11-22T16:00",
+      "estimatedProductionKw": null,
+      "forecastFavorable": false,
+      "predictedBoostActive": false,
+      "predictedTargetCelsius": 55
+    }
+  ]
+}

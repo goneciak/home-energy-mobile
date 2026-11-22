@@ -7,6 +7,7 @@ import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/config/config_providers.dart';
 import 'package:gi_home/src/core/dev/mock_core_adapter.dart';
 import 'package:gi_home/src/core/platform/device_identity.dart';
+import 'package:gi_home/src/features/demo/application/demo_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -47,11 +48,14 @@ FlutterSecureStorage secureStorage(Ref ref) => appSecureStorage;
 /// Transport used by every GI Core request; `null` means the real network.
 /// This is the seam for the in-process demo adapter (plan §19.5) and tests.
 ///
-/// In the dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
+/// Demo mode (any flavor) always uses its own in-process adapter. In the
+/// dev flavor the `mockCore` feature flag swaps in [MockCoreAdapter];
 /// the clients watch this provider, so switching the flag rebuilds them.
 /// Beta and prod never get the mock, whatever the flags say.
 @Riverpod(keepAlive: true)
 HttpClientAdapter? coreHttpClientAdapter(Ref ref) {
+  final demo = ref.watch(demoModeProvider);
+  if (demo != null) return demo.adapter;
   if (ref.watch(appFlavorProvider) != AppFlavor.dev) return null;
   final mock = ref.watch(featureFlagsProvider.select((f) => f.mockCore));
   return mock ? MockCoreAdapter(mockCoreRoutes()) : null;

@@ -15,6 +15,7 @@ import 'package:gi_home/src/features/appliance/application/connect_controller.da
 import 'package:gi_home/src/features/appliance/domain/appliance_candidate.dart';
 import 'package:gi_home/src/features/appliance/presentation/change_appliance_dialog.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
+import 'package:gi_home/src/features/demo/application/demo_mode.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// "Znajdź GI Home" (plan §4.1, §9.2): the connection ladder runs as soon
@@ -37,6 +38,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
   final _formKey = GlobalKey<FormState>();
   final _address = TextEditingController();
   final _addressFocus = FocusNode();
+  bool _startingDemo = false;
 
   @override
   void dispose() {
@@ -63,6 +65,49 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       ),
     );
     _addressFocus.requestFocus();
+  }
+
+  /// "Wypróbuj wersję demonstracyjną" (plan §19.5): a made-up appliance in
+  /// memory; the saved profile and its session are left untouched.
+  Future<void> _startDemo() async {
+    if (_startingDemo) return;
+    setState(() => _startingDemo = true);
+    try {
+      await ref.read(demoModeProvider.notifier).enter();
+      if (mounted) widget.onConnected?.call(context);
+    } on Object {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.demoStartFailed)));
+      }
+    } finally {
+      if (mounted) setState(() => _startingDemo = false);
+    }
+  }
+
+  List<Widget> _demoEntry(BuildContext context, {required bool busy}) {
+    final l10n = context.l10n;
+    final tokens = GiTokens.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    return [
+      SizedBox(height: tokens.gap * 2),
+      const Divider(),
+      SizedBox(height: tokens.gap),
+      Text(l10n.demoEntryTitle, style: textTheme.titleMedium),
+      const SizedBox(height: 4),
+      Text(
+        l10n.demoEntryBody,
+        style: textTheme.bodyMedium?.copyWith(color: tokens.textMuted),
+      ),
+      SizedBox(height: tokens.gap),
+      OutlinedButton.icon(
+        key: const ValueKey('demo-enter'),
+        onPressed: busy || _startingDemo ? null : _startDemo,
+        icon: const Icon(Icons.play_circle_outline),
+        label: Text(l10n.demoEnter),
+      ),
+    ];
   }
 
   /// "Tak, połącz": another appliance than the saved one replaces it only
@@ -101,6 +146,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             : [
                 ..._searchSection(context, search, probing: state.isLoading),
                 ..._addressForm(context, state),
+                ..._demoEntry(context, busy: state.isLoading),
               ],
       ),
     );

@@ -65,9 +65,13 @@ void main() {
 
   Future<void> tapWhenVisible(WidgetTester tester, Finder finder) async {
     await waitFor(tester, finder);
-    await tester.ensureVisible(finder);
+    // Centred, not scrolled to the edge: a pinned app bar would cover it.
+    await Scrollable.ensureVisible(
+      tester.element(finder.first),
+      alignment: 0.5,
+    );
     await tester.pump();
-    await tester.tap(finder);
+    await tester.tap(finder.first);
     await tester.pump();
   }
 
@@ -146,6 +150,13 @@ void main() {
         of: find.byType(NavigationBar),
         matching: anyLanguageText((l) => l.navSettings),
       ),
+    );
+    // The settings list is lazy and longer on small screens: build the
+    // logout row before looking for it.
+    await tester.scrollUntilVisible(
+      anyLanguageText((l) => l.settingsLogout),
+      300,
+      scrollable: find.byType(Scrollable).hitTestable().first,
     );
     await tapWhenVisible(tester, anyLanguageText((l) => l.settingsLogout));
     await waitFor(tester, anyLanguageText((l) => l.loginTitle));

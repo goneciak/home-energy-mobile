@@ -1,0 +1,36 @@
+[
+  {
+    "id": "cmi9x2k7d0001qz8h3v5b6n7m",
+    "deviceId": "5f0c1b9e-3a7d-4c2e-8b6f-0d1e2f3a4b5c",
+    "name": "Poranek w tygodniu",
+    "daysOfWeek": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "startTime": "05:30",
+    "endTime": "07:00",
+    "targetTemperatureCelsius": 58.5,
+    "hysteresisCelsius": 3,
+    "enabled": true,
+    "createdAt": "2026-11-20T08:00:00.000Z",
+    "updatedAt": "2026-11-20T08:00:00.000Z"
+  },
+  {
+    "id": "cmi9x3a1f0002qz8hk2l4p9q1",
+    "deviceId": "5f0c1b9e-3a7d-4c2e-8b6f-0d1e2f3a4b5c",
+    "name": "Noc weekendowa",
+    "daysOfWeek": [
+      6
+    ],
+    "startTime": "22:00",
+    "endTime": "06:00",
+    "targetTemperatureCelsius": 45,
+    "hysteresisCelsius": 5,
+    "enabled": false,
+    "createdAt": "2026-11-21T19:30:00.000Z",
+    "updatedAt": "2026-11-22T07:12:44.120Z"
+  }
+]

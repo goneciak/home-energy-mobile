@@ -8,5 +8,6 @@ import 'package:gi_core_api/gi_core_api.dart';
 /// all. `tools/gen_backend_contract.dart` prints the reasons in
 /// `docs/backend-contract.md`.
 ///
-/// Every MVP entry is covered today, so the list is empty.
+/// Every catalog entry has a live test at the moment; add an entry here
+/// (with its reason) only for an endpoint the contract stack cannot reach.
 const liveCoverageExemptions = <Endpoint, String>{};

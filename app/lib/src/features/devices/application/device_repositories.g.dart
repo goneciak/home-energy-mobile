@@ -60,7 +60,63 @@ final class DeviceReadSourceProvider
   }
 }
 
-String _$deviceReadSourceHash() => r'647ae1c81d59d1c5545b1494944fba3a0dc3a9b1';
+String _$deviceReadSourceHash() => r'75f573e0864c554f294164ddd494c5a85e4d070d';
+
+/// Device write endpoints of the saved appliance (plan §12). Only read once
+/// signed in, i.e. when a client exists.
+
+@ProviderFor(deviceCommandSource)
+final deviceCommandSourceProvider = DeviceCommandSourceProvider._();
+
+/// Device write endpoints of the saved appliance (plan §12). Only read once
+/// signed in, i.e. when a client exists.
+
+final class DeviceCommandSourceProvider
+    extends
+        $FunctionalProvider<
+          DeviceCommandSource,
+          DeviceCommandSource,
+          DeviceCommandSource
+        >
+    with $Provider<DeviceCommandSource> {
+  /// Device write endpoints of the saved appliance (plan §12). Only read once
+  /// signed in, i.e. when a client exists.
+  DeviceCommandSourceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'deviceCommandSourceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$deviceCommandSourceHash();
+
+  @$internal
+  @override
+  $ProviderElement<DeviceCommandSource> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  DeviceCommandSource create(Ref ref) {
+    return deviceCommandSource(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DeviceCommandSource value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DeviceCommandSource>(value),
+    );
+  }
+}
+
+String _$deviceCommandSourceHash() =>
+    r'1a322aab70ff5bae4cb649acdf1fd9173ec9e127';
 
 /// Shared device cache. A new appliance gets a new repository; a different
 /// (or no) user clears it, so nothing outlives the session (plan §8.3).

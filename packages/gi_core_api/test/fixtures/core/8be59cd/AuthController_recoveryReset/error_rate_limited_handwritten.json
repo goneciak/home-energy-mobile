@@ -1,0 +1,8 @@
+{
+  "statusCode": 429,
+  "code": "HTTP_429",
+  "message": "ThrottlerException: Too Many Requests",
+  "path": "/api/v1/auth/recovery/reset",
+  "requestId": "0d6f3e2a-8b1c-4d5e-9f7a-1b2c3d4e5f60",
+  "timestamp": "2026-11-22T10:15:00.000Z"
+}

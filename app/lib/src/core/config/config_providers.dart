@@ -30,8 +30,8 @@ FeatureFlagOverridesStore featureFlagOverridesStore(Ref ref) =>
 /// never reads or writes overrides, and a flag that does not exist in the
 /// flavor stays off.
 ///
-/// The merge with the capability probe results (plan §16) comes with the
-/// probes in M3; until then the flags alone decide.
+/// The capability probe results (plan §16) gate screens next to these
+/// flags: see `coreCapabilityAvailableProvider`.
 @Riverpod(keepAlive: true)
 class FeatureFlagsNotifier extends _$FeatureFlagsNotifier {
   @override

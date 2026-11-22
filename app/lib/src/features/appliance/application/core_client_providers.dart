@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
+import 'package:gi_home/src/core/config/config_providers.dart';
 import 'package:gi_home/src/core/l10n/request_language.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
@@ -10,6 +11,7 @@ import 'package:gi_home/src/features/appliance/application/appliance_profile_not
 import 'package:gi_home/src/features/auth/data/counting_token_vault.dart';
 import 'package:gi_home/src/features/auth/data/secure_token_vault.dart';
 import 'package:gi_home/src/features/auth/data/vault_read_failures.dart';
+import 'package:gi_home/src/features/demo/application/demo_mode.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -28,9 +30,12 @@ ApplianceProbe applianceProbe(Ref ref) => ApplianceProbe(
 
 /// Secure storage of the current profile's refresh cookie. Failed reads are
 /// counted across restarts; the third in a row wipes the entry (plan §7.1),
-/// and each one feeds the local diagnostic counters.
+/// and each one feeds the local diagnostic counters. Demo mode keeps its
+/// session in memory and never touches secure storage.
 @Riverpod(keepAlive: true)
 TokenVault? tokenVault(Ref ref) {
+  final demo = ref.watch(demoModeProvider);
+  if (demo != null) return demo.vault;
   final profileId = ref.watch(
     applianceProfileProvider.select((p) => p?.profileId),
   );
@@ -89,6 +94,12 @@ GiCoreClient? giCoreClient(Ref ref) {
     },
     waitUntilForeground: foreground.untilForeground,
     httpClientAdapter: ref.watch(coreHttpClientAdapterProvider),
+    // Read, not watched: toggling the flag must not rebuild the client
+    // mid-session (plan §6.5 pt 4); the cache is per client, so per profile.
+    etagCache: ref.read(featureFlagsProvider).conditionalGet
+        ? EtagCache()
+        : null,
+    etagScope: ref.read(applianceProfileProvider)?.profileId ?? '',
     onFailure: (failure) {
       diagnostics.recordFailure(failure);
       // A reset seen mid-session (a refresh before any request); a reset

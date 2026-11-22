@@ -1,0 +1,21 @@
+[
+  {
+    "id": "cmwravw6r002x01o68nl4gyrz",
+    "deviceId": "4e574b55-4fe0-4e31-8d4f-52814e0b1e72",
+    "name": "Dni robocze",
+    "daysOfWeek": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "startTime": "06:00",
+    "endTime": "22:00",
+    "targetTemperatureCelsius": 50,
+    "hysteresisCelsius": 3,
+    "enabled": false,
+    "createdAt": "2026-11-22T03:51:55.827Z",
+    "updatedAt": "2026-11-22T03:51:55.827Z"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "statusCode": 400,
+  "code": "VALIDATION_FAILED",
+  "message": "Validation failed.",
+  "path": "/api/v1/devices/ed430911-765c-493f-bc58-e9a648c5d057/control-strategy",
+  "requestId": "b1b78537-c75c-422f-91c2-6a274db851af",
+  "timestamp": "2026-11-21T18:20:17.369Z",
+  "details": {
+    "hysteresisCelsius": [
+      "hysteresisCelsius must not be less than 1"
+    ]
+  }
+}

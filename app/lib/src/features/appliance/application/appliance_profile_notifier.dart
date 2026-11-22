@@ -2,6 +2,7 @@ import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/features/appliance/data/appliance_profile_store.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
+import 'package:gi_home/src/features/demo/application/demo_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'appliance_profile_notifier.g.dart';
@@ -11,10 +12,19 @@ ApplianceProfileStore applianceProfileStore(Ref ref) =>
     ApplianceProfileStore(ref.watch(sharedPreferencesProvider));
 
 /// The saved appliance profile; `null` until the user connects.
+///
+/// In demo mode it is the demo appliance's profile, held in memory: changes
+/// are never stored, and the saved profile is left as it was.
 @Riverpod(keepAlive: true)
 class ApplianceProfileNotifier extends _$ApplianceProfileNotifier {
   @override
-  ApplianceProfile? build() => ref.watch(applianceProfileStoreProvider).read();
+  ApplianceProfile? build() {
+    final demo = ref.watch(demoModeProvider);
+    if (demo != null) return demo.profile;
+    return ref.watch(applianceProfileStoreProvider).read();
+  }
+
+  bool get _inDemo => ref.read(demoModeProvider) != null;
 
   ApplianceProfileStore get _store => ref.read(applianceProfileStoreProvider);
 
@@ -119,7 +129,12 @@ class ApplianceProfileNotifier extends _$ApplianceProfileNotifier {
   /// `AuthSessionNotifier.forgetAppliance`, which also ends and wipes the
   /// stored session: the token vault depends on this provider, so it cannot
   /// be reached from here.
+  /// In demo mode it ends the demo instead.
   Future<void> forget() async {
+    if (_inDemo) {
+      ref.read(demoModeProvider.notifier).exit();
+      return;
+    }
     await _store.clear();
     state = null;
   }
@@ -129,6 +144,6 @@ class ApplianceProfileNotifier extends _$ApplianceProfileNotifier {
   /// build on each other instead of overwriting.
   Future<void> _save(ApplianceProfile profile) async {
     state = profile;
-    await _store.write(profile);
+    if (!_inDemo) await _store.write(profile);
   }
 }

@@ -41,7 +41,7 @@ final devices = await client.devices();
 dart run build_runner build      # freezed + json_serializable
 dart analyze
 dart test -x contract            # unit tests
-dart test -t contract            # live tests (GI_CORE_URL, default http://localhost:3000)
+dart test -t contract -j 1       # live tests, one file at a time (GI_CORE_URL, default http://localhost:3000)
 ```
 
 Live tests carry the tag `contract` (the plan's `live`, §17.3) and decode in
@@ -52,9 +52,9 @@ repo README), which prints `GI_CORE_URL` and `FAKE_ESPHOME_URL`.
 of §9.3. Tests that change data (switching the fake device, the owner
 password) run only on a Core seeded for contract use and skip on a dev Core.
 Credentials come from `tools/backend/dev.env` (owner) and
-`tools/seed_accounts.example.json` (ADMIN, USER). The suites log in five times
-in all; GI Core allows 5 logins per minute, so a login just after the seeder
-waits out `Retry-After` once.
+`tools/seed_accounts.example.json` (ADMIN, USER, SERVICE). The suites log in
+eight times in all; GI Core allows 5 logins per minute, so a login over the
+limit waits out `Retry-After` once (`respectingLoginLimit`).
 
 Recorded responses live in
 `test/fixtures/core/<backendRef>/<endpointId>/<case>.json` (plan §17.4):

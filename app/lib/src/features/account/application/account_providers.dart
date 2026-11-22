@@ -9,6 +9,8 @@ import 'package:gi_home/src/features/account/domain/app_locale.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
+import 'package:gi_home/src/features/demo/application/demo_mode.dart';
+import 'package:gi_home/src/features/settings/application/settings_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'account_providers.g.dart';
@@ -36,7 +38,8 @@ Future<UserProfile?> userProfile(Ref ref) async {
   if (userId == null || profileId == null || client == null) return null;
   _reloadOnResume(ref);
   final profile = await client.profile();
-  if (ref.mounted && profile.id == userId) {
+  // The demo user's language is not remembered (plan §19.5).
+  if (ref.mounted && profile.id == userId && !ref.read(isDemoProvider)) {
     await ref
         .read(sessionLocaleStoreProvider)
         .write(
@@ -51,6 +54,8 @@ Future<UserProfile?> userProfile(Ref ref) async {
 /// The language the app shows (plan §13.2), fed to `MaterialApp.locale`;
 /// `null` means the phone language.
 ///
+/// * A language picked in Settings ([languagePreferenceProvider]) wins
+///   over everything below, signed in or not.
 /// * Signed out (before login, after logout or "Zmień użytkownika"): the
 ///   phone language.
 /// * Signed in: the language of the user's GI Core profile, or the phone
@@ -60,6 +65,8 @@ Future<UserProfile?> userProfile(Ref ref) async {
 ///   restored session does not start in the phone language.
 @Riverpod(keepAlive: true)
 Locale? appLocale(Ref ref) {
+  final picked = ref.watch(languagePreferenceProvider);
+  if (picked != null) return picked;
   final (:profileId, :lastUserId) = ref.watch(
     applianceProfileProvider.select(
       (p) => (profileId: p?.profileId, lastUserId: p?.lastUserId),

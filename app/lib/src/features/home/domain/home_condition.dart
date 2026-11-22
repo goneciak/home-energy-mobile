@@ -119,7 +119,7 @@ final class HomeCondition {
     final items = [
       for (final device in enabled)
         for (final kind in [
-          ..._attentionKinds(device),
+          ...attentionKindsOf(device),
           if (device.isHeating) ..._cardKinds(heatingCards[device.id]),
         ])
           AttentionItem(device, kind),
@@ -167,7 +167,8 @@ final class HomeCondition {
   int get hiddenItemCount =>
       items.length > maxSuggestions ? items.length - maxSuggestions : 0;
 
-  static Iterable<AttentionKind> _attentionKinds(DeviceListItem device) sync* {
+  /// What the list alone says about [device] (plan §11.1, §15).
+  static Iterable<AttentionKind> attentionKindsOf(DeviceListItem device) sync* {
     if (device.currentState?.isCritical ?? false) {
       yield AttentionKind.firmwareFault;
     }

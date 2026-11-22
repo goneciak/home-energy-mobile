@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/app/router/route_guard.dart';
+import 'package:gi_home/src/core/data/fetched.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/freshness_banner.dart';
@@ -9,9 +10,14 @@ import 'package:gi_home/src/core/widgets/permission_state.dart';
 import 'package:gi_home/src/core/widgets/section_header.dart';
 import 'package:gi_home/src/core/widgets/skeleton.dart';
 import 'package:gi_home/src/core/widgets/state_views.dart';
+import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/devices/application/device_list_notifier.dart';
+import 'package:gi_home/src/features/devices/application/heating_suspension_controller.dart';
 import 'package:gi_home/src/features/devices/application/rooms_notifier.dart';
+import 'package:gi_home/src/features/devices/domain/freshness_policy.dart';
+import 'package:gi_home/src/features/devices/domain/heating_permission.dart';
 import 'package:gi_home/src/features/devices/presentation/device_tile.dart';
+import 'package:gi_home/src/features/devices/presentation/widgets/heating_control_panel.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
 import 'package:gi_home/src/features/home/application/heating_card_notifier.dart';
 import 'package:gi_home/src/features/home/application/home_dashboard.dart';
@@ -202,6 +208,15 @@ class _Dashboard extends StatelessWidget {
                     ),
             ),
         ],
+        gap,
+        ListTile(
+          key: const ValueKey('home-weather'),
+          leading: const Icon(Icons.wb_cloudy_outlined),
+          title: Text(l10n.weatherEntryTitle),
+          subtitle: Text(l10n.weatherEntrySubtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.go(AppRoutes.weather),
+        ),
       ],
     );
   }
@@ -233,12 +248,41 @@ class _HeatingCardSlot extends ConsumerWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => HeatingCard(
-    device: device,
-    listFetchedAt: listFetchedAt,
-    detail: ref.watch(heatingCardProvider(device.id)),
-    roomName: roomName,
-    now: now,
-    onTap: onTap,
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detail = ref.watch(heatingCardProvider(device.id));
+    final provider = heatingSuspensionControllerProvider(device.id);
+    // Watched so a resume started here outlives the sheet (plan §12.1).
+    final command = ref.watch(provider);
+    final fetched = detail.data;
+
+    Future<void> resume(Fetched<DeviceDetail> fetched) async {
+      if (await showResumeSheet(context, detail: fetched, now: now)) {
+        await ref
+            .read(provider.notifier)
+            .submit(suspend: false, freshness: FreshnessPolicy.heatingCard);
+      }
+    }
+
+    return HeatingCard(
+      device: device,
+      listFetchedAt: listFetchedAt,
+      detail: detail,
+      roomName: roomName,
+      now: now,
+      onTap: onTap,
+      permission: HeatingPermission.of(
+        ref.watch(currentUserProvider.select((user) => user?.role)),
+      ),
+      onResume: fetched == null || command.isBusy
+          ? null
+          : () => resume(fetched),
+      commandStatus: SuspensionOutcome.visible(command)
+          ? SuspensionOutcome(
+              state: command,
+              now: now,
+              onRefresh: () => ref.read(provider.notifier).refresh(),
+            )
+          : null,
+    );
+  }
 }

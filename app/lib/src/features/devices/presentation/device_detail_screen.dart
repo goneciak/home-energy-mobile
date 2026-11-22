@@ -13,19 +13,28 @@ import 'package:gi_home/src/core/widgets/section_header.dart';
 import 'package:gi_home/src/core/widgets/skeleton.dart';
 import 'package:gi_home/src/core/widgets/state_views.dart';
 import 'package:gi_home/src/core/widgets/status_chip.dart';
+import 'package:gi_home/src/features/appliance/application/core_capabilities.dart';
 import 'package:gi_home/src/features/devices/application/device_detail_notifier.dart';
 import 'package:gi_home/src/features/devices/application/device_list_notifier.dart';
 import 'package:gi_home/src/features/devices/application/rooms_notifier.dart';
 import 'package:gi_home/src/features/devices/domain/controller_status.dart';
+import 'package:gi_home/src/features/devices/domain/freshness_policy.dart';
+import 'package:gi_home/src/features/devices/domain/switch_command_state.dart';
 import 'package:gi_home/src/features/devices/presentation/device_labels.dart';
+import 'package:gi_home/src/features/devices/presentation/widgets/heating_control_panel.dart';
+import 'package:gi_home/src/features/devices/presentation/widgets/switch_command_panel.dart';
+import 'package:gi_home/src/features/environment/application/environment_providers.dart';
+import 'package:gi_home/src/features/environment/presentation/widgets/pv_plan_card.dart';
+import 'package:gi_home/src/features/history/domain/history_window.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// "Szczegóły urządzenia", read-only (plan §4.1): state, information,
+/// "Szczegóły urządzenia" (plan §4.1): state, information,
 /// operating modes, entities and diagnostics of one device, polled every
 /// 5 s while visible (15 s after 2 min without a touch or scroll, plan §11).
 /// Controller state and fault count come from the cached device list, each
-/// labelled with its source and time.
+/// labelled with its source and time. Switch entities get a non-optimistic
+/// control for OWNER/ADMIN ([SwitchEntityControl], plan §12.2).
 class DeviceDetailScreen extends ConsumerWidget {
   const new({required this.deviceId, super.key});
 
@@ -39,10 +48,15 @@ class DeviceDetailScreen extends ConsumerWidget {
     final rooms = ref.watch(roomsProvider).data?.value;
     final now = ref.watch(clockProvider)();
 
-    Future<void> refresh() => Future.wait([
-      ref.read(deviceDetailProvider(deviceId).notifier).refresh(),
-      ref.read(deviceListProvider.notifier).refresh(),
-    ]);
+    Future<void> refresh() {
+      if (ref.read(pvHeatingPlanProvider(deviceId).exists)) {
+        ref.invalidate(pvHeatingPlanProvider(deviceId));
+      }
+      return Future.wait([
+        ref.read(deviceDetailProvider(deviceId).notifier).refresh(),
+        ref.read(deviceListProvider.notifier).refresh(),
+      ]);
+    }
 
     final notifier = ref.read(deviceDetailProvider(deviceId).notifier);
     final data = detail.data;
@@ -51,14 +65,14 @@ class DeviceDetailScreen extends ConsumerWidget {
     if (data != null) {
       final listItem = list?.value.where((d) => d.id == deviceId).firstOrNull;
       final roomId = data.value.roomId;
+      final freshness = notifier.freshnessOf(data.fetchedAt);
       body = RefreshIndicator(
         onRefresh: refresh,
         child: _DeviceDetailView(
           detail: data,
           error: error,
-          isStale: notifier
-              .freshnessOf(data.fetchedAt)
-              .isStale(data.fetchedAt, now),
+          freshness: freshness,
+          isStale: freshness.isStale(data.fetchedAt, now),
           now: now,
           deviceType: listItem?.type ?? DeviceType.unknown,
           status: ControllerStatus.resolve(
@@ -161,10 +175,11 @@ class _DeviceDetailSkeleton extends StatelessWidget {
   }
 }
 
-class _DeviceDetailView extends StatelessWidget {
+class _DeviceDetailView extends ConsumerWidget {
   const new({
     required this.detail,
     required this.error,
+    required this.freshness,
     required this.isStale,
     required this.now,
     required this.deviceType,
@@ -174,6 +189,7 @@ class _DeviceDetailView extends StatelessWidget {
 
   final Fetched<DeviceDetail> detail;
   final Object? error;
+  final FreshnessPolicy freshness;
   final bool isStale;
   final DateTime now;
 
@@ -185,10 +201,16 @@ class _DeviceDetailView extends StatelessWidget {
   final String? roomName;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final tokens = GiTokens.of(context);
     final device = detail.value;
+    // Feature probing (plan §16): a route this Core lacks is not offered.
+    bool available(CoreCapability capability) =>
+        ref.watch(coreCapabilityAvailableProvider(capability));
+    final hasSchedules = available(CoreCapability.schedules);
+    final hasHistory = available(CoreCapability.history);
+    final hasPvPlan = available(CoreCapability.pvPlan);
     final edge = EdgeInsets.symmetric(horizontal: tokens.gap);
     final banners = <Widget>[
       FreshnessBanner(
@@ -226,6 +248,44 @@ class _DeviceDetailView extends StatelessWidget {
           padding: edge,
           child: _Header(device: device, type: deviceType, now: now),
         ),
+        if (device.isHeating)
+          HeatingControlPanel(
+            key: const ValueKey('heating-control-panel'),
+            detail: detail,
+            freshness: freshness,
+            now: now,
+          ),
+        if (device.isHeating && hasSchedules)
+          ListTile(
+            key: const ValueKey('device-schedules'),
+            leading: const Icon(Icons.event_repeat_outlined),
+            title: Text(l10n.schedulesEntryTitle),
+            subtitle: Text(l10n.schedulesEntrySubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.go(AppRoutes.deviceSchedules(device.id)),
+          ),
+        if (device.isHeating &&
+            hasHistory &&
+            device.controlTemperatureEntityId != null)
+          ListTile(
+            key: const ValueKey('device-night-history'),
+            leading: const Icon(Icons.timeline),
+            title: Text(l10n.historyNightEntryTitle),
+            subtitle: Text(l10n.historyNightEntrySubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.go(
+              AppRoutes.entityHistory(
+                device.id,
+                device.controlTemperatureEntityId!,
+                window: HistoryWindow.day,
+              ),
+            ),
+          ),
+        if (device.isHeating && hasPvPlan)
+          PvPlanSection(
+            key: const ValueKey('device-pv-plan'),
+            deviceId: device.id,
+          ),
         SectionHeader(l10n.deviceStatusSection),
         _ControllerStatusRows(status: status, now: now),
         SectionHeader(l10n.deviceInfoSection),
@@ -245,8 +305,22 @@ class _DeviceDetailView extends StatelessWidget {
         if (device.entities.isEmpty)
           _MutedNote(l10n.deviceEntitiesEmpty)
         else
-          for (final entity in device.entities)
-            _EntityTile(device: device, entity: entity, now: now),
+          for (final entity in device.entities) ...[
+            _EntityTile(
+              device: device,
+              entity: entity,
+              now: now,
+              hasHistory: hasHistory,
+            ),
+            if (entity.domain == EntityDomain.switch_)
+              SwitchEntityControl(
+                key: ValueKey('switch-control-${entity.id}'),
+                detail: detail,
+                entity: entity,
+                freshness: freshness,
+                now: now,
+              ),
+          ],
         SectionHeader(l10n.deviceDiagnosticsSection),
         ..._diagnosticsRows(l10n, device.diagnostics),
       ],
@@ -425,11 +499,35 @@ class _ControllerStatusRows extends StatelessWidget {
 }
 
 class _EntityTile extends StatelessWidget {
-  const new({required this.device, required this.entity, required this.now});
+  const new({
+    required this.device,
+    required this.entity,
+    required this.now,
+    required this.hasHistory,
+  });
 
   final DeviceDetail device;
   final DeviceEntity entity;
   final DateTime now;
+
+  /// Whether this Core has entity history (feature probing, plan §16).
+  final bool hasHistory;
+
+  /// A GI Edge switch shows only what the device reported, never the value
+  /// GI Core writes on enqueue (plan §12.2); `null` for everything else.
+  String? _switchValue(AppLocalizations l10n) {
+    if (entity.domain != EntityDomain.switch_ ||
+        device.communicationMode != CommunicationMode.giEdgeV1) {
+      return null;
+    }
+    return switch (reportedSwitchState(device, entity)) {
+      true => l10n.entityValueOn,
+      false => l10n.entityValueOff,
+      null when entity.value is EntityValueBoolean =>
+        l10n.entitySwitchAwaitingReport,
+      null => l10n.commonNoDataValue,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -448,12 +546,13 @@ class _EntityTile extends StatelessWidget {
         ? l10n.entityDisabled
         : !entity.availability
         ? l10n.entityUnavailable
-        : formatEntityValue(
-            l10n,
-            entity.value,
-            unit: entity.unit,
-            deviceClass: entity.deviceClass,
-          );
+        : _switchValue(l10n) ??
+              formatEntityValue(
+                l10n,
+                entity.value,
+                unit: entity.unit,
+                deviceClass: entity.deviceClass,
+              );
     final subtitle = [
       ?role,
       entityDomainLabel(l10n, entity.domain),
@@ -461,6 +560,10 @@ class _EntityTile extends StatelessWidget {
     ].join(' · ');
     return ListTile(
       key: ValueKey('entity-${entity.id}'),
+      // Every reading has a history (plan §4.2), for every role.
+      onTap: hasHistory
+          ? () => context.go(AppRoutes.entityHistory(device.id, entity.id))
+          : null,
       title: Text(entity.displayName),
       subtitle: Text(subtitle),
       trailing: ConstrainedBox(
