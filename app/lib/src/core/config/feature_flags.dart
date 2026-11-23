@@ -36,7 +36,14 @@ enum FeatureFlag {
   /// and a 304 replays the cached body (plan §6.5 pt 4, spike S4). Saves
   /// bandwidth only; nothing depends on it. Read when the GI Core client is
   /// built, so a change applies from the next session.
-  conditionalGet('FF_CONDITIONAL_GET');
+  conditionalGet('FF_CONDITIONAL_GET'),
+
+  /// When the system cannot resolve a `.local` name (some Android phones),
+  /// the app asks the network itself over multicast DNS (`multicast_dns`)
+  /// before giving up on the name. Android only; needs
+  /// `CHANGE_WIFI_MULTICAST_STATE`. Off until spike S3 has run on real
+  /// phones.
+  mdnsFallback('FF_MDNS_FALLBACK');
 
   new(this.define, {this.devOnly = false});
 
@@ -76,6 +83,7 @@ final class FeatureFlags {
   bool get androidLocalNetworkPermissionRequest =>
       this[FeatureFlag.androidLocalNetworkPermissionRequest];
   bool get conditionalGet => this[FeatureFlag.conditionalGet];
+  bool get mdnsFallback => this[FeatureFlag.mdnsFallback];
 
   /// Every flag with its value, in declaration order.
   Map<FeatureFlag, bool> asMap() => _values;

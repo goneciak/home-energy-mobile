@@ -92,6 +92,15 @@ jobs:
         working-directory: tools
         run: dart test
 
+      # The GI Edge device simulator is a standalone package (its image runs
+      # `dart pub get`), so it resolves on its own, outside the workspace.
+      - name: GI Edge simulator (analyze, test)
+        working-directory: tools/gi_edge_sim
+        run: |
+          dart pub get
+          dart analyze --fatal-infos
+          dart test
+
       # Goldens run in their own step below, so a golden failure is reported
       # as one. Writes app/coverage/lcov.info (with branch data).
       - name: Unit and widget tests (app)

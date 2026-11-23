@@ -211,7 +211,7 @@ class ResumeSheet extends StatelessWidget {
     final device = detail.value;
     final requirement = ConfirmationPolicy.of(const ResumeHeating(), device);
     final base = device.baseControlStrategy;
-    final temperature = HeatingReadings.of(device).controlTemperature;
+    final temperature = HeatingReadings.of(device, now: now).controlTemperature;
     final value = temperature?.value;
 
     Widget line(IconData icon, String text, {Key? key}) => Padding(

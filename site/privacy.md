@@ -84,10 +84,18 @@ przechowamy przez [[OKRES_PRZECHOWYWANIA_RAPORTOW]].
   Home w sieci domowej. Bez niej aplikacja nie zadziała; możesz ją zmienić w
   Ustawieniach systemu.
 - **Android: Internet i stan sieci** – połączenie z urządzeniem w sieci
-  domowej i wykrywanie braku sieci.
+  domowej, wykrywanie braku sieci i zmiany sieci (po zmianie Wi-Fi aplikacja
+  odświeża dane i sprawdza, czy urządzenie nie zmieniło adresu).
 - **Android: Urządzenia w pobliżu (Wi-Fi)** – zadeklarowane na potrzeby
   ochrony sieci lokalnej w nowszych wersjach Androida, z oznaczeniem, że
-  **nie służy do ustalania lokalizacji**.
+  **nie służy do ustalania lokalizacji**. Aplikacja prosi o tę zgodę tylko
+  wtedy, gdy odpowiednia opcja jest włączona; w wydaniu domyślnym jest
+  wyłączona.
+- **Android: Zmiana stanu multicastu Wi-Fi** – zadeklarowane dla opcjonalnego,
+  domyślnie wyłączonego zapasowego wyszukiwania urządzenia po nazwie `.local`
+  (multicast DNS). Zapytanie trafia tylko do Twojej sieci lokalnej i służy
+  wyłącznie do znalezienia adresu urządzenia GI Home; nie wysyła danych poza
+  sieć domową.
 
 Aplikacja nie używa lokalizacji, aparatu, mikrofonu, kontaktów ani
 powiadomień push.

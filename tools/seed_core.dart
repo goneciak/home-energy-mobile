@@ -51,6 +51,12 @@ const _fakeExternalId = 'gi-fake-esphome-01';
 /// (esphome-integration.service.ts sync), so another name would not stick.
 const _fakeDeviceName = 'Fake kotłownia';
 
+/// What the GI Edge simulator's manifest reports (tools/gi_edge_sim).
+const _edgeSimManufacturer = 'GI Industries';
+const _edgeSimModel = 'GI Boiler Room Controller';
+const _edgeSimExternalId = 'gi-edge-sim-01';
+const _edgeSimDeviceName = 'GI Boiler Room Controller (simulator)';
+
 /// MANUAL: GI Core's live hysteresis loop only acts in AUTO
 /// (gi-edge-live-heating-control.service.ts), so the relay moves only when a
 /// test or a person switches it.
@@ -69,6 +75,9 @@ Usage: dart run tools/seed_core.dart [options]
   --allow-initialized     allow writes to a Core that is already initialized
   --fake-device HOST      fake-esphome host as GI Core resolves it (default fake-esphome;
                           "none" skips steps 5-7)
+  --edge-sim HOST         also provision the GI Edge simulator (host as GI Core
+                          resolves it, normally gi-edge-sim) and wait for its
+                          activation (communicationMode GI_EDGE_V1)
   --fixtures              record missing fixtures (see packages/gi_core_api/test/fixtures)
   --overwrite-fixtures    with --fixtures: re-record existing files too
   -h, --help              this text
@@ -174,6 +183,19 @@ Future<void> main(List<String> args) async {
       final deviceId = await _ensureFakeDevice(api, host, rooms['Kotłownia']);
       if (deviceId != null) await _configureHeating(api, deviceId);
     }
+
+    // The GI Edge simulator (opt-in: an extra device in the lists).
+    if (options.edgeSim case final host?) {
+      final deviceId = await _ensureEdgeSim(api, host, rooms['Kotłownia']);
+      if (deviceId != null) {
+        await _configureHeating(
+          api,
+          deviceId,
+          relayName: 'relay_2',
+          temperatureName: 'Temperature 1',
+        );
+      }
+    }
   }
 
   if (options.fixtures) {
@@ -193,6 +215,7 @@ final class Options {
     required this.yes,
     required this.allowInitialized,
     required this.fakeDevice,
+    required this.edgeSim,
     required this.fixtures,
     required this.overwriteFixtures,
     required this.help,
@@ -201,6 +224,7 @@ final class Options {
   factory parse(List<String> args) {
     var baseUrl = 'http://localhost:3000';
     String? fakeDevice = 'fake-esphome';
+    String? edgeSim;
     final flags = <String>{};
     for (var i = 0; i < args.length; i++) {
       final arg = args[i];
@@ -215,6 +239,8 @@ final class Options {
         case '--fake-device':
           final host = value();
           fakeDevice = host == 'none' ? null : host;
+        case '--edge-sim':
+          edgeSim = value();
         case '--init' ||
             '--yes' ||
             '--allow-initialized' ||
@@ -236,6 +262,7 @@ final class Options {
       yes: flags.contains('--yes'),
       allowInitialized: flags.contains('--allow-initialized'),
       fakeDevice: fakeDevice,
+      edgeSim: edgeSim,
       fixtures: flags.contains('--fixtures'),
       overwriteFixtures: flags.contains('--overwrite-fixtures'),
       help: flags.contains('--help'),
@@ -247,6 +274,7 @@ final class Options {
   final bool yes;
   final bool allowInitialized;
   final String? fakeDevice;
+  final String? edgeSim;
   final bool fixtures;
   final bool overwriteFixtures;
   final bool help;
@@ -374,10 +402,73 @@ Future<void> _ensureDevice(_Api api, Map<String, Object?> body) async {
 /// fake does not advertise `_esphomelib._tcp`. The manual host path is the
 /// one GI Core falls back to in Docker anyway
 /// (esphome-mdns-discovery.service.ts).
-Future<String?> _ensureFakeDevice(_Api api, String host, String? roomId) async {
-  final existing = (await _devices(api)).where(
-    (d) => d['manufacturer'] == _fakeManufacturer && d['model'] == _fakeModel,
+Future<String?> _ensureFakeDevice(_Api api, String host, String? roomId) =>
+    _ensureEsphomeDevice(
+      api,
+      host,
+      roomId,
+      manufacturer: _fakeManufacturer,
+      model: _fakeModel,
+      externalId: _fakeExternalId,
+      name: _fakeDeviceName,
+    );
+
+/// Step 5b: the GI Edge simulator. After the sync GI Core pushes
+/// `/gi-provision` itself (GiEdgeAutoActivationService); when that did not
+/// happen within a few seconds the owner endpoint `activate-now` is used. Then
+/// it waits for `communicationMode` GI_EDGE_V1.
+Future<String?> _ensureEdgeSim(_Api api, String host, String? roomId) async {
+  final deviceId = await _ensureEsphomeDevice(
+    api,
+    host,
+    roomId,
+    manufacturer: _edgeSimManufacturer,
+    model: _edgeSimModel,
+    externalId: _edgeSimExternalId,
+    name: _edgeSimDeviceName,
   );
+  if (deviceId == null) return null;
+  var pushed = false;
+  for (var attempt = 0; attempt < 40; attempt++) {
+    final r = await api.get('/devices/$deviceId');
+    _expect(r, 200);
+    final device = jsonDecode(r.body) as Map<String, dynamic>;
+    if (device['communicationMode'] == 'GI_EDGE_V1') {
+      stdout.writeln('GI Edge simulator $deviceId activated (GI_EDGE_V1)');
+      // The first heartbeat creates the diagnostics; wait for it too.
+      for (var i = 0; i < 20 && device['diagnostics'] == null; i++) {
+        await Future<void>.delayed(const Duration(seconds: 2));
+        final again = await api.get('/devices/$deviceId');
+        if (again.status != 200) break;
+        device['diagnostics'] = (jsonDecode(again.body) as Map)['diagnostics'];
+      }
+      return deviceId;
+    }
+    if (attempt == 5 && !pushed) {
+      pushed = true;
+      final a = await api.post(
+        '/edge/devices/$deviceId/activate-now',
+        const {},
+      );
+      stdout.writeln('activate-now -> ${a.status} ${a.body}');
+    }
+    await Future<void>.delayed(const Duration(seconds: 2));
+  }
+  stderr.writeln('WARNING: GI Edge simulator $deviceId was not activated.');
+  return null;
+}
+
+Future<String?> _ensureEsphomeDevice(
+  _Api api,
+  String host,
+  String? roomId, {
+  required String manufacturer,
+  required String model,
+  required String externalId,
+  required String name,
+}) async {
+  final existing = (await _devices(api))
+      .where((d) => d['manufacturer'] == manufacturer && d['model'] == model);
   var deviceId = existing.isEmpty ? null : existing.first['id'] as String;
 
   if (deviceId == null) {
@@ -385,7 +476,7 @@ Future<String?> _ensureFakeDevice(_Api api, String host, String? roomId) async {
     // must not be repeated, GI Core answers a second discover of the same
     // identity with 500 INTERNAL_SERVER_ERROR (an unmapped
     // PROVISIONING_SESSION_ALREADY_ACTIVE).
-    var sessionId = await _openFakeSession(api);
+    var sessionId = await _openEsphomeSession(api, externalId);
     if (sessionId == null) {
       final discover = await api.post('/integrations/esphome/discover', {
         'host': host,
@@ -401,7 +492,7 @@ Future<String?> _ensureFakeDevice(_Api api, String host, String? roomId) async {
       }
       // The discover body nests the domain snapshot, not the
       // ProvisioningSessionResponseDto: read the session back.
-      sessionId = await _openFakeSession(api);
+      sessionId = await _openEsphomeSession(api, externalId);
       stdout.writeln('fake device discovered at $host (session $sessionId)');
       if (sessionId == null) {
         stderr.writeln('WARNING: no open provisioning session for $host.');
@@ -418,7 +509,7 @@ Future<String?> _ensureFakeDevice(_Api api, String host, String? roomId) async {
     }
     if (_field(session.body, 'status') == 'CLAIMED') {
       session = await api.post('/provisioning/$sessionId/complete', {
-        'name': _fakeDeviceName,
+        'name': name,
         'type': 'ESP32',
         'roomId': ?roomId,
       });
@@ -440,12 +531,12 @@ Future<String?> _ensureFakeDevice(_Api api, String host, String? roomId) async {
   return deviceId;
 }
 
-Future<String?> _openFakeSession(_Api api) async {
+Future<String?> _openEsphomeSession(_Api api, String externalId) async {
   final r = await api.get('/provisioning?source=ESPHOME&limit=100');
   _expect(r, 200);
   for (final s in _items(r.body)) {
     final identity = s['externalIdentity'] as Map;
-    if (identity['externalId'] == _fakeExternalId &&
+    if (identity['externalId'] == externalId &&
         const {'DISCOVERED', 'CLAIMED'}.contains(s['status'])) {
       return s['id'] as String;
     }
@@ -454,16 +545,30 @@ Future<String?> _openFakeSession(_Api api) async {
 }
 
 /// Steps 6 and 7.
-Future<void> _configureHeating(_Api api, String deviceId) async {
+Future<void> _configureHeating(
+  _Api api,
+  String deviceId, {
+  String? relayName,
+  String? temperatureName,
+}) async {
   final r = await api.get('/devices/$deviceId');
   _expect(r, 200);
   final device = jsonDecode(r.body) as Map<String, dynamic>;
   final entities = (device['entities'] as List).cast<Map<String, dynamic>>();
   final relay = entities
-      .where((e) => e['domain'] == 'switch' && e['writable'] == true)
+      .where(
+        (e) =>
+            e['domain'] == 'switch' &&
+            e['writable'] == true &&
+            (relayName == null || e['sourceName'] == relayName),
+      )
       .firstOrNull;
   final temperature = entities
-      .where((e) => e['deviceClass'] == 'temperature')
+      .where(
+        (e) =>
+            e['deviceClass'] == 'temperature' &&
+            (temperatureName == null || e['sourceName'] == temperatureName),
+      )
       .firstOrNull;
   if (relay == null || temperature == null) {
     stderr.writeln(

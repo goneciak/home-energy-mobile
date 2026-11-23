@@ -118,7 +118,7 @@ final class HeatingSuspensionControllerProvider
 }
 
 String _$heatingSuspensionControllerHash() =>
-    r'fb7370696d887864c8539f3937ca80f5d10bea27';
+    r'c9f9d5d3619d1e094641d7bed1695bdc0db50529';
 
 /// Suspends or resumes heating of device [deviceId] (plan §12.1, M2 item 5)
 /// with `PATCH /devices/:id {"heatingSuspended": …}` and nothing else.

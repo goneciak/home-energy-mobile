@@ -6,6 +6,7 @@ import 'package:gi_home/src/app/router/route_guard.dart';
 import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/core/widgets/section_header.dart';
 import 'package:gi_home/src/features/account/application/account_controllers.dart';
@@ -66,7 +67,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
         .save(update);
     if (saved && mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(context.l10n.accountSaved)));
+          .showSnackBar(localizedSnackBar((l10n) => l10n.accountSaved));
     }
   }
 
@@ -75,9 +76,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
         .read(profileEditControllerProvider.notifier)
         .save(ProfileUpdate(locale: locale));
     if (saved && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.accountLanguageSaved)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(localizedSnackBar((l10n) => l10n.accountLanguageSaved));
     }
   }
 

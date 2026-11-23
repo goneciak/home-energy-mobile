@@ -47,6 +47,7 @@ String _genericFailureMessage(AppLocalizations l10n, Object error) =>
       LocalNetworkDeniedFailure() => l10n.errorLocalNetworkDenied,
       TlsUntrustedFailure() => l10n.errorTlsUntrusted,
       InsecureTransportFailure() => l10n.errorInsecureTransport,
+      HttpsRequiredFailure() => l10n.errorHttpsRequired,
       // A 401 that did not end the session (that is SessionLostFailure).
       UnauthorizedFailure() => l10n.errorUnauthorized,
       ForbiddenFailure() => l10n.errorForbidden,
@@ -55,6 +56,8 @@ String _genericFailureMessage(AppLocalizations l10n, Object error) =>
       ValidationFailure() => l10n.errorValidation,
       RateLimitedFailure() => l10n.errorRateLimited,
       DomainFailure() => l10n.errorGeneric,
+      // 503: starting up or being updated; the same state as maintenance.
+      ServerFailure(statusCode: 503) => l10n.errorMaintenance,
       ServerFailure() => l10n.errorServer,
       UnexpectedResponseFailure() => l10n.errorUnexpectedResponse,
       UnexpectedShapeFailure() => l10n.errorUnexpectedShape,

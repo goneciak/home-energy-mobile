@@ -191,7 +191,7 @@ abstract class AppLocalizations {
   /// No description provided for @connectAddressHint.
   ///
   /// In pl, this message translates to:
-  /// **'np. gi-home.local lub 192.168.1.20'**
+  /// **'np. gi-home.local lub 192.168.1.20:3000'**
   String get connectAddressHint;
 
   /// No description provided for @connectAddressRequired.
@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @connectSearchNoneFound.
   ///
   /// In pl, this message translates to:
-  /// **'Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej.'**
+  /// **'Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej, najlepiej adres IP.'**
   String get connectSearchNoneFound;
 
   /// No description provided for @connectSearchAgain.
@@ -428,6 +428,12 @@ abstract class AppLocalizations {
   /// **'Wystąpił błąd po stronie GI Home. Spróbuj ponownie.'**
   String get errorServer;
 
+  /// No description provided for @errorMaintenance.
+  ///
+  /// In pl, this message translates to:
+  /// **'GI Home jest chwilowo niedostępny – uruchamia się lub trwa konserwacja. Spróbuj ponownie za kilka minut.'**
+  String get errorMaintenance;
+
   /// No description provided for @errorUnexpectedResponse.
   ///
   /// In pl, this message translates to:
@@ -515,7 +521,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorDeviceOffline.
   ///
   /// In pl, this message translates to:
-  /// **'Urządzenie jest offline. Polecenie nie zostało wysłane.'**
+  /// **'Urządzenie jest niedostępne. Polecenie nie zostało wysłane.'**
   String get errorDeviceOffline;
 
   /// No description provided for @errorDeviceUnreachable.
@@ -1187,7 +1193,7 @@ abstract class AppLocalizations {
   /// No description provided for @productStatusOffline.
   ///
   /// In pl, this message translates to:
-  /// **'Offline'**
+  /// **'Niedostępne'**
   String get productStatusOffline;
 
   /// No description provided for @productStatusConnecting.
@@ -1267,6 +1273,18 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Elementy'**
   String get deviceEntitiesSection;
+
+  /// No description provided for @entityStaleValue.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak świeżych danych'**
+  String get entityStaleValue;
+
+  /// No description provided for @deviceTechnicalEntitiesSection.
+  ///
+  /// In pl, this message translates to:
+  /// **'Dane techniczne urządzenia'**
+  String get deviceTechnicalEntitiesSection;
 
   /// No description provided for @deviceEntitiesEmpty.
   ///
@@ -1793,7 +1811,7 @@ abstract class AppLocalizations {
   /// No description provided for @heatingCardControllerUnknown.
   ///
   /// In pl, this message translates to:
-  /// **'Sterownik: brak danych'**
+  /// **'Czekamy na dane ze sterownika'**
   String get heatingCardControllerUnknown;
 
   /// No description provided for @heatingCardLoading.
@@ -1963,6 +1981,24 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Zaktualizowano {time}, dane mogą być nieaktualne'**
   String freshnessUpdatedStale(String time);
+
+  /// No description provided for @freshnessWaitingForReading.
+  ///
+  /// In pl, this message translates to:
+  /// **'Czekamy na pierwszy odczyt'**
+  String get freshnessWaitingForReading;
+
+  /// No description provided for @schedulesOfflineBanner.
+  ///
+  /// In pl, this message translates to:
+  /// **'Brak połączenia z GI Home. Widzisz ostatnio pobraną listę – możesz ją odświeżyć.'**
+  String get schedulesOfflineBanner;
+
+  /// No description provided for @schedulesRefreshFailedBanner.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie udało się odświeżyć harmonogramów. Widzisz ostatnio pobraną listę – możesz spróbować ponownie.'**
+  String get schedulesRefreshFailedBanner;
 
   /// Non-blocking banner shown when GI Core keeps sending responses this app version cannot read (plan §16 point 4).
   ///
@@ -2159,8 +2195,8 @@ abstract class AppLocalizations {
   /// Switch command (plan §12.2). Never claims the relay physically switched.
   ///
   /// In pl, this message translates to:
-  /// **'nie zgłoszono'**
-  String get switchCommandNotReported;
+  /// **'czeka na raport'**
+  String get switchValueAwaitingReport;
 
   /// Switch command (plan §12.2). Never claims the relay physically switched.
   ///
@@ -2261,7 +2297,7 @@ abstract class AppLocalizations {
   /// pvBoostActive; the target is pvHeatingConfig.safeMaxTemperatureCelsius, not exposed directly.
   ///
   /// In pl, this message translates to:
-  /// **'PV boost: grzanie do {temperature} °C'**
+  /// **'Dogrzewanie z PV: grzanie do {temperature} °C'**
   String heatingPvBoost(String temperature);
 
   /// No description provided for @heatingPvBoostDerived.
@@ -2273,13 +2309,13 @@ abstract class AppLocalizations {
   /// pvBoostActive without pvHeatingConfig.
   ///
   /// In pl, this message translates to:
-  /// **'PV boost aktywny – cel nieznany'**
+  /// **'Dogrzewanie z PV aktywne – cel nieznany'**
   String get heatingPvBoostUnknownTarget;
 
   /// Source and freshness of the strategy values.
   ///
   /// In pl, this message translates to:
-  /// **'Według GI Core · dane z {time}'**
+  /// **'Według GI Home · dane z {time}'**
   String heatingStrategySource(String time);
 
   /// No description provided for @heatingControlSection.
@@ -2369,7 +2405,7 @@ abstract class AppLocalizations {
   /// No description provided for @strategySuspendedNote.
   ///
   /// In pl, this message translates to:
-  /// **'Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu tryb efektywny to Wył.'**
+  /// **'Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu obowiązuje tryb Wył.'**
   String get strategySuspendedNote;
 
   /// No description provided for @strategySave.
@@ -2465,7 +2501,7 @@ abstract class AppLocalizations {
   /// No description provided for @strategySavedTitle.
   ///
   /// In pl, this message translates to:
-  /// **'Zapisano w GI Core'**
+  /// **'Zapisano w GI Home'**
   String get strategySavedTitle;
 
   /// No description provided for @strategySavedBase.
@@ -2483,7 +2519,7 @@ abstract class AppLocalizations {
   /// No description provided for @strategySavedSuspended.
   ///
   /// In pl, this message translates to:
-  /// **'Ogrzewanie jest wstrzymane, więc tryb efektywny pozostaje Wył. do czasu wznowienia.'**
+  /// **'Ogrzewanie jest wstrzymane, więc obowiązuje tryb Wył. do czasu wznowienia.'**
   String get strategySavedSuspended;
 
   /// No description provided for @strategyValue.
@@ -2537,13 +2573,13 @@ abstract class AppLocalizations {
   /// No description provided for @suspendAwaiting.
   ///
   /// In pl, this message translates to:
-  /// **'Wysłano · czekamy, aż GI Core potwierdzi wstrzymanie'**
+  /// **'Wysłano · czekamy, aż GI Home potwierdzi wstrzymanie'**
   String get suspendAwaiting;
 
   /// No description provided for @resumeAwaiting.
   ///
   /// In pl, this message translates to:
-  /// **'Wysłano · czekamy, aż GI Core potwierdzi wznowienie'**
+  /// **'Wysłano · czekamy, aż GI Home potwierdzi wznowienie'**
   String get resumeAwaiting;
 
   /// No description provided for @suspendAppliedAwaitingHeartbeat.
@@ -2579,7 +2615,7 @@ abstract class AppLocalizations {
   /// No description provided for @suspendAppliedLegacy.
   ///
   /// In pl, this message translates to:
-  /// **'Ogrzewanie wstrzymane w GI Core. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.'**
+  /// **'Ogrzewanie wstrzymane. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.'**
   String get suspendAppliedLegacy;
 
   /// No description provided for @resumeApplied.
@@ -2591,19 +2627,19 @@ abstract class AppLocalizations {
   /// No description provided for @resumeAppliedPending.
   ///
   /// In pl, this message translates to:
-  /// **'Ogrzewanie wznowione. GI Core nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.'**
+  /// **'Ogrzewanie wznowione. GI Home nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.'**
   String get resumeAppliedPending;
 
   /// No description provided for @suspendTimedOut.
   ///
   /// In pl, this message translates to:
-  /// **'GI Core nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.'**
+  /// **'GI Home nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.'**
   String get suspendTimedOut;
 
   /// No description provided for @resumeTimedOut.
   ///
   /// In pl, this message translates to:
-  /// **'GI Core nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.'**
+  /// **'GI Home nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.'**
   String get resumeTimedOut;
 
   /// No description provided for @resumeSheetTitle.
@@ -2665,6 +2701,12 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Język aplikacji'**
   String get settingsLanguageDialogTitle;
+
+  /// Przycisk wyboru języka na ekranach przed logowaniem; {language} to bieżący wybór (Automatycznie, Polski, English).
+  ///
+  /// In pl, this message translates to:
+  /// **'Język: {language}'**
+  String languageSelectorLabel(String language);
 
   /// No description provided for @settingsCoreVersion.
   ///
@@ -2765,7 +2807,7 @@ abstract class AppLocalizations {
   /// Schedule list without schedules: what that means.
   ///
   /// In pl, this message translates to:
-  /// **'Ogrzewanie przez cały czas działa według strategii bazowej.'**
+  /// **'Ogrzewanie przez cały czas działa według ustawienia domyślnego.'**
   String get schedulesEmptyBody;
 
   /// Button that opens the editor for a new schedule.
@@ -2987,7 +3029,7 @@ abstract class AppLocalizations {
   /// Delete confirmation body.
   ///
   /// In pl, this message translates to:
-  /// **'Harmonogram „{name}” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do strategii bazowej.'**
+  /// **'Harmonogram „{name}” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do ustawienia domyślnego.'**
   String scheduleDeleteConfirmBody(String name);
 
   /// Delete confirmation button.
@@ -3698,6 +3740,18 @@ abstract class AppLocalizations {
   /// **'Lista i szczegóły urządzeń są pobierane z nagłówkiem If-None-Match; odpowiedź 304 oszczędza transfer. Zmiana działa od następnej sesji.'**
   String get flagConditionalGetDescription;
 
+  /// No description provided for @flagMdnsFallbackTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Wyszukiwanie urządzenia przez multicast DNS'**
+  String get flagMdnsFallbackTitle;
+
+  /// No description provided for @flagMdnsFallbackDescription.
+  ///
+  /// In pl, this message translates to:
+  /// **'Tylko Android. Gdy system nie rozpoznaje nazwy .local, aplikacja pyta o nią bezpośrednio sieć lokalną. Zmiana działa przy następnym wyszukiwaniu.'**
+  String get flagMdnsFallbackDescription;
+
   /// No description provided for @settingsAccountManage.
   ///
   /// In pl, this message translates to:
@@ -3761,7 +3815,7 @@ abstract class AppLocalizations {
   /// No description provided for @accountLanguageHint.
   ///
   /// In pl, this message translates to:
-  /// **'Po zalogowaniu aplikacja i panel WWW używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.'**
+  /// **'Po zalogowaniu aplikacja i panel web używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.'**
   String get accountLanguageHint;
 
   /// No description provided for @accountLanguagePolish.
@@ -4135,6 +4189,60 @@ abstract class AppLocalizations {
   /// In pl, this message translates to:
   /// **'Wróć do logowania'**
   String get recoveryResetBack;
+
+  /// No description provided for @errorHttpsRequired.
+  ///
+  /// In pl, this message translates to:
+  /// **'To urządzenie wymaga połączenia szyfrowanego (https://), którego aplikacja jeszcze nie obsługuje. Użyj adresu bez szyfrowania w sieci domowej, np. 192.168.1.20:3000.'**
+  String get errorHttpsRequired;
+
+  /// No description provided for @connectErrorUnreachable.
+  ///
+  /// In pl, this message translates to:
+  /// **'Nie znaleziono GI Home pod tym adresem. Sprawdź, czy telefon jest w tej samej sieci Wi-Fi co urządzenie (nie w sieci dla gości), i wpisz jego adres IP, np. 192.168.1.20:3000.'**
+  String get connectErrorUnreachable;
+
+  /// No description provided for @connectHelpLink.
+  ///
+  /// In pl, this message translates to:
+  /// **'Gdzie znajdę adres?'**
+  String get connectHelpLink;
+
+  /// No description provided for @connectHelpTitle.
+  ///
+  /// In pl, this message translates to:
+  /// **'Gdzie znajdę adres GI Home?'**
+  String get connectHelpTitle;
+
+  /// No description provided for @connectHelpSameWifi.
+  ///
+  /// In pl, this message translates to:
+  /// **'Telefon musi być w tej samej sieci Wi-Fi co GI Home. Sieć dla gości i transmisja danych komórkowych nie działają.'**
+  String get connectHelpSameWifi;
+
+  /// No description provided for @connectHelpRouter.
+  ///
+  /// In pl, this message translates to:
+  /// **'Adres IP urządzenia sprawdzisz na liście podłączonych urządzeń w panelu routera, np. 192.168.1.20.'**
+  String get connectHelpRouter;
+
+  /// No description provided for @connectHelpPort.
+  ///
+  /// In pl, this message translates to:
+  /// **'Jeśli samo IP nie działa, dopisz port: 192.168.1.20:3000. Aplikacja sama sprawdza porty 80 i 3000.'**
+  String get connectHelpPort;
+
+  /// No description provided for @connectHelpLocalName.
+  ///
+  /// In pl, this message translates to:
+  /// **'W gotowym urządzeniu GI Home zwykle działa też nazwa gi-home.local, ale nie na każdym telefonie. Adres IP zawsze zadziała.'**
+  String get connectHelpLocalName;
+
+  /// No description provided for @connectHelpClose.
+  ///
+  /// In pl, this message translates to:
+  /// **'Zamknij'**
+  String get connectHelpClose;
 }
 
 class _AppLocalizationsDelegate

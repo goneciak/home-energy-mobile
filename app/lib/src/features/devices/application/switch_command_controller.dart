@@ -4,6 +4,7 @@ import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/core/polling/foreground_poller.dart';
+import 'package:gi_home/src/core/polling/polling_budget.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/devices/application/device_detail_notifier.dart';
 import 'package:gi_home/src/features/devices/application/device_repositories.dart';
@@ -44,7 +45,7 @@ class SwitchCommandController extends _$SwitchCommandController {
   /// (30 s, `gi-edge-command.service.ts`).
   static const heartbeatTimeout = Duration(seconds: 45);
 
-  static const heartbeatPollInterval = Duration(seconds: 2);
+  static const Duration heartbeatPollInterval = PollingBudget.postCommandPoll;
 
   ForegroundPoller? _poller;
   Timer? _deadline;

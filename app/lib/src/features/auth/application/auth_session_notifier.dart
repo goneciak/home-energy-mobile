@@ -5,7 +5,7 @@ import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/features/account/application/account_controllers.dart';
 import 'package:gi_home/src/features/account/application/account_providers.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
-import 'package:gi_home/src/features/appliance/application/connection_ladder.dart';
+import 'package:gi_home/src/features/appliance/application/appliance_rebinder.dart';
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
 import 'package:gi_home/src/features/demo/application/demo_mode.dart';
@@ -86,15 +86,9 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
   /// session kept (plan §9.3). Best effort: on any failure the original
   /// restore error stands.
   Future<void> _rebindMovedAppliance() async {
-    final profile = ref.read(applianceProfileProvider);
-    if (profile == null) return;
-    try {
-      final moved = await ref.read(connectionLadderProvider).findMoved(profile);
-      if (moved == null || !ref.mounted) return;
-      await ref.read(applianceProfileProvider.notifier).rebind(moved.host);
-    } on Object {
-      // Nothing found; the restore error is shown with "Try again".
-    }
+    await ref
+        .read(applianceRebinderProvider)
+        .rebindIfMoved(stillWanted: () => ref.mounted);
   }
 
   void _reloadUserOnResume(GiCoreClient client) {
@@ -174,22 +168,21 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
   /// are always wiped, and so are the per-session preferences (the profile
   /// language) and the local diagnostics, including a report file left for
   /// the share sheet, and the device list snapshot (plan §8.3: logout clears
-  /// secure storage, prefs and files). The app returns to the phone
-  /// language.
+  /// secure storage, prefs and files). The language last applied for the
+  /// user stays, so the login screen keeps it (plan §13.2); "Zmień
+  /// użytkownika" and forgetting the appliance drop it.
   ///
   /// In demo mode it only ends the demo: nothing real is wiped.
   Future<LogoutResult> logout() async {
     if (_exitDemo()) return const LogoutResult(serverSessionEnded: true);
     final diagnostics = ref.read(diagnosticsServiceProvider);
     final reports = ref.read(reportDirectoryProvider);
-    final locales = ref.read(sessionLocaleStoreProvider);
     final snapshots = ref.read(deviceSnapshotKeeperProvider);
     final profileId = ref.read(applianceProfileProvider)?.profileId;
     final result = await _client.logout();
     // Not awaited: secure storage must never hold up leaving the session;
     // the wipe never throws.
     if (profileId != null) unawaited(snapshots.wipe(profileId));
-    await locales.clear();
     await diagnostics.clear();
     await DiagnosticReportSharer.deleteReports(reports);
     return result;
@@ -220,10 +213,8 @@ class AuthSessionNotifier extends _$AuthSessionNotifier {
   Future<void> Function() _sessionDataWipe() {
     final diagnostics = ref.read(diagnosticsServiceProvider);
     final reports = ref.read(reportDirectoryProvider);
-    final locales = ref.read(sessionLocaleStoreProvider);
     return () async {
       if (_exitDemo()) return;
-      await locales.clear();
       await diagnostics.clear();
       await DiagnosticReportSharer.deleteReports(reports);
     };

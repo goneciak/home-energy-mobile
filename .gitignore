@@ -41,3 +41,6 @@ fastlane/README.md
 # and the collected logs; created only on runners or when replaying CI locally.
 .ci-backend/
 .ci-artifacts/
+
+# Tester APK builds (tools/build_tester_apk.ps1).
+/dist/

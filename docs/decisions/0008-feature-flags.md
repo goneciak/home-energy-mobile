@@ -20,7 +20,8 @@ prywatności (brak SDK zewnętrznych).
 - Enum `FeatureFlag` i niezmienny obiekt `FeatureFlags`
   (`app/lib/src/core/config/feature_flags.dart`). Obecne flagi: `mockCore`
   (tylko dev), `scheduleClockConversion` (D8),
-  `switchControlByIntegration` (§19.6), `androidLocalNetworkPermissionRequest`.
+  `switchControlByIntegration` (§19.6), `androidLocalNetworkPermissionRequest`,
+  `conditionalGet` oraz `mdnsFallback` ([ADR 0015](0015-network-change-no-write-replay.md)).
   D10 (lokalne powiadomienia w tle, v1.1) dostanie własną flagę, gdy
   powstanie.
 - Wartości domyślne z `config/<flavor>.json` przez `--dart-define-from-file`

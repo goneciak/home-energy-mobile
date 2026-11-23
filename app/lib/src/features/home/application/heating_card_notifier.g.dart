@@ -64,12 +64,124 @@ final class HeatingCardLimiterProvider
 String _$heatingCardLimiterHash() =>
     r'183a28e030d20259affa315e98171fad8447c09a';
 
+/// The devices of the latest list that get a heating card, in list order.
+/// Their number decides the cadence of each card
+/// ([heatingCardPolicyProvider]); their order spreads the cards over that
+/// cadence.
+
+@ProviderFor(heatingCardIds)
+final heatingCardIdsProvider = HeatingCardIdsProvider._();
+
+/// The devices of the latest list that get a heating card, in list order.
+/// Their number decides the cadence of each card
+/// ([heatingCardPolicyProvider]); their order spreads the cards over that
+/// cadence.
+
+final class HeatingCardIdsProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  /// The devices of the latest list that get a heating card, in list order.
+  /// Their number decides the cadence of each card
+  /// ([heatingCardPolicyProvider]); their order spreads the cards over that
+  /// cadence.
+  HeatingCardIdsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'heatingCardIdsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$heatingCardIdsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return heatingCardIds(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$heatingCardIdsHash() => r'bd6e4130b21e54c42a819a1c24a005a60f367c61';
+
+/// How often each heating card polls and when its data counts as outdated:
+/// every 15 s for up to two cards, slower beyond that so that Home with the
+/// device list stays within the request budget of one phone
+/// ([PollingBudget.heatingCardInterval], ADR 0016).
+
+@ProviderFor(heatingCardPolicy)
+final heatingCardPolicyProvider = HeatingCardPolicyProvider._();
+
+/// How often each heating card polls and when its data counts as outdated:
+/// every 15 s for up to two cards, slower beyond that so that Home with the
+/// device list stays within the request budget of one phone
+/// ([PollingBudget.heatingCardInterval], ADR 0016).
+
+final class HeatingCardPolicyProvider
+    extends
+        $FunctionalProvider<FreshnessPolicy, FreshnessPolicy, FreshnessPolicy>
+    with $Provider<FreshnessPolicy> {
+  /// How often each heating card polls and when its data counts as outdated:
+  /// every 15 s for up to two cards, slower beyond that so that Home with the
+  /// device list stays within the request budget of one phone
+  /// ([PollingBudget.heatingCardInterval], ADR 0016).
+  HeatingCardPolicyProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'heatingCardPolicyProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$heatingCardPolicyHash();
+
+  @$internal
+  @override
+  $ProviderElement<FreshnessPolicy> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  FreshnessPolicy create(Ref ref) {
+    return heatingCardPolicy(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FreshnessPolicy value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FreshnessPolicy>(value),
+    );
+  }
+}
+
+String _$heatingCardPolicyHash() => r'99cd142c2d5bd187c7bcd006d23e2e19f5fb1245';
+
 /// `GET /devices/:id` of one heating device shown as a card on Home, polled
-/// every 15 s while the card is on screen and the app is in the foreground
-/// (plan §4.1, §11). Only the card widget watches it, and Home builds its
-/// rows lazily, so a card scrolled out of view (or never scrolled to) sends
-/// no requests. Only heating devices recognised from the list get a card,
-/// so Home never asks for details of other devices.
+/// every 15 s (slower with more than two cards) while the card is on screen
+/// and the app is in the foreground (plan §4.1, §11). Only the card widget
+/// watches it, and Home builds its rows lazily, so a card scrolled out of
+/// view (or never scrolled to) sends no requests. Only heating devices
+/// recognised from the list get a card, so Home never asks for details of
+/// other devices.
 ///
 /// Every state is also published to [heatingCardResultsProvider], which the
 /// Home condition reads without keeping the card alive.
@@ -85,11 +197,12 @@ String _$heatingCardLimiterHash() =>
 final heatingCardProvider = HeatingCardNotifierFamily._();
 
 /// `GET /devices/:id` of one heating device shown as a card on Home, polled
-/// every 15 s while the card is on screen and the app is in the foreground
-/// (plan §4.1, §11). Only the card widget watches it, and Home builds its
-/// rows lazily, so a card scrolled out of view (or never scrolled to) sends
-/// no requests. Only heating devices recognised from the list get a card,
-/// so Home never asks for details of other devices.
+/// every 15 s (slower with more than two cards) while the card is on screen
+/// and the app is in the foreground (plan §4.1, §11). Only the card widget
+/// watches it, and Home builds its rows lazily, so a card scrolled out of
+/// view (or never scrolled to) sends no requests. Only heating devices
+/// recognised from the list get a card, so Home never asks for details of
+/// other devices.
 ///
 /// Every state is also published to [heatingCardResultsProvider], which the
 /// Home condition reads without keeping the card alive.
@@ -103,11 +216,12 @@ final heatingCardProvider = HeatingCardNotifierFamily._();
 final class HeatingCardNotifierProvider
     extends $NotifierProvider<HeatingCardNotifier, PolledData<DeviceDetail>> {
   /// `GET /devices/:id` of one heating device shown as a card on Home, polled
-  /// every 15 s while the card is on screen and the app is in the foreground
-  /// (plan §4.1, §11). Only the card widget watches it, and Home builds its
-  /// rows lazily, so a card scrolled out of view (or never scrolled to) sends
-  /// no requests. Only heating devices recognised from the list get a card,
-  /// so Home never asks for details of other devices.
+  /// every 15 s (slower with more than two cards) while the card is on screen
+  /// and the app is in the foreground (plan §4.1, §11). Only the card widget
+  /// watches it, and Home builds its rows lazily, so a card scrolled out of
+  /// view (or never scrolled to) sends no requests. Only heating devices
+  /// recognised from the list get a card, so Home never asks for details of
+  /// other devices.
   ///
   /// Every state is also published to [heatingCardResultsProvider], which the
   /// Home condition reads without keeping the card alive.
@@ -163,14 +277,15 @@ final class HeatingCardNotifierProvider
 }
 
 String _$heatingCardNotifierHash() =>
-    r'8718afc8b90fdb9a7ce0e7cec64abe971b0d279c';
+    r'010c8a27063e2854ff67207704cbdf4221845e0b';
 
 /// `GET /devices/:id` of one heating device shown as a card on Home, polled
-/// every 15 s while the card is on screen and the app is in the foreground
-/// (plan §4.1, §11). Only the card widget watches it, and Home builds its
-/// rows lazily, so a card scrolled out of view (or never scrolled to) sends
-/// no requests. Only heating devices recognised from the list get a card,
-/// so Home never asks for details of other devices.
+/// every 15 s (slower with more than two cards) while the card is on screen
+/// and the app is in the foreground (plan §4.1, §11). Only the card widget
+/// watches it, and Home builds its rows lazily, so a card scrolled out of
+/// view (or never scrolled to) sends no requests. Only heating devices
+/// recognised from the list get a card, so Home never asks for details of
+/// other devices.
 ///
 /// Every state is also published to [heatingCardResultsProvider], which the
 /// Home condition reads without keeping the card alive.
@@ -201,11 +316,12 @@ final class HeatingCardNotifierFamily extends $Family
       );
 
   /// `GET /devices/:id` of one heating device shown as a card on Home, polled
-  /// every 15 s while the card is on screen and the app is in the foreground
-  /// (plan §4.1, §11). Only the card widget watches it, and Home builds its
-  /// rows lazily, so a card scrolled out of view (or never scrolled to) sends
-  /// no requests. Only heating devices recognised from the list get a card,
-  /// so Home never asks for details of other devices.
+  /// every 15 s (slower with more than two cards) while the card is on screen
+  /// and the app is in the foreground (plan §4.1, §11). Only the card widget
+  /// watches it, and Home builds its rows lazily, so a card scrolled out of
+  /// view (or never scrolled to) sends no requests. Only heating devices
+  /// recognised from the list get a card, so Home never asks for details of
+  /// other devices.
   ///
   /// Every state is also published to [heatingCardResultsProvider], which the
   /// Home condition reads without keeping the card alive.
@@ -225,11 +341,12 @@ final class HeatingCardNotifierFamily extends $Family
 }
 
 /// `GET /devices/:id` of one heating device shown as a card on Home, polled
-/// every 15 s while the card is on screen and the app is in the foreground
-/// (plan §4.1, §11). Only the card widget watches it, and Home builds its
-/// rows lazily, so a card scrolled out of view (or never scrolled to) sends
-/// no requests. Only heating devices recognised from the list get a card,
-/// so Home never asks for details of other devices.
+/// every 15 s (slower with more than two cards) while the card is on screen
+/// and the app is in the foreground (plan §4.1, §11). Only the card widget
+/// watches it, and Home builds its rows lazily, so a card scrolled out of
+/// view (or never scrolled to) sends no requests. Only heating devices
+/// recognised from the list get a card, so Home never asks for details of
+/// other devices.
 ///
 /// Every state is also published to [heatingCardResultsProvider], which the
 /// Home condition reads without keeping the card alive.

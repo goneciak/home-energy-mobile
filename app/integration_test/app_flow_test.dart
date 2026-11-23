@@ -63,6 +63,17 @@ void main() {
     );
   }
 
+  /// Home is a lazy list: with more devices the lamp can sit below the fold
+  /// and is not built until it is scrolled into view.
+  Future<void> showLamp(WidgetTester tester, Finder lamp) async {
+    await tester.scrollUntilVisible(
+      lamp,
+      300,
+      scrollable: find.byType(Scrollable).hitTestable().first,
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+  }
+
   Future<void> tapWhenVisible(WidgetTester tester, Finder finder) async {
     await waitFor(tester, finder);
     // Centred, not scrolled to the edge: a pinned app bar would cover it.
@@ -122,10 +133,18 @@ void main() {
       of: find.byType(DeviceTile),
       matching: find.text('Lampa w salonie'),
     );
-    await waitFor(tester, lamp);
+    await waitFor(tester, find.byType(NavigationBar));
+    await showLamp(tester, lamp);
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.text('Salon'), findsWidgets);
+    // The boiler room sits above the lamp: scroll back up to build it.
+    await tester.scrollUntilVisible(
+      find.text('Kotłownia'),
+      -300,
+      scrollable: find.byType(Scrollable).hitTestable().first,
+    );
     expect(find.text('Kotłownia'), findsWidgets);
+    await showLamp(tester, lamp);
 
     // Device details, then back to Home.
     await tapWhenVisible(tester, lamp);
@@ -141,7 +160,7 @@ void main() {
     // Not tester.pageBack(): it looks for package:flutter/material.dart's
     // BackButton, while the app's AppBar uses package:material_ui's.
     await tapWhenVisible(tester, find.byType(BackButton));
-    await waitFor(tester, lamp);
+    await showLamp(tester, lamp);
 
     // Settings → logout lands on login.
     await tapWhenVisible(

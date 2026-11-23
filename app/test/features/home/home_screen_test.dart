@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
+import 'package:gi_home/src/core/polling/polling_budget.dart';
 import 'package:gi_home/src/core/widgets/permission_state.dart';
 import 'package:gi_home/src/core/widgets/skeleton.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
@@ -455,7 +456,9 @@ void main() {
     // h1 is out of view now: its card no longer polls.
     expect(find.byKey(const ValueKey('device-h1')), findsNothing);
     final h1Calls = source.calls.where((c) => c == 'device:h1').length;
-    await tester.pump(const Duration(seconds: 31));
+    // Six cards poll slower than the base cadence (ADR 0016): wait out one
+    // cadence plus the card's offset within it.
+    await tester.pump(PollingBudget.heatingCardInterval(6) * 2);
     await tester.pumpAndSettle();
     expect(source.calls.where((c) => c == 'device:h1').length, h1Calls);
     expect(source.calls.where((c) => c == 'device:h6').length, greaterThan(1));

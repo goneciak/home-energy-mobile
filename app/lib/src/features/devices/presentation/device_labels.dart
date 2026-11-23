@@ -44,39 +44,44 @@ StateLook connectivityLook(AppLocalizations l10n, ConnectivityState state) =>
     };
 
 /// Product status of `GET /devices/:id` (lowercase vocabulary).
-StateLook productStatusLook(AppLocalizations l10n, ProductStatus status) =>
-    switch (status) {
-      ProductStatus.online => (
-        label: l10n.productStatusOnline,
-        icon: Icons.check_circle_outline,
-        tone: StatusTone.good,
-      ),
-      ProductStatus.offline => (
-        label: l10n.productStatusOffline,
-        icon: Icons.cloud_off_outlined,
-        tone: StatusTone.warning,
-      ),
-      ProductStatus.connecting => (
-        label: l10n.productStatusConnecting,
-        icon: Icons.sync,
-        tone: StatusTone.neutral,
-      ),
-      ProductStatus.needsConfiguration => (
-        label: l10n.productStatusNeedsConfiguration,
-        icon: Icons.tune,
-        tone: StatusTone.warning,
-      ),
-      ProductStatus.error => (
-        label: l10n.productStatusError,
-        icon: Icons.error_outline,
-        tone: StatusTone.danger,
-      ),
-      ProductStatus.unknown => (
-        label: l10n.productStatusUnknown,
-        icon: Icons.help_outline,
-        tone: StatusTone.neutral,
-      ),
-    };
+/// [benign] marks `needs_configuration` that only lists GI Edge's own
+/// diagnostics entities (see `needsRealConfiguration`): a hint, not a warning.
+StateLook productStatusLook(
+  AppLocalizations l10n,
+  ProductStatus status, {
+  bool benign = false,
+}) => switch (status) {
+  ProductStatus.online => (
+    label: l10n.productStatusOnline,
+    icon: Icons.check_circle_outline,
+    tone: StatusTone.good,
+  ),
+  ProductStatus.offline => (
+    label: l10n.productStatusOffline,
+    icon: Icons.cloud_off_outlined,
+    tone: StatusTone.warning,
+  ),
+  ProductStatus.connecting => (
+    label: l10n.productStatusConnecting,
+    icon: Icons.sync,
+    tone: StatusTone.neutral,
+  ),
+  ProductStatus.needsConfiguration => (
+    label: l10n.productStatusNeedsConfiguration,
+    icon: Icons.tune,
+    tone: benign ? StatusTone.neutral : StatusTone.warning,
+  ),
+  ProductStatus.error => (
+    label: l10n.productStatusError,
+    icon: Icons.error_outline,
+    tone: StatusTone.danger,
+  ),
+  ProductStatus.unknown => (
+    label: l10n.productStatusUnknown,
+    icon: Icons.help_outline,
+    tone: StatusTone.neutral,
+  ),
+};
 
 /// Controller state machine state reported by GI Edge.
 StateLook firmwareStateLook(AppLocalizations l10n, FirmwareState state) {

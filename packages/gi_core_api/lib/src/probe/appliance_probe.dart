@@ -42,22 +42,66 @@ final class ApplianceProbe {
   /// Normalises [rawAddress] and probes it. Throws [FormatException] for an
   /// address that cannot be parsed and [ApiFailure] when the appliance does
   /// not answer as GI Core.
+  ///
+  /// An `http` address without a port is probed on port 80 first and then on
+  /// [fallbackPorts] (GI Core itself listens on 3000), see [probeAddress].
   Future<ProbeResult> probe(String rawAddress) async {
     final address = ApplianceAddress.parse(rawAddress);
-    return await probeAddress(address);
+    return await probeAddress(address, tryFallbackPorts: true);
   }
+
+  /// Ports tried after port 80 for an address typed without a port.
+  static const fallbackPorts = [3000];
 
   /// Probes an already normalised [address] (the connection ladder,
   /// plan §9.2). With [healthTimeout], `GET /health/live` must answer
   /// within it as a whole, or the probe fails with [TimeoutFailure]: the
   /// ladder gives a remembered host 1.5 s.
+  ///
+  /// With [tryFallbackPorts], an `http` [address] without a port that fails
+  /// on port 80 is probed on each of [fallbackPorts] too, and the first
+  /// that answers wins; the returned address carries the port that worked.
+  /// When none answers, the first failure is thrown, unless it only says
+  /// "nothing there" and a fallback port gave a more telling one.
   Future<ProbeResult> probeAddress(
     ApplianceAddress address, {
     Duration? healthTimeout,
-  }) => observeFailures(
-    _onFailure,
-    () => _probe(address, healthTimeout: healthTimeout),
-  );
+    bool tryFallbackPorts = false,
+  }) => observeFailures(_onFailure, () async {
+    final ports = tryFallbackPorts && address.isCleartext && !address.hasPort
+        ? fallbackPorts
+        : const <int>[];
+    try {
+      return await _probe(address, healthTimeout: healthTimeout);
+    } on ApiFailure catch (first) {
+      if (ports.isEmpty || !_worthRetryingOnAnotherPort(first)) rethrow;
+      var best = first;
+      for (final port in ports) {
+        try {
+          return await _probe(
+            address.withPort(port),
+            healthTimeout: healthTimeout,
+          );
+        } on ApiFailure catch (failure) {
+          if (!_worthRetryingOnAnotherPort(failure)) rethrow;
+          if (best is UnreachableFailure || best is TimeoutFailure) {
+            if (failure is! UnreachableFailure && failure is! TimeoutFailure) {
+              best = failure;
+            }
+          }
+        }
+      }
+      throw best;
+    }
+  });
+
+  /// Only a refusal by the system or by the transport policy is final; any
+  /// other failure on port 80 (nothing listening, a proxy redirecting to
+  /// https, some other web server) may still leave GI Core on another port.
+  static bool _worthRetryingOnAnotherPort(ApiFailure failure) =>
+      failure is! LocalNetworkDeniedFailure &&
+      failure is! InsecureTransportFailure &&
+      failure is! CancelledFailure;
 
   Future<ProbeResult> _probe(
     ApplianceAddress address, {

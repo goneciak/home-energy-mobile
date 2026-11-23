@@ -21,6 +21,10 @@ jest zmieniany (ADR-y backendu, np. „ADR 006”, to osobna numeracja).
 | [0012](0012-etag-non-authoritative-cache.md) | ETag jako nieautorytatywny cache za flagą `conditionalGet` | Przyjęta, domyślnie wyłączona | §6.5, S4 |
 | [0013](0013-feature-probing.md) | Sondowanie funkcji: tylko `HTTP_404` ukrywa funkcję | Przyjęta | §16 |
 | [0014](0014-recovery-code-secure-display.md) | Bezpieczne wyświetlanie i kopiowanie kodu odzyskiwania | Przyjęta, odstępstwo: formularz resetu bez `SecureContent` | §7.7 |
+| [0015](0015-network-change-no-write-replay.md) | Zmiana sieci w trakcie sesji, wspólny backoff i brak ponawiania zapisów | Przyjęta, mDNS za flagą do wyniku S3 | M4, §9.3, §11 |
+| [0016](0016-home-card-cadence-request-budget.md) | Budżet żądań na Home: wolniejsze karty przy więcej niż dwóch kotłach | Przyjęta | M4, §11 |
+| [0017](0017-accessibility-verification-strategy.md) | Weryfikacja dostępności: zrzuty i wytyczne, testy semantyki, ręczna bramka czytników ekranu | Przyjęta, bramka ręczna zablokowana | M4 |
+| [0018](0018-beta-programme-and-metrics.md) | Program beta 3–5 gospodarstw i metryki stabilności | Przyjęta, realizacja czeka | M4, §19 |
 
 ## Odstępstwa od planu zapisane w ADR-ach
 

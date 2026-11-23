@@ -208,16 +208,16 @@ void main() {
       handle.dispose();
     });
 
-    testWidgets('a value that never arrived reads "Brak danych"', (
+    testWidgets('a value that never arrived waits for the first reading', (
       tester,
     ) async {
       final handle = tester.ensureSemantics();
       await pump(tester, FreshnessLabel(updatedAt: null, now: now));
 
-      expect(find.text('Brak danych'), findsOneWidget);
+      expect(find.text('Czekamy na pierwszy odczyt'), findsOneWidget);
       expect(
         tester.getSemantics(find.byType(FreshnessLabel)),
-        matchesSemantics(label: 'Brak danych'),
+        matchesSemantics(label: 'Czekamy na pierwszy odczyt'),
       );
       await expectAccessibilityGuidelines(tester);
       handle.dispose();

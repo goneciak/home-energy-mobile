@@ -1,6 +1,8 @@
 @Tags(['golden'])
 library;
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/features/account/application/account_controllers.dart';
@@ -58,5 +60,31 @@ void main() {
     fileName: 'account_recovery_reset',
     screen: RecoveryResetScreen.new,
     overrides: () => fakeAccountControllers(script),
+  );
+
+  screenGoldens(
+    'Account: sessions unreachable',
+    fileName: 'account_sessions_error',
+    screen: SessionsScreen.new,
+    overrides: () => [
+      authSessionsProvider.overrideWith(
+        (ref) =>
+            Future<List<AuthSessionInfo>>.error(const ApiFailure.unreachable()),
+      ),
+      ...fakeAccountControllers(script),
+    ],
+  );
+
+  screenGoldens(
+    'Account: sessions loading',
+    fileName: 'account_sessions_loading',
+    screen: SessionsScreen.new,
+    settle: (tester) => tester.pump(const Duration(milliseconds: 50)),
+    overrides: () => [
+      authSessionsProvider.overrideWith(
+        (ref) => Completer<List<AuthSessionInfo>>().future,
+      ),
+      ...fakeAccountControllers(script),
+    ],
   );
 }

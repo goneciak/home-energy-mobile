@@ -133,6 +133,38 @@ void main() {
       expect(map(502, '<html/>').code, 'INTERNAL_SERVER_ERROR');
     });
 
+    test('reads Retry-After for a 503 too', () {
+      expect(
+        map(
+          503,
+          'busy',
+          _headers({
+            'retry-after': ['30'],
+          }),
+        ),
+        isA<ServerFailure>().having(
+          (f) => f.retryAfter,
+          'retryAfter',
+          const Duration(seconds: 30),
+        ),
+      );
+      expect(
+        map(
+          503,
+          {'code': 'SERVICE_UNAVAILABLE'},
+          _headers({
+            'retry-after': ['7'],
+          }),
+        ),
+        isA<ServerFailure>().having(
+          (f) => f.retryAfter,
+          'retryAfter',
+          const Duration(seconds: 7),
+        ),
+      );
+      expect((map(503, null) as ServerFailure).retryAfter, isNull);
+    });
+
     test('reads Retry-After for rate limiting', () {
       final failure = map(
         429,

@@ -10,6 +10,7 @@ import 'contract/capability_probe_contract_test.dart' as capability_probe;
 import 'contract/control_contract_test.dart' as control;
 import 'contract/core_quirks_contract_test.dart' as core_quirks;
 import 'contract/devices_contract_test.dart' as devices;
+import 'contract/edge_contract_test.dart' as edge;
 import 'contract/environment_history_contract_test.dart' as environment_history;
 import 'contract/schedules_contract_test.dart' as schedules;
 import 'contract/session_rotation_contract_test.dart' as session_rotation;
@@ -26,6 +27,7 @@ final Map<String, List<Endpoint>> liveCoverageByFile = {
   'control_contract_test.dart': control.liveCoverage,
   'core_quirks_contract_test.dart': core_quirks.liveCoverage,
   'devices_contract_test.dart': devices.liveCoverage,
+  'edge_contract_test.dart': edge.liveCoverage,
   'environment_history_contract_test.dart': environment_history.liveCoverage,
   'schedules_contract_test.dart': schedules.liveCoverage,
   'session_rotation_contract_test.dart': session_rotation.liveCoverage,

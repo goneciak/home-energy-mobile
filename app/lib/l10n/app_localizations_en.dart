@@ -56,7 +56,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connectAddressLabel => 'GI Home address';
 
   @override
-  String get connectAddressHint => 'e.g. gi-home.local or 192.168.1.20';
+  String get connectAddressHint => 'e.g. gi-home.local or 192.168.1.20:3000';
 
   @override
   String get connectAddressRequired => 'Enter the GI Home address';
@@ -69,7 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get connectSearchNoneFound =>
-      'No GI Home found on this network. Enter its address below.';
+      'No GI Home found on this network. Enter its address below, preferably an IP address.';
 
   @override
   String get connectSearchAgain => 'Search again';
@@ -191,6 +191,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorServer => 'GI Home reported an error. Please try again.';
+
+  @override
+  String get errorMaintenance =>
+      'GI Home is briefly unavailable – it is starting up or under maintenance. Please try again in a few minutes.';
 
   @override
   String get errorUnexpectedResponse =>
@@ -706,6 +710,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deviceEntitiesSection => 'Elements';
 
   @override
+  String get entityStaleValue => 'No recent data';
+
+  @override
+  String get deviceTechnicalEntitiesSection => 'Device technical data';
+
+  @override
   String get deviceEntitiesEmpty => 'This device has no elements yet.';
 
   @override
@@ -1010,7 +1020,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Relay states as commanded by the controller';
 
   @override
-  String get heatingCardControllerUnknown => 'Controller: no data';
+  String get heatingCardControllerUnknown =>
+      'Waiting for data from the controller';
 
   @override
   String get heatingCardLoading => 'Fetching details…';
@@ -1114,6 +1125,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String freshnessUpdatedStale(String time) {
     return 'Updated $time, data may be out of date';
   }
+
+  @override
+  String get freshnessWaitingForReading => 'Waiting for the first reading';
+
+  @override
+  String get schedulesOfflineBanner =>
+      'No connection to GI Home. You are seeing the last list loaded – you can refresh it.';
+
+  @override
+  String get schedulesRefreshFailedBanner =>
+      'Could not refresh the schedules. You are seeing the last list loaded – you can try again.';
 
   @override
   String get staleAppTitle => 'Update the app';
@@ -1243,7 +1265,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get switchCommandNotReported => 'not reported';
+  String get switchValueAwaitingReport => 'waiting for a report';
 
   @override
   String switchConfirmOnTitle(String name) {
@@ -1318,7 +1340,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String heatingStrategySource(String time) {
-    return 'According to GI Core · data from $time';
+    return 'According to GI Home · data from $time';
   }
 
   @override
@@ -1372,7 +1394,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get strategySuspendedNote =>
-      'Heating is suspended. The saved setting applies once heating is resumed – until then the effective mode stays Off.';
+      'Heating is suspended. The saved setting applies once heating is resumed – until then the mode stays Off.';
 
   @override
   String get strategySave => 'Save';
@@ -1424,7 +1446,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get strategyConflictDiscard => 'Discard my changes';
 
   @override
-  String get strategySavedTitle => 'Saved in GI Core';
+  String get strategySavedTitle => 'Saved in GI Home';
 
   @override
   String strategySavedBase(String value) {
@@ -1438,7 +1460,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get strategySavedSuspended =>
-      'Heating is suspended, so the effective mode stays Off until heating is resumed.';
+      'Heating is suspended, so the mode stays Off until heating is resumed.';
 
   @override
   String strategyValue(String target, String hysteresis, String mode) {
@@ -1469,11 +1491,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get suspendAwaiting =>
-      'Sent · waiting for GI Core to confirm the suspension';
+      'Sent · waiting for GI Home to confirm the suspension';
 
   @override
   String get resumeAwaiting =>
-      'Sent · waiting for GI Core to confirm the resume';
+      'Sent · waiting for GI Home to confirm the resume';
 
   @override
   String get suspendAppliedAwaitingHeartbeat =>
@@ -1499,7 +1521,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get suspendAppliedLegacy =>
-      'Heating suspended in GI Core. This ESPHome device gets no relay-off commands – GI Home simply will not turn the boiler on.';
+      'Heating suspended. This ESPHome device gets no relay-off commands – GI Home simply will not turn the boiler on.';
 
   @override
   String get resumeApplied =>
@@ -1507,15 +1529,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resumeAppliedPending =>
-      'Heating resumed. GI Core has not restored the control mode yet – refresh in a moment.';
+      'Heating resumed. GI Home has not restored the control mode yet – refresh in a moment.';
 
   @override
   String get suspendTimedOut =>
-      'GI Core did not confirm the suspension within 30 s. Refresh and check the state.';
+      'GI Home did not confirm the suspension within 30 s. Refresh and check the state.';
 
   @override
   String get resumeTimedOut =>
-      'GI Core did not confirm the resume within 30 s. Refresh and check the state.';
+      'GI Home did not confirm the resume within 30 s. Refresh and check the state.';
 
   @override
   String get resumeSheetTitle => 'Resume heating?';
@@ -1552,6 +1574,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLanguageDialogTitle => 'App language';
+
+  @override
+  String languageSelectorLabel(String language) {
+    return 'Language: $language';
+  }
 
   @override
   String get settingsCoreVersion => 'GI Home software version';
@@ -1616,7 +1643,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schedulesEmptyBody =>
-      'Heating follows the base strategy all the time.';
+      'Heating follows the default setting all the time.';
 
   @override
   String get schedulesAdd => 'Add schedule';
@@ -1748,7 +1775,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String scheduleDeleteConfirmBody(String name) {
-    return 'The schedule “$name” will be deleted. If it was active, heating returns to the base strategy.';
+    return 'The schedule “$name” will be deleted. If it was active, heating returns to the default setting.';
   }
 
   @override
@@ -2191,6 +2218,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'The device list and details are requested with If-None-Match; a 304 response saves data. The change applies from the next session.';
 
   @override
+  String get flagMdnsFallbackTitle => 'Find the appliance over multicast DNS';
+
+  @override
+  String get flagMdnsFallbackDescription =>
+      'Android only. When the system cannot resolve a .local name, the app asks the local network for it directly. Applies from the next search.';
+
+  @override
   String get settingsAccountManage => 'Profile and security';
 
   @override
@@ -2447,4 +2481,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryResetBack => 'Back to sign-in';
+
+  @override
+  String get errorHttpsRequired =>
+      'This device requires an encrypted connection (https://), which the app does not support yet. Use the unencrypted address in your home network, e.g. 192.168.1.20:3000.';
+
+  @override
+  String get connectErrorUnreachable =>
+      'No GI Home found at this address. Check that your phone is on the same Wi-Fi as the device (not a guest network) and enter its IP address, e.g. 192.168.1.20:3000.';
+
+  @override
+  String get connectHelpLink => 'Where do I find the address?';
+
+  @override
+  String get connectHelpTitle => 'Where do I find the GI Home address?';
+
+  @override
+  String get connectHelpSameWifi =>
+      'Your phone must be on the same Wi-Fi as GI Home. Guest networks and mobile data do not work.';
+
+  @override
+  String get connectHelpRouter =>
+      'You can find the device IP address in the connected-devices list of your router, e.g. 192.168.1.20.';
+
+  @override
+  String get connectHelpPort =>
+      'If the IP alone does not work, add the port: 192.168.1.20:3000. The app tries ports 80 and 3000 by itself.';
+
+  @override
+  String get connectHelpLocalName =>
+      'A ready-made GI Home usually answers to gi-home.local as well, but not on every phone. The IP address always works.';
+
+  @override
+  String get connectHelpClose => 'Close';
 }

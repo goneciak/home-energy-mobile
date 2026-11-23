@@ -56,7 +56,7 @@ extension ApiFailurePatterns on ApiFailure {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( UnreachableFailure value)?  unreachable,TResult Function( TimeoutFailure value)?  timeout,TResult Function( LocalNetworkDeniedFailure value)?  localNetworkDenied,TResult Function( TlsUntrustedFailure value)?  tlsUntrusted,TResult Function( InsecureTransportFailure value)?  insecureTransport,TResult Function( UnauthorizedFailure value)?  unauthorized,TResult Function( ForbiddenFailure value)?  forbidden,TResult Function( NotFoundFailure value)?  notFound,TResult Function( RouteAbsentFailure value)?  routeAbsent,TResult Function( ValidationFailure value)?  validation,TResult Function( RateLimitedFailure value)?  rateLimited,TResult Function( DomainFailure value)?  domain,TResult Function( ServerFailure value)?  server,TResult Function( UnexpectedResponseFailure value)?  unexpectedResponse,TResult Function( UnexpectedShapeFailure value)?  unexpectedShape,TResult Function( SessionLostFailure value)?  sessionLost,TResult Function( RefreshCookieMissingFailure value)?  refreshCookieMissing,TResult Function( VaultUnavailableFailure value)?  vaultUnavailable,TResult Function( DifferentApplianceFailure value)?  differentAppliance,TResult Function( ApplianceResetFailure value)?  applianceReset,TResult Function( CancelledFailure value)?  cancelled,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( UnreachableFailure value)?  unreachable,TResult Function( TimeoutFailure value)?  timeout,TResult Function( LocalNetworkDeniedFailure value)?  localNetworkDenied,TResult Function( TlsUntrustedFailure value)?  tlsUntrusted,TResult Function( InsecureTransportFailure value)?  insecureTransport,TResult Function( HttpsRequiredFailure value)?  httpsRequired,TResult Function( UnauthorizedFailure value)?  unauthorized,TResult Function( ForbiddenFailure value)?  forbidden,TResult Function( NotFoundFailure value)?  notFound,TResult Function( RouteAbsentFailure value)?  routeAbsent,TResult Function( ValidationFailure value)?  validation,TResult Function( RateLimitedFailure value)?  rateLimited,TResult Function( DomainFailure value)?  domain,TResult Function( ServerFailure value)?  server,TResult Function( UnexpectedResponseFailure value)?  unexpectedResponse,TResult Function( UnexpectedShapeFailure value)?  unexpectedShape,TResult Function( SessionLostFailure value)?  sessionLost,TResult Function( RefreshCookieMissingFailure value)?  refreshCookieMissing,TResult Function( VaultUnavailableFailure value)?  vaultUnavailable,TResult Function( DifferentApplianceFailure value)?  differentAppliance,TResult Function( ApplianceResetFailure value)?  applianceReset,TResult Function( CancelledFailure value)?  cancelled,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case UnreachableFailure() when unreachable != null:
@@ -64,7 +64,8 @@ return unreachable(_that);case TimeoutFailure() when timeout != null:
 return timeout(_that);case LocalNetworkDeniedFailure() when localNetworkDenied != null:
 return localNetworkDenied(_that);case TlsUntrustedFailure() when tlsUntrusted != null:
 return tlsUntrusted(_that);case InsecureTransportFailure() when insecureTransport != null:
-return insecureTransport(_that);case UnauthorizedFailure() when unauthorized != null:
+return insecureTransport(_that);case HttpsRequiredFailure() when httpsRequired != null:
+return httpsRequired(_that);case UnauthorizedFailure() when unauthorized != null:
 return unauthorized(_that);case ForbiddenFailure() when forbidden != null:
 return forbidden(_that);case NotFoundFailure() when notFound != null:
 return notFound(_that);case RouteAbsentFailure() when routeAbsent != null:
@@ -98,7 +99,7 @@ return cancelled(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( UnreachableFailure value)  unreachable,required TResult Function( TimeoutFailure value)  timeout,required TResult Function( LocalNetworkDeniedFailure value)  localNetworkDenied,required TResult Function( TlsUntrustedFailure value)  tlsUntrusted,required TResult Function( InsecureTransportFailure value)  insecureTransport,required TResult Function( UnauthorizedFailure value)  unauthorized,required TResult Function( ForbiddenFailure value)  forbidden,required TResult Function( NotFoundFailure value)  notFound,required TResult Function( RouteAbsentFailure value)  routeAbsent,required TResult Function( ValidationFailure value)  validation,required TResult Function( RateLimitedFailure value)  rateLimited,required TResult Function( DomainFailure value)  domain,required TResult Function( ServerFailure value)  server,required TResult Function( UnexpectedResponseFailure value)  unexpectedResponse,required TResult Function( UnexpectedShapeFailure value)  unexpectedShape,required TResult Function( SessionLostFailure value)  sessionLost,required TResult Function( RefreshCookieMissingFailure value)  refreshCookieMissing,required TResult Function( VaultUnavailableFailure value)  vaultUnavailable,required TResult Function( DifferentApplianceFailure value)  differentAppliance,required TResult Function( ApplianceResetFailure value)  applianceReset,required TResult Function( CancelledFailure value)  cancelled,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( UnreachableFailure value)  unreachable,required TResult Function( TimeoutFailure value)  timeout,required TResult Function( LocalNetworkDeniedFailure value)  localNetworkDenied,required TResult Function( TlsUntrustedFailure value)  tlsUntrusted,required TResult Function( InsecureTransportFailure value)  insecureTransport,required TResult Function( HttpsRequiredFailure value)  httpsRequired,required TResult Function( UnauthorizedFailure value)  unauthorized,required TResult Function( ForbiddenFailure value)  forbidden,required TResult Function( NotFoundFailure value)  notFound,required TResult Function( RouteAbsentFailure value)  routeAbsent,required TResult Function( ValidationFailure value)  validation,required TResult Function( RateLimitedFailure value)  rateLimited,required TResult Function( DomainFailure value)  domain,required TResult Function( ServerFailure value)  server,required TResult Function( UnexpectedResponseFailure value)  unexpectedResponse,required TResult Function( UnexpectedShapeFailure value)  unexpectedShape,required TResult Function( SessionLostFailure value)  sessionLost,required TResult Function( RefreshCookieMissingFailure value)  refreshCookieMissing,required TResult Function( VaultUnavailableFailure value)  vaultUnavailable,required TResult Function( DifferentApplianceFailure value)  differentAppliance,required TResult Function( ApplianceResetFailure value)  applianceReset,required TResult Function( CancelledFailure value)  cancelled,}){
 final _that = this;
 switch (_that) {
 case UnreachableFailure():
@@ -106,7 +107,8 @@ return unreachable(_that);case TimeoutFailure():
 return timeout(_that);case LocalNetworkDeniedFailure():
 return localNetworkDenied(_that);case TlsUntrustedFailure():
 return tlsUntrusted(_that);case InsecureTransportFailure():
-return insecureTransport(_that);case UnauthorizedFailure():
+return insecureTransport(_that);case HttpsRequiredFailure():
+return httpsRequired(_that);case UnauthorizedFailure():
 return unauthorized(_that);case ForbiddenFailure():
 return forbidden(_that);case NotFoundFailure():
 return notFound(_that);case RouteAbsentFailure():
@@ -136,7 +138,7 @@ return cancelled(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( UnreachableFailure value)?  unreachable,TResult? Function( TimeoutFailure value)?  timeout,TResult? Function( LocalNetworkDeniedFailure value)?  localNetworkDenied,TResult? Function( TlsUntrustedFailure value)?  tlsUntrusted,TResult? Function( InsecureTransportFailure value)?  insecureTransport,TResult? Function( UnauthorizedFailure value)?  unauthorized,TResult? Function( ForbiddenFailure value)?  forbidden,TResult? Function( NotFoundFailure value)?  notFound,TResult? Function( RouteAbsentFailure value)?  routeAbsent,TResult? Function( ValidationFailure value)?  validation,TResult? Function( RateLimitedFailure value)?  rateLimited,TResult? Function( DomainFailure value)?  domain,TResult? Function( ServerFailure value)?  server,TResult? Function( UnexpectedResponseFailure value)?  unexpectedResponse,TResult? Function( UnexpectedShapeFailure value)?  unexpectedShape,TResult? Function( SessionLostFailure value)?  sessionLost,TResult? Function( RefreshCookieMissingFailure value)?  refreshCookieMissing,TResult? Function( VaultUnavailableFailure value)?  vaultUnavailable,TResult? Function( DifferentApplianceFailure value)?  differentAppliance,TResult? Function( ApplianceResetFailure value)?  applianceReset,TResult? Function( CancelledFailure value)?  cancelled,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( UnreachableFailure value)?  unreachable,TResult? Function( TimeoutFailure value)?  timeout,TResult? Function( LocalNetworkDeniedFailure value)?  localNetworkDenied,TResult? Function( TlsUntrustedFailure value)?  tlsUntrusted,TResult? Function( InsecureTransportFailure value)?  insecureTransport,TResult? Function( HttpsRequiredFailure value)?  httpsRequired,TResult? Function( UnauthorizedFailure value)?  unauthorized,TResult? Function( ForbiddenFailure value)?  forbidden,TResult? Function( NotFoundFailure value)?  notFound,TResult? Function( RouteAbsentFailure value)?  routeAbsent,TResult? Function( ValidationFailure value)?  validation,TResult? Function( RateLimitedFailure value)?  rateLimited,TResult? Function( DomainFailure value)?  domain,TResult? Function( ServerFailure value)?  server,TResult? Function( UnexpectedResponseFailure value)?  unexpectedResponse,TResult? Function( UnexpectedShapeFailure value)?  unexpectedShape,TResult? Function( SessionLostFailure value)?  sessionLost,TResult? Function( RefreshCookieMissingFailure value)?  refreshCookieMissing,TResult? Function( VaultUnavailableFailure value)?  vaultUnavailable,TResult? Function( DifferentApplianceFailure value)?  differentAppliance,TResult? Function( ApplianceResetFailure value)?  applianceReset,TResult? Function( CancelledFailure value)?  cancelled,}){
 final _that = this;
 switch (_that) {
 case UnreachableFailure() when unreachable != null:
@@ -144,7 +146,8 @@ return unreachable(_that);case TimeoutFailure() when timeout != null:
 return timeout(_that);case LocalNetworkDeniedFailure() when localNetworkDenied != null:
 return localNetworkDenied(_that);case TlsUntrustedFailure() when tlsUntrusted != null:
 return tlsUntrusted(_that);case InsecureTransportFailure() when insecureTransport != null:
-return insecureTransport(_that);case UnauthorizedFailure() when unauthorized != null:
+return insecureTransport(_that);case HttpsRequiredFailure() when httpsRequired != null:
+return httpsRequired(_that);case UnauthorizedFailure() when unauthorized != null:
 return unauthorized(_that);case ForbiddenFailure() when forbidden != null:
 return forbidden(_that);case NotFoundFailure() when notFound != null:
 return notFound(_that);case RouteAbsentFailure() when routeAbsent != null:
@@ -177,14 +180,15 @@ return cancelled(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String? reason)?  unreachable,TResult Function( String? reason)?  timeout,TResult Function( String? reason)?  localNetworkDenied,TResult Function( String host,  String? reason)?  tlsUntrusted,TResult Function( String host)?  insecureTransport,TResult Function( String code,  ApiErrorEnvelope? envelope)?  unauthorized,TResult Function( String code,  ApiErrorEnvelope? envelope)?  forbidden,TResult Function( String code,  ApiErrorEnvelope? envelope)?  notFound,TResult Function( ApiErrorEnvelope? envelope)?  routeAbsent,TResult Function( Map<String, List<String>> details,  ApiErrorEnvelope? envelope)?  validation,TResult Function( Duration? retryAfter,  ApiErrorEnvelope? envelope)?  rateLimited,TResult Function( int statusCode,  String code,  ApiErrorEnvelope? envelope)?  domain,TResult Function( int statusCode,  String? errorCode,  ApiErrorEnvelope? envelope)?  server,TResult Function( int? statusCode,  String? contentType)?  unexpectedResponse,TResult Function( String endpointId,  String? requestId,  String? fieldPath,  String? message)?  unexpectedShape,TResult Function( SessionLostReason reason)?  sessionLost,TResult Function()?  refreshCookieMissing,TResult Function()?  vaultUnavailable,TResult Function()?  differentAppliance,TResult Function()?  applianceReset,TResult Function()?  cancelled,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String? reason)?  unreachable,TResult Function( String? reason)?  timeout,TResult Function( String? reason)?  localNetworkDenied,TResult Function( String host,  String? reason)?  tlsUntrusted,TResult Function( String host)?  insecureTransport,TResult Function( String host)?  httpsRequired,TResult Function( String code,  ApiErrorEnvelope? envelope)?  unauthorized,TResult Function( String code,  ApiErrorEnvelope? envelope)?  forbidden,TResult Function( String code,  ApiErrorEnvelope? envelope)?  notFound,TResult Function( ApiErrorEnvelope? envelope)?  routeAbsent,TResult Function( Map<String, List<String>> details,  ApiErrorEnvelope? envelope)?  validation,TResult Function( Duration? retryAfter,  ApiErrorEnvelope? envelope)?  rateLimited,TResult Function( int statusCode,  String code,  ApiErrorEnvelope? envelope)?  domain,TResult Function( int statusCode,  String? errorCode,  Duration? retryAfter,  ApiErrorEnvelope? envelope)?  server,TResult Function( int? statusCode,  String? contentType)?  unexpectedResponse,TResult Function( String endpointId,  String? requestId,  String? fieldPath,  String? message)?  unexpectedShape,TResult Function( SessionLostReason reason)?  sessionLost,TResult Function()?  refreshCookieMissing,TResult Function()?  vaultUnavailable,TResult Function()?  differentAppliance,TResult Function()?  applianceReset,TResult Function()?  cancelled,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case UnreachableFailure() when unreachable != null:
 return unreachable(_that.reason);case TimeoutFailure() when timeout != null:
 return timeout(_that.reason);case LocalNetworkDeniedFailure() when localNetworkDenied != null:
 return localNetworkDenied(_that.reason);case TlsUntrustedFailure() when tlsUntrusted != null:
 return tlsUntrusted(_that.host,_that.reason);case InsecureTransportFailure() when insecureTransport != null:
-return insecureTransport(_that.host);case UnauthorizedFailure() when unauthorized != null:
+return insecureTransport(_that.host);case HttpsRequiredFailure() when httpsRequired != null:
+return httpsRequired(_that.host);case UnauthorizedFailure() when unauthorized != null:
 return unauthorized(_that.code,_that.envelope);case ForbiddenFailure() when forbidden != null:
 return forbidden(_that.code,_that.envelope);case NotFoundFailure() when notFound != null:
 return notFound(_that.code,_that.envelope);case RouteAbsentFailure() when routeAbsent != null:
@@ -192,7 +196,7 @@ return routeAbsent(_that.envelope);case ValidationFailure() when validation != n
 return validation(_that.details,_that.envelope);case RateLimitedFailure() when rateLimited != null:
 return rateLimited(_that.retryAfter,_that.envelope);case DomainFailure() when domain != null:
 return domain(_that.statusCode,_that.code,_that.envelope);case ServerFailure() when server != null:
-return server(_that.statusCode,_that.errorCode,_that.envelope);case UnexpectedResponseFailure() when unexpectedResponse != null:
+return server(_that.statusCode,_that.errorCode,_that.retryAfter,_that.envelope);case UnexpectedResponseFailure() when unexpectedResponse != null:
 return unexpectedResponse(_that.statusCode,_that.contentType);case UnexpectedShapeFailure() when unexpectedShape != null:
 return unexpectedShape(_that.endpointId,_that.requestId,_that.fieldPath,_that.message);case SessionLostFailure() when sessionLost != null:
 return sessionLost(_that.reason);case RefreshCookieMissingFailure() when refreshCookieMissing != null:
@@ -218,14 +222,15 @@ return cancelled();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String? reason)  unreachable,required TResult Function( String? reason)  timeout,required TResult Function( String? reason)  localNetworkDenied,required TResult Function( String host,  String? reason)  tlsUntrusted,required TResult Function( String host)  insecureTransport,required TResult Function( String code,  ApiErrorEnvelope? envelope)  unauthorized,required TResult Function( String code,  ApiErrorEnvelope? envelope)  forbidden,required TResult Function( String code,  ApiErrorEnvelope? envelope)  notFound,required TResult Function( ApiErrorEnvelope? envelope)  routeAbsent,required TResult Function( Map<String, List<String>> details,  ApiErrorEnvelope? envelope)  validation,required TResult Function( Duration? retryAfter,  ApiErrorEnvelope? envelope)  rateLimited,required TResult Function( int statusCode,  String code,  ApiErrorEnvelope? envelope)  domain,required TResult Function( int statusCode,  String? errorCode,  ApiErrorEnvelope? envelope)  server,required TResult Function( int? statusCode,  String? contentType)  unexpectedResponse,required TResult Function( String endpointId,  String? requestId,  String? fieldPath,  String? message)  unexpectedShape,required TResult Function( SessionLostReason reason)  sessionLost,required TResult Function()  refreshCookieMissing,required TResult Function()  vaultUnavailable,required TResult Function()  differentAppliance,required TResult Function()  applianceReset,required TResult Function()  cancelled,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String? reason)  unreachable,required TResult Function( String? reason)  timeout,required TResult Function( String? reason)  localNetworkDenied,required TResult Function( String host,  String? reason)  tlsUntrusted,required TResult Function( String host)  insecureTransport,required TResult Function( String host)  httpsRequired,required TResult Function( String code,  ApiErrorEnvelope? envelope)  unauthorized,required TResult Function( String code,  ApiErrorEnvelope? envelope)  forbidden,required TResult Function( String code,  ApiErrorEnvelope? envelope)  notFound,required TResult Function( ApiErrorEnvelope? envelope)  routeAbsent,required TResult Function( Map<String, List<String>> details,  ApiErrorEnvelope? envelope)  validation,required TResult Function( Duration? retryAfter,  ApiErrorEnvelope? envelope)  rateLimited,required TResult Function( int statusCode,  String code,  ApiErrorEnvelope? envelope)  domain,required TResult Function( int statusCode,  String? errorCode,  Duration? retryAfter,  ApiErrorEnvelope? envelope)  server,required TResult Function( int? statusCode,  String? contentType)  unexpectedResponse,required TResult Function( String endpointId,  String? requestId,  String? fieldPath,  String? message)  unexpectedShape,required TResult Function( SessionLostReason reason)  sessionLost,required TResult Function()  refreshCookieMissing,required TResult Function()  vaultUnavailable,required TResult Function()  differentAppliance,required TResult Function()  applianceReset,required TResult Function()  cancelled,}) {final _that = this;
 switch (_that) {
 case UnreachableFailure():
 return unreachable(_that.reason);case TimeoutFailure():
 return timeout(_that.reason);case LocalNetworkDeniedFailure():
 return localNetworkDenied(_that.reason);case TlsUntrustedFailure():
 return tlsUntrusted(_that.host,_that.reason);case InsecureTransportFailure():
-return insecureTransport(_that.host);case UnauthorizedFailure():
+return insecureTransport(_that.host);case HttpsRequiredFailure():
+return httpsRequired(_that.host);case UnauthorizedFailure():
 return unauthorized(_that.code,_that.envelope);case ForbiddenFailure():
 return forbidden(_that.code,_that.envelope);case NotFoundFailure():
 return notFound(_that.code,_that.envelope);case RouteAbsentFailure():
@@ -233,7 +238,7 @@ return routeAbsent(_that.envelope);case ValidationFailure():
 return validation(_that.details,_that.envelope);case RateLimitedFailure():
 return rateLimited(_that.retryAfter,_that.envelope);case DomainFailure():
 return domain(_that.statusCode,_that.code,_that.envelope);case ServerFailure():
-return server(_that.statusCode,_that.errorCode,_that.envelope);case UnexpectedResponseFailure():
+return server(_that.statusCode,_that.errorCode,_that.retryAfter,_that.envelope);case UnexpectedResponseFailure():
 return unexpectedResponse(_that.statusCode,_that.contentType);case UnexpectedShapeFailure():
 return unexpectedShape(_that.endpointId,_that.requestId,_that.fieldPath,_that.message);case SessionLostFailure():
 return sessionLost(_that.reason);case RefreshCookieMissingFailure():
@@ -255,14 +260,15 @@ return cancelled();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String? reason)?  unreachable,TResult? Function( String? reason)?  timeout,TResult? Function( String? reason)?  localNetworkDenied,TResult? Function( String host,  String? reason)?  tlsUntrusted,TResult? Function( String host)?  insecureTransport,TResult? Function( String code,  ApiErrorEnvelope? envelope)?  unauthorized,TResult? Function( String code,  ApiErrorEnvelope? envelope)?  forbidden,TResult? Function( String code,  ApiErrorEnvelope? envelope)?  notFound,TResult? Function( ApiErrorEnvelope? envelope)?  routeAbsent,TResult? Function( Map<String, List<String>> details,  ApiErrorEnvelope? envelope)?  validation,TResult? Function( Duration? retryAfter,  ApiErrorEnvelope? envelope)?  rateLimited,TResult? Function( int statusCode,  String code,  ApiErrorEnvelope? envelope)?  domain,TResult? Function( int statusCode,  String? errorCode,  ApiErrorEnvelope? envelope)?  server,TResult? Function( int? statusCode,  String? contentType)?  unexpectedResponse,TResult? Function( String endpointId,  String? requestId,  String? fieldPath,  String? message)?  unexpectedShape,TResult? Function( SessionLostReason reason)?  sessionLost,TResult? Function()?  refreshCookieMissing,TResult? Function()?  vaultUnavailable,TResult? Function()?  differentAppliance,TResult? Function()?  applianceReset,TResult? Function()?  cancelled,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String? reason)?  unreachable,TResult? Function( String? reason)?  timeout,TResult? Function( String? reason)?  localNetworkDenied,TResult? Function( String host,  String? reason)?  tlsUntrusted,TResult? Function( String host)?  insecureTransport,TResult? Function( String host)?  httpsRequired,TResult? Function( String code,  ApiErrorEnvelope? envelope)?  unauthorized,TResult? Function( String code,  ApiErrorEnvelope? envelope)?  forbidden,TResult? Function( String code,  ApiErrorEnvelope? envelope)?  notFound,TResult? Function( ApiErrorEnvelope? envelope)?  routeAbsent,TResult? Function( Map<String, List<String>> details,  ApiErrorEnvelope? envelope)?  validation,TResult? Function( Duration? retryAfter,  ApiErrorEnvelope? envelope)?  rateLimited,TResult? Function( int statusCode,  String code,  ApiErrorEnvelope? envelope)?  domain,TResult? Function( int statusCode,  String? errorCode,  Duration? retryAfter,  ApiErrorEnvelope? envelope)?  server,TResult? Function( int? statusCode,  String? contentType)?  unexpectedResponse,TResult? Function( String endpointId,  String? requestId,  String? fieldPath,  String? message)?  unexpectedShape,TResult? Function( SessionLostReason reason)?  sessionLost,TResult? Function()?  refreshCookieMissing,TResult? Function()?  vaultUnavailable,TResult? Function()?  differentAppliance,TResult? Function()?  applianceReset,TResult? Function()?  cancelled,}) {final _that = this;
 switch (_that) {
 case UnreachableFailure() when unreachable != null:
 return unreachable(_that.reason);case TimeoutFailure() when timeout != null:
 return timeout(_that.reason);case LocalNetworkDeniedFailure() when localNetworkDenied != null:
 return localNetworkDenied(_that.reason);case TlsUntrustedFailure() when tlsUntrusted != null:
 return tlsUntrusted(_that.host,_that.reason);case InsecureTransportFailure() when insecureTransport != null:
-return insecureTransport(_that.host);case UnauthorizedFailure() when unauthorized != null:
+return insecureTransport(_that.host);case HttpsRequiredFailure() when httpsRequired != null:
+return httpsRequired(_that.host);case UnauthorizedFailure() when unauthorized != null:
 return unauthorized(_that.code,_that.envelope);case ForbiddenFailure() when forbidden != null:
 return forbidden(_that.code,_that.envelope);case NotFoundFailure() when notFound != null:
 return notFound(_that.code,_that.envelope);case RouteAbsentFailure() when routeAbsent != null:
@@ -270,7 +276,7 @@ return routeAbsent(_that.envelope);case ValidationFailure() when validation != n
 return validation(_that.details,_that.envelope);case RateLimitedFailure() when rateLimited != null:
 return rateLimited(_that.retryAfter,_that.envelope);case DomainFailure() when domain != null:
 return domain(_that.statusCode,_that.code,_that.envelope);case ServerFailure() when server != null:
-return server(_that.statusCode,_that.errorCode,_that.envelope);case UnexpectedResponseFailure() when unexpectedResponse != null:
+return server(_that.statusCode,_that.errorCode,_that.retryAfter,_that.envelope);case UnexpectedResponseFailure() when unexpectedResponse != null:
 return unexpectedResponse(_that.statusCode,_that.contentType);case UnexpectedShapeFailure() when unexpectedShape != null:
 return unexpectedShape(_that.endpointId,_that.requestId,_that.fieldPath,_that.message);case SessionLostFailure() when sessionLost != null:
 return sessionLost(_that.reason);case RefreshCookieMissingFailure() when refreshCookieMissing != null:
@@ -620,6 +626,74 @@ class _$InsecureTransportFailureCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? host = null,}) {
   return _then(InsecureTransportFailure(
+host: null == host ? _self.host : host // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class HttpsRequiredFailure extends ApiFailure {
+  const HttpsRequiredFailure({required this.host}): super._();
+  
+
+ final  String host;
+
+/// Create a copy of ApiFailure
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$HttpsRequiredFailureCopyWith<HttpsRequiredFailure> get copyWith => _$HttpsRequiredFailureCopyWithImpl<HttpsRequiredFailure>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HttpsRequiredFailure&&(identical(other.host, host) || other.host == host));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,host);
+}
+
+@override
+String toString() {
+    return 'ApiFailure.httpsRequired(host: $host)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $HttpsRequiredFailureCopyWith<$Res> implements $ApiFailureCopyWith<$Res> {
+  factory $HttpsRequiredFailureCopyWith(HttpsRequiredFailure value, $Res Function(HttpsRequiredFailure) _then) = _$HttpsRequiredFailureCopyWithImpl;
+@useResult
+$Res call({
+ String host
+});
+
+
+
+
+}
+/// @nodoc
+class _$HttpsRequiredFailureCopyWithImpl<$Res>
+    implements $HttpsRequiredFailureCopyWith<$Res> {
+  _$HttpsRequiredFailureCopyWithImpl(this._self, this._then);
+
+  final HttpsRequiredFailure _self;
+  final $Res Function(HttpsRequiredFailure) _then;
+
+/// Create a copy of ApiFailure
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? host = null,}) {
+  return _then(HttpsRequiredFailure(
 host: null == host ? _self.host : host // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -1212,11 +1286,12 @@ $ApiErrorEnvelopeCopyWith<$Res>? get envelope {
 
 
 class ServerFailure extends ApiFailure {
-  const ServerFailure({required this.statusCode, this.errorCode, this.envelope}): super._();
+  const ServerFailure({required this.statusCode, this.errorCode, this.retryAfter, this.envelope}): super._();
   
 
  final  int statusCode;
  final  String? errorCode;
+ final  Duration? retryAfter;
  final  ApiErrorEnvelope? envelope;
 
 /// Create a copy of ApiFailure
@@ -1229,18 +1304,18 @@ $ServerFailureCopyWith<ServerFailure> get copyWith => _$ServerFailureCopyWithImp
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerFailure&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.errorCode, errorCode) || other.errorCode == errorCode)&&(identical(other.envelope, envelope) || other.envelope == envelope));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ServerFailure&&(identical(other.statusCode, statusCode) || other.statusCode == statusCode)&&(identical(other.errorCode, errorCode) || other.errorCode == errorCode)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter)&&(identical(other.envelope, envelope) || other.envelope == envelope));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,statusCode,errorCode,envelope);
+    return Object.hash(runtimeType,statusCode,errorCode,retryAfter,envelope);
 }
 
 @override
 String toString() {
-    return 'ApiFailure.server(statusCode: $statusCode, errorCode: $errorCode, envelope: $envelope)';
+    return 'ApiFailure.server(statusCode: $statusCode, errorCode: $errorCode, retryAfter: $retryAfter, envelope: $envelope)';
 }
 
 
@@ -1251,7 +1326,7 @@ abstract mixin class $ServerFailureCopyWith<$Res> implements $ApiFailureCopyWith
   factory $ServerFailureCopyWith(ServerFailure value, $Res Function(ServerFailure) _then) = _$ServerFailureCopyWithImpl;
 @useResult
 $Res call({
- int statusCode, String? errorCode, ApiErrorEnvelope? envelope
+ int statusCode, String? errorCode, Duration? retryAfter, ApiErrorEnvelope? envelope
 });
 
 
@@ -1268,11 +1343,12 @@ class _$ServerFailureCopyWithImpl<$Res>
 
 /// Create a copy of ApiFailure
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? statusCode = null,Object? errorCode = freezed,Object? envelope = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? statusCode = null,Object? errorCode = freezed,Object? retryAfter = freezed,Object? envelope = freezed,}) {
   return _then(ServerFailure(
 statusCode: null == statusCode ? _self.statusCode : statusCode // ignore: cast_nullable_to_non_nullable
 as int,errorCode: freezed == errorCode ? _self.errorCode : errorCode // ignore: cast_nullable_to_non_nullable
-as String?,envelope: freezed == envelope ? _self.envelope : envelope // ignore: cast_nullable_to_non_nullable
+as String?,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
+as Duration?,envelope: freezed == envelope ? _self.envelope : envelope // ignore: cast_nullable_to_non_nullable
 as ApiErrorEnvelope?,
   ));
 }

@@ -3,10 +3,13 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:alchemist/alchemist.dart';
+import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_home/src/core/theme/app_theme.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:material_ui/material_ui.dart';
+
+import 'support/quiet_connectivity.dart';
 
 /// Golden test setup (alchemist, plan §17.1), picked up by `flutter test`
 /// for every test under `test/`.
@@ -22,6 +25,8 @@ import 'package:material_ui/material_ui.dart';
 ///   `flutter test --update-goldens --tags golden` and never run on CI
 ///   (the `CI` variable is set there).
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  // No platform channel in widget tests: the app listens for network changes.
+  ConnectivityPlatform.instance = QuietConnectivity();
   if (!Platform.isLinux) {
     final current = goldenFileComparator;
     if (current is LocalFileComparator) {

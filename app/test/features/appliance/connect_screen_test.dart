@@ -207,14 +207,53 @@ void main() {
 
     expect(
       find.text(
-        'Nie można połączyć się z GI Home. Sprawdź, czy telefon jest w tej '
-        'samej sieci Wi-Fi.',
+        'Nie znaleziono GI Home pod tym adresem. Sprawdź, czy telefon jest w '
+        'tej samej sieci Wi-Fi co urządzenie (nie w sieci dla gości), i wpisz '
+        'jego adres IP, np. 192.168.1.20:3000.',
       ),
       findsOneWidget,
     );
     expect(find.text('Czy to Twój GI Home?'), findsNothing);
     expect(find.text('Otwórz ustawienia'), findsNothing);
     expect(container.read(applianceProfileProvider), isNull);
+  });
+
+  testWidgets('a redirect to https is explained, not called "not GI Home"', (
+    tester,
+  ) async {
+    core.routes['GET /api/v1/health/live'] = (_) => ResponseBody.fromString(
+      '',
+      301,
+      headers: {
+        'location': ['https://gi-home.local/api/v1/health/live'],
+      },
+    );
+    await pumpConnect(tester);
+
+    await probe(tester, '192.168.1.1');
+
+    expect(
+      find.textContaining('wymaga połączenia szyfrowanego'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('nie GI Home'), findsNothing);
+  });
+
+  testWidgets('the help sheet explains where to find the address', (
+    tester,
+  ) async {
+    await pumpConnect(tester);
+
+    await tester.ensureVisible(find.byKey(const ValueKey('connect-help')));
+    await tester.tap(find.byKey(const ValueKey('connect-help')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Gdzie znajdę adres GI Home?'), findsOneWidget);
+    expect(find.textContaining('tej samej sieci Wi-Fi'), findsWidgets);
+    expect(find.textContaining('192.168.1.20:3000'), findsWidgets);
+    await tester.tap(find.text('Zamknij'));
+    await tester.pumpAndSettle();
+    expect(find.text('Gdzie znajdę adres GI Home?'), findsNothing);
   });
 
   testWidgets('another web server is not mistaken for GI Home', (tester) async {
@@ -309,7 +348,8 @@ void main() {
       expect(find.text('Szukam GI Home…'), findsNothing);
       expect(
         find.text(
-          'Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej.',
+          'Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej, '
+          'najlepiej adres IP.',
         ),
         findsOneWidget,
       );

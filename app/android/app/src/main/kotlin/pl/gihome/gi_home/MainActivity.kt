@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -27,6 +28,10 @@ import io.flutter.plugin.common.MethodChannel
  */
 class MainActivity : FlutterActivity() {
     private var pendingPermission: MethodChannel.Result? = null
+    private var multicastLock: WifiManager.MulticastLock? = null
+
+    /** Lookups that hold the lock now; it is released with the last one. */
+    private var multicastLockHolders = 0
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -36,6 +41,11 @@ class MainActivity : FlutterActivity() {
                     "sdkInt" -> result.success(Build.VERSION.SDK_INT)
                     "openAppSettings" -> result.success(openAppSettings())
                     "requestNearbyWifiDevices" -> requestNearbyWifiDevices(result)
+                    "acquireMulticastLock" -> result.success(acquireMulticastLock())
+                    "releaseMulticastLock" -> {
+                        releaseMulticastLock()
+                        result.success(null)
+                    }
                     else -> result.notImplemented()
                 }
             }
@@ -85,6 +95,50 @@ class MainActivity : FlutterActivity() {
             }
         }, clearAfterMs)
         return true
+    }
+
+    /**
+     * Many phones drop multicast packets unless an app holds a multicast
+     * lock; the multicast DNS fallback (mdnsFallback flag) takes it for the
+     * length of one lookup. `true` if the lock is held.
+     */
+    private fun acquireMulticastLock(): Boolean {
+        multicastLock?.let {
+            if (it.isHeld) {
+                multicastLockHolders++
+                return true
+            }
+            return false
+        }
+        val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager
+            ?: return false
+        val lock = wifi.createMulticastLock("gi_home_mdns").apply {
+            setReferenceCounted(false)
+        }
+        return try {
+            lock.acquire()
+            multicastLock = lock
+            multicastLockHolders = 1
+            true
+        } catch (e: SecurityException) {
+            false
+        }
+    }
+
+    private fun releaseMulticastLock() {
+        if (multicastLockHolders > 1) {
+            multicastLockHolders--
+            return
+        }
+        multicastLockHolders = 0
+        multicastLock?.let { if (it.isHeld) it.release() }
+        multicastLock = null
+    }
+
+    override fun onDestroy() {
+        multicastLockHolders = 0
+        releaseMulticastLock()
+        super.onDestroy()
     }
 
     private fun openAppSettings(): Boolean {

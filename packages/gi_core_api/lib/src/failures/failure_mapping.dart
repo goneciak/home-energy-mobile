@@ -122,12 +122,24 @@ ApiFailure failureFromResponse({
   Object? data,
   Headers? headers,
 }) {
+  if (const {301, 302, 303, 307, 308}.contains(statusCode)) {
+    // Never followed (a proxy or a captive portal must not get credentials).
+    final location = Uri.tryParse(headers?.value('location') ?? '');
+    if (location != null && location.scheme.toLowerCase() == 'https') {
+      return ApiFailure.httpsRequired(host: location.host);
+    }
+  }
   final envelope = ApiErrorEnvelope.tryParse(data);
   if (envelope == null) {
     if (statusCode == 429) {
       return ApiFailure.rateLimited(retryAfter: parseRetryAfter(headers));
     }
-    if (statusCode >= 500) return ApiFailure.server(statusCode: statusCode);
+    if (statusCode >= 500) {
+      return ApiFailure.server(
+        statusCode: statusCode,
+        retryAfter: parseRetryAfter(headers),
+      );
+    }
     return ApiFailure.unexpectedResponse(
       statusCode: statusCode,
       contentType: headers?.value(Headers.contentTypeHeader),
@@ -151,6 +163,7 @@ ApiFailure failureFromResponse({
     >= 500 => ApiFailure.server(
       statusCode: statusCode,
       errorCode: code,
+      retryAfter: parseRetryAfter(headers),
       envelope: envelope,
     ),
     _ => ApiFailure.domain(

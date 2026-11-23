@@ -18,20 +18,23 @@
 # (GI Core, its own tmpfs Postgres, local-only mosquitto, fake ESPHome device; ephemeral
 # 127.0.0.1 port, no container names, so it runs beside the dev stack), resolves the port
 # with `docker compose port mosquitto 3000`, waits for /api/v1/health/live and prints
-# GI_CORE_URL and FAKE_ESPHOME_URL. --seed runs the seeder with --init --yes; --down
-# removes the project and its volumes (down -v).
+# GI_CORE_URL, FAKE_ESPHOME_URL, GI_EDGE_SIM_URL and GI_EDGE_SIM_CONTROL_URL (the GI Edge
+# device simulator, docs/gi-edge-simulator.md). --seed runs the seeder with --init --yes;
+# --edge-sim also provisions and activates the simulator. --down removes the project and
+# its volumes (down -v).
 #
 # Nothing is written to the backend repo by this script. Compose itself only
 # produces files the backend already gitignores (see README, "Backend").
 # Re-running is safe: `up -d` leaves services with unchanged configuration as they are.
 #
 # Usage: tools/dev-up.sh [--backend-dir DIR] [--lan] [--port N] [--seed] [--timeout SECONDS]
-#        tools/dev-up.sh --contract [--run-id ID] [--seed] [--backend-dir DIR] [--timeout SECONDS]
+#        tools/dev-up.sh --contract [--run-id ID] [--seed [--edge-sim]] [--backend-dir DIR] [--timeout SECONDS]
 #        tools/dev-up.sh --contract --run-id ID --down
 #   --lan       dev only: publish GI Core on 0.0.0.0 (GI_CORE_BIND_ADDRESS) for a physical
 #               phone on the LAN; changing it on a running stack recreates the containers
 #   --port      dev only: host port (GI_CORE_PORT, default 3000)
 #   --seed      run the seeder after the health check
+#   --edge-sim  contract only (with --seed): also provision and activate the GI Edge simulator
 #   --contract  start (or with --down remove) the contract stack gi-mobile-contract-<run-id>
 #   --run-id    contract project suffix (default: random when starting; required with --down)
 #   --down      contract only: docker compose ... down -v
@@ -39,7 +42,7 @@
 #               builds the images)
 set -euo pipefail
 
-usage() { sed -n '2,38p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,41p' "$0" | sed 's/^# \{0,1\}//'; }
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 override="$repo_root/tools/backend/compose.override.yml"
@@ -52,6 +55,7 @@ contract=false
 run_id=""
 down=false
 dev_only=false
+edge_sim=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -59,6 +63,7 @@ while [[ $# -gt 0 ]]; do
     --lan) export GI_CORE_BIND_ADDRESS=0.0.0.0; dev_only=true; shift ;;
     --port) port="${2:?--port needs a number}"; dev_only=true; shift 2 ;;
     --seed) seed=true; shift ;;
+    --edge-sim) edge_sim=true; shift ;;
     --timeout) timeout="${2:?--timeout needs seconds}"; shift 2 ;;
     --contract) contract=true; shift ;;
     --run-id) run_id="${2:?--run-id needs a value}"; shift 2 ;;
@@ -133,11 +138,17 @@ if [[ "$contract" == true ]]; then
   [[ -n "$core_published" ]] || die "could not resolve the published GI Core port of $project"
   core_url="http://$core_published"
   fake_url="http://$fake_published"
+  sim_published="$(docker compose -p "$project" -f "$contract_compose" port gi-edge-sim 80 | head -n1 | tr -d '[:space:]')"
+  sim_control_published="$(docker compose -p "$project" -f "$contract_compose" port gi-edge-sim 8081 | head -n1 | tr -d '[:space:]')"
+  sim_url="http://$sim_published"
+  sim_control_url="http://$sim_control_published"
   wait_health "$core_url/api/v1/health/live" "$timeout" "Logs: docker compose -p $project logs gi-core"
   echo "GI Core is up."
 
   if [[ "$seed" == true ]]; then
-    run_seeder --base-url "$core_url" --init --yes
+    seed_args=(--base-url "$core_url" --init --yes)
+    if [[ "$edge_sim" == true ]]; then seed_args+=(--edge-sim gi-edge-sim); fi
+    run_seeder "${seed_args[@]}"
   fi
 
   cat <<EOF
@@ -145,9 +156,12 @@ if [[ "$contract" == true ]]; then
 GI_CONTRACT_PROJECT=$project
 GI_CORE_URL=$core_url
 FAKE_ESPHOME_URL=$fake_url
+GI_EDGE_SIM_URL=$sim_url
+GI_EDGE_SIM_CONTROL_URL=$sim_control_url
 
 Contract tests (packages/gi_core_api):
-  GI_CORE_URL=$core_url FAKE_ESPHOME_URL=$fake_url dart test -t contract -j 1
+  GI_CORE_URL=$core_url FAKE_ESPHOME_URL=$fake_url GI_EDGE_SIM_CONTROL_URL=$sim_control_url dart test -t contract -j 1
+GI Edge simulator: curl $sim_control_url/fake/state  (docs/gi-edge-simulator.md)
 Remove: tools/dev-up.sh --contract --run-id $run_id --down
 EOF
   exit 0

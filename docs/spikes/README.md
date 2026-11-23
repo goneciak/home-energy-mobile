@@ -9,8 +9,8 @@ niezmienionemu backendowi `8be59cd`; stosy zostały usunięte (`-Down`), a
 | Spike | Wynik | Status |
 |---|---|---|
 | [S1 Auth przez ciasteczko](s1-auth-cookie.md) | 50 rotacji OK; podwójny refresh → `AUTH_REFRESH_TOKEN_REUSED` i unieważnienie sesji; śmierć procesu przed zapisem → jedno wymuszone logowanie; test kontraktowy refreshu zielony | Zamknięty |
-| S2 Cleartext i sieć lokalna | – | **Oczekuje: wymaga fizycznych telefonów** (iPhone, Android 16 z flagą ochrony sieci lokalnej) |
-| S3 `.local` | – | **Oczekuje: wymaga fizycznych telefonów** (iOS, Android 10/13/14/15, 2 producentów) |
+| S2 Cleartext i sieć lokalna | – | **Oczekuje: wymaga fizycznych telefonów** (iPhone, Android 16 z flagą ochrony sieci lokalnej); do sprawdzenia: prośba `NEARBY_WIFI_DEVICES` i przepływ odmowy, komunikat iOS o sieci lokalnej, zachowanie po zmianie Wi-Fi |
+| S3 `.local` | – | **Oczekuje: wymaga fizycznych telefonów** (iOS, Android 10/13/14/15, 2 producentów); zapasowy resolver mDNS jest zaimplementowany za flagą `mdnsFallback` (domyślnie wyłączoną), o jej włączeniu rozstrzygnie ten wynik ([ADR 0015](../decisions/0015-network-change-no-write-replay.md)) |
 | [S4 Conditional GET](s4-conditional-get.md) | Słaby ETag i 304 na `/devices` i `/devices/:id`; ETag zmienia się co 30 s przez odpytanie legacy | Zamknięty: 304 tak |
 | [S5 Fixture'y i osobliwości](s5-fixtures-quirks.md) | Kształt control-strategy (Swagger błędny), `initializedAt` stabilne, `configurationVersion` +2/min bez harmonogramów, `communicationMode` odróżnia GI Edge | Zamknięty; klucze `diagnostics` GI Edge tylko z kodu (sprzęt) |
 | [S6 Urządzenie fake](s6-fake-device.md) | GO: provisioning bez proxy, ONLINE mimo 404 `/gi-provision`, przełącznik w obie strony | Zamknięty |

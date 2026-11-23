@@ -766,7 +766,7 @@ void main() {
     await pumpApp(
       tester,
       profile: testProfile,
-      physicalSize: const Size(1200, 9000),
+      physicalSize: const Size(1200, 12000),
     );
 
     // Five heating cards: three requests out, two waiting for a slot.
@@ -783,9 +783,11 @@ void main() {
     }
     expect(find.text('Grzeje'), findsWidgets);
 
-    // The 15 s cadence; non-heating devices are still never asked for.
+    // Five cards poll every 30 s, the n-th offset by n/5 of that (ADR 0016):
+    // all have run a second time by 54 s. Non-heating devices are still never
+    // asked for.
     gate = Completer<void>()..complete();
-    await tester.pump(const Duration(seconds: 15));
+    await tester.pump(const Duration(seconds: 55));
     await tester.pumpAndSettle();
     for (final id in heatingIds) {
       expect(detailRequests(id), 2, reason: id);

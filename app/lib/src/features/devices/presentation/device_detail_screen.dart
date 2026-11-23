@@ -18,6 +18,7 @@ import 'package:gi_home/src/features/devices/application/device_detail_notifier.
 import 'package:gi_home/src/features/devices/application/device_list_notifier.dart';
 import 'package:gi_home/src/features/devices/application/rooms_notifier.dart';
 import 'package:gi_home/src/features/devices/domain/controller_status.dart';
+import 'package:gi_home/src/features/devices/domain/entity_presentation.dart';
 import 'package:gi_home/src/features/devices/domain/freshness_policy.dart';
 import 'package:gi_home/src/features/devices/domain/switch_command_state.dart';
 import 'package:gi_home/src/features/devices/presentation/device_labels.dart';
@@ -304,28 +305,57 @@ class _DeviceDetailView extends ConsumerWidget {
         SectionHeader(l10n.deviceEntitiesSection),
         if (device.entities.isEmpty)
           _MutedNote(l10n.deviceEntitiesEmpty)
-        else
-          for (final entity in device.entities) ...[
-            _EntityTile(
-              device: device,
-              entity: entity,
-              now: now,
-              hasHistory: hasHistory,
+        else ...[
+          for (final entity in device.entities.where(
+            (e) => !isTechnicalEntity(e),
+          ))
+            ..._entityRows(device, entity, detail, freshness, now, hasHistory),
+          if (device.entities.any(isTechnicalEntity))
+            ExpansionTile(
+              key: const ValueKey('technical-entities'),
+              title: Text(l10n.deviceTechnicalEntitiesSection),
+              children: [
+                for (final entity in device.entities.where(isTechnicalEntity))
+                  ..._entityRows(
+                    device,
+                    entity,
+                    detail,
+                    freshness,
+                    now,
+                    hasHistory,
+                  ),
+              ],
             ),
-            if (entity.domain == EntityDomain.switch_)
-              SwitchEntityControl(
-                key: ValueKey('switch-control-${entity.id}'),
-                detail: detail,
-                entity: entity,
-                freshness: freshness,
-                now: now,
-              ),
-          ],
+        ],
         SectionHeader(l10n.deviceDiagnosticsSection),
         ..._diagnosticsRows(l10n, device.diagnostics),
       ],
     );
   }
+
+  static List<Widget> _entityRows(
+    DeviceDetail device,
+    DeviceEntity entity,
+    Fetched<DeviceDetail> detail,
+    FreshnessPolicy freshness,
+    DateTime now,
+    bool hasHistory,
+  ) => [
+    _EntityTile(
+      device: device,
+      entity: entity,
+      now: now,
+      hasHistory: hasHistory,
+    ),
+    if (entity.domain == EntityDomain.switch_)
+      SwitchEntityControl(
+        key: ValueKey('switch-control-${entity.id}'),
+        detail: detail,
+        entity: entity,
+        freshness: freshness,
+        now: now,
+      ),
+  ];
 
   static List<Widget> _diagnosticsRows(
     AppLocalizations l10n,
@@ -379,7 +409,11 @@ class _Header extends StatelessWidget {
     final tokens = GiTokens.of(context);
     final textTheme = Theme.of(context).textTheme;
     final connectivity = connectivityLook(l10n, device.connectivityState);
-    final product = productStatusLook(l10n, device.status);
+    final product = productStatusLook(
+      l10n,
+      device.status,
+      benign: !needsRealConfiguration(device),
+    );
     final description = device.description;
     return Card(
       shape: RoundedRectangleBorder(
@@ -541,11 +575,14 @@ class _EntityTile extends StatelessWidget {
         l10n.entityRoleControlTemperature,
       _ => null,
     };
-    final usable = entity.enabled && entity.availability;
+    final usable =
+        entity.enabled && entity.availability && !isStaleReading(entity, now);
     final value = !entity.enabled
         ? l10n.entityDisabled
         : !entity.availability
         ? l10n.entityUnavailable
+        : isStaleReading(entity, now)
+        ? l10n.entityStaleValue
         : _switchValue(l10n) ??
               formatEntityValue(
                 l10n,

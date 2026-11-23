@@ -90,6 +90,7 @@ final class AppConfig {
       'FF_ANDROID_LOCAL_NETWORK_PERMISSION_REQUEST',
     ),
     'FF_CONDITIONAL_GET': String.fromEnvironment('FF_CONDITIONAL_GET'),
+    'FF_MDNS_FALLBACK': String.fromEnvironment('FF_MDNS_FALLBACK'),
     androidStoreUrlDefine: String.fromEnvironment(androidStoreUrlDefine),
     iosStoreUrlDefine: String.fromEnvironment(iosStoreUrlDefine),
   };

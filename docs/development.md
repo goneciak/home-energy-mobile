@@ -78,7 +78,10 @@ jednorazowy projekt compose (plan §17.3, spike S8): GI Core zbudowany z
 folderu backendu (target `migrator` i `production`, tylko do odczytu, bez bind
 mountów), własny Postgres na tmpfs, mosquitto nasłuchujący tylko na
 `127.0.0.1` we wspólnej przestrzeni sieciowej z gi-core oraz udawany sterownik
-[`tools/fake_esphome`](../tools/fake_esphome). Nie ma stałych nazw kontenerów ani
+[`tools/fake_esphome`](../tools/fake_esphome). Drugi kontener, symulator sterownika GI Edge
+([`tools/gi_edge_sim`](../tools/gi_edge_sim), opis w
+[`gi-edge-simulator.md`](gi-edge-simulator.md)), działa jak prawdziwe
+urządzenie: wysyła do Core podpisany heartbeat i telemetrię i odbiera polecenia. Nie ma stałych nazw kontenerów ani
 portów hosta: Core dostaje efemeryczny port na `127.0.0.1`, więc działa
 równolegle ze stosem dev (i z innymi stosami kontraktowymi). Bez reverse
 proxy, Home Assistant i GI UI.
@@ -142,6 +145,8 @@ Kroki (plan §17.3), każdy idempotentny:
 7. `PATCH /devices/:id/control-strategy`: 55 °C, histereza 4 °C, tryb `MANUAL`
    (pętla histerezy Core działa tylko w `AUTO`, więc przekaźnik rusza się tylko
    na polecenie).
+   Z `--edge-sim <host>` (w `dev-up`: `-Seed -EdgeSim`) seeder dodaje też
+   symulator GI Edge i czeka na jego aktywację (`GI_EDGE_V1`).
 
 - **Strażnik:** wszystko, co pisze do Core, który już jest zainicjalizowany
   (`--init`, `--fixtures`), wymaga `--allow-initialized`. Bez tej flagi seeder
@@ -375,7 +380,31 @@ certyfikatem self-signed kończy się komunikatem „Certyfikat serwera nie jest
 zaufany” (`TlsUntrusted`). Taki certyfikat zadziała dopiero z przypinaniem przy
 pierwszym połączeniu (TOFU), planowanym na v1.1.
 
+## Adres, port i przekierowania
+
+- Adres wpisany bez portu (np. `192.168.1.20`) aplikacja sprawdza na porcie 80,
+  a gdy tam nic nie odpowiada jak GI Core, na porcie 3000. Zapisany profil
+  zawiera port, który zadziałał. Adres z portem sprawdzany jest dokładnie.
+  Ta sama kolejność obowiązuje dla nazw `.local` w „Znajdź GI Home”.
+- Przekierowanie na `https://` (np. Traefik na porcie 80 gotowego urządzenia)
+  nie jest wykonywane; użytkownik dostaje komunikat o wymaganym połączeniu
+  szyfrowanym (`HttpsRequired`). Zwykle pomaga wtedy port 3000, który
+  urządzenie publikuje w sieci domowej.
+- Ciasteczko odświeżania z flagą `Secure` działa przez zwykłe `http://`
+  w sieci domowej: aplikacja przechowuje je i odsyła sama, nagłówkiem
+  `Cookie`, bez magazynu ciasteczek `dart:io` (test `plain_http_access_test`).
+- Flavor `beta` ma włączone `FF_MDNS_FALLBACK`; ekran połączenia od niego nie
+  zależy, adres IP zawsze działa. Pomoc „Gdzie znajdę adres?” jest w aplikacji.
+- Przypinanie certyfikatu przy pierwszym połączeniu (TOFU) nie jest jeszcze
+  zaimplementowane. Projekt: `IOHttpClientAdapter` z `badCertificateCallback`,
+  który przyjmuje wyłącznie odcisk SHA-256 potwierdzony przez użytkownika na
+  ekranie połączenia (hosty `.local` i adresy prywatne), zapis odcisku w
+  profilu i twardy błąd „certyfikat się zmienił”. Do tego czasu urządzenia
+  dostępne tylko przez HTTPS z własnym certyfikatem nie połączą się.
+
 # Flavory, konfiguracja i flagi funkcji
+
+Build APK dla testera (flavor beta): [`docs/tester-build.md`](tester-build.md).
 
 Trzy flavory (plan §19.2), każdy z własnym punktem wejścia i plikiem
 konfiguracji w `app/config/` (bez sekretów). Na Androidzie mają osobne
@@ -433,6 +462,13 @@ fvm flutter build appbundle --flavor prod -t lib/main.dart --dart-define-from-fi
 - `FF_MOCK_CORE` (tylko dev) podmienia GI Core na atrapę w procesie
   (`MockCoreAdapter`): dowolny adres z sieci domowej i dowolne dane logowania
   prowadzą do przykładowego domu. Atrapa nigdy nie trafia do beta ani prod.
+- `FF_MDNS_FALLBACK` (domyślnie `false` w każdym flavorze) włącza na Androidzie
+  zapasowe wyszukiwanie nazw `.local` przez multicast DNS, gdy system ich nie
+  rozwiązuje (`MulticastDnsHostResolver`; wymaga uprawnienia
+  `CHANGE_WIFI_MULTICAST_STATE`, wpisanego w manifest). W dev i beta można ją
+  przełączyć na ekranie „Funkcje eksperymentalne”. Czy ma być domyślnie
+  włączona, rozstrzygnie spike S3 na fizycznych telefonach
+  ([ADR 0015](decisions/0015-network-change-no-write-replay.md)).
 - Ikony dev i beta mają wstążkę. Po zmianie `assets/icon/icon*.png`:
   `cd app; fvm dart run tool/make_flavor_icons.dart; fvm dart run flutter_launcher_icons`
   (pliki `flutter_launcher_icons-{dev,beta}.yaml`, zasoby w
@@ -530,6 +566,15 @@ GI_CORE_URL=http://127.0.0.1:<port> FAKE_ESPHOME_URL=http://127.0.0.1:<port2> da
 - `GI_CORE_URL` (domyślnie `http://localhost:3000`) wskazuje Core.
   `FAKE_ESPHOME_URL` deklaruje stos kontraktowy: wtedy brak urządzenia fake to
   błąd, a testy sprawdzają też fizyczny stan przekaźnika (`GET /fake/state`).
+- Urządzenie legacy (`fake-esphome`) potwierdza przełączenie synchronicznie;
+  testy `control_*`, `devices_*`, `schedules_*` i `core_quirks_*` zostają przy
+  nim. Ścieżkę GI Edge (zapis optymistyczny, potwierdzenie dopiero w kolejnym
+  heartbeat, `ACCEPTED` kończące jako `TIMED_OUT`, `FAILED`, offline,
+  zamrożony heartbeat, nieprawidłowy czujnik, awaria, zegar, restart) pokrywa
+  `edge_contract_test.dart` na symulatorze
+  ([gi-edge-simulator.md](gi-edge-simulator.md)). Wymaga `-Seed -EdgeSim` i
+  `GI_EDGE_SIM_CONTROL_URL` (bez niej grupa jest pomijana). Testy z tagiem
+  `slow` czekają na własne timery Core (do kilku minut): `-x slow` je pomija.
 - Wszystkie testy dekodują ściśle (`DecodeMode.strict`, plan §6.4): nieznane
   pole w odpowiedzi kończy wywołanie błędem `UnexpectedShape` z
   identyfikatorem endpointu i ścieżką pola (np. `$.items[0].nowePole`).
@@ -650,6 +695,94 @@ zakaz znacznika TODO dla backendu, plan G5) i ten sam Flutter z `.fvmrc` (`.gith
 
 Procedura wydania (tagi, zapis refu backendu, phased release / staged rollout jako
 wyłącznik): [`docs/release-runbook.md`](release-runbook.md).
+
+## Obciążenie GI Core (`tools/load`)
+
+Budżet żądań i kadencje opisuje [load-budget.md](load-budget.md). Narzędzie
+`tools/load/simulate_clients.dart` odtwarza kadencje aplikacji dla N telefonów z
+otwartym Home (tylko GET; jedyny inny ruch to jedno logowanie) i zapisuje
+raport. Kadencje czyta z `app/lib/src/core/polling/polling_budget.dart`, więc
+nie ma ich w narzędziu drugi raz.
+
+Przeciw stosowi kontraktowemu (z `-Seed`, żeby były urządzenia):
+
+```powershell
+.\tools\dev-up.ps1 -Contract -RunId load1 -Seed
+# GI_CORE_URL=http://127.0.0.1:<port>
+dart run tools/load/simulate_clients.dart --base-url http://127.0.0.1:<port> `
+  --run-id load1 --clients 3 --cards 3 --duration 600
+.\tools\dev-up.ps1 -Contract -RunId load1 -Down
+```
+
+| Opcja | Znaczenie |
+|---|---|
+| `--clients` | liczba telefonów (domyślnie 3) |
+| `--cards` | karty ogrzewania na Home każdego telefonu (domyślnie 2) |
+| `--duration` | czas w sekundach (domyślnie 600) |
+| `--base-url` | adres GI Core (albo zmienna `GI_CORE_URL`) |
+| `--run-id` | RunId stosu kontraktowego; próbkuje kontener `gi-core` projektu `gi-mobile-contract-<RunId>` (`--container-filter` podaje projekt wprost) |
+| `--out-dir` | katalog raportu (domyślnie `build/load-report/<znacznik czasu>`, poza gitem) |
+| `--email`, `--password`, `--token` | konto do logowania (domyślnie ADMIN z `tools/seed_accounts*.json`) albo gotowy token |
+| `--dry-run` | zamiast Core uruchamia atrapę w procesie i przyspiesza czas (`--time-scale`, domyślnie 30); sprawdza samo narzędzie |
+
+Wynik to `report.json` i `report.md`: żądania na minutę na telefon (ustalone,
+bez pierwszej rundy startowej), szczyt minuty, kody odpowiedzi, odsetek 304,
+percentyle opóźnień p50, p90 i p99 oraz, gdy docker jest dostępny, średnie i
+szczytowe CPU kontenera `gi-core` (próbka co 5 s z `docker stats`). Bez
+dockera albo bez `--run-id` narzędzie ostrzega w raporcie i pomija próbkowanie.
+Kod wyjścia to 0, gdy każdy telefon mieści się w 12 żądaniach na minutę, a 1,
+gdy nie.
+
+Jak czytać wynik: żądania na minutę są wiarygodne (to te same kadencje co w
+aplikacji), CPU z komputera deweloperskiego mówi tylko, jak obciążenie rośnie z
+liczbą telefonów, nie ile zużyje Raspberry Pi. Pomiar na Pi (trzy telefony i
+panel www przez 30 minut, CPU poniżej 50%) wymaga sprzętu i jest jeszcze do
+zrobienia; wynik zapisuje się według
+[templates/load-test-pi-report.md](templates/load-test-pi-report.md).
+
+Test samego narzędzia (liczenie percentyli, werdykt, przebieg na atrapie)
+działa w `tools/`: `dart test test/load_simulator_test.dart`.
+
+### Zimny start (p90 z 20 uruchomień, limit 5 s)
+
+Szkielet pomiaru to `app/integration_test/perf/cold_start_benchmark_test.dart`:
+mierzy część aplikacji (od `runGiHome` do pierwszej listy urządzeń na Home,
+po jednym logowaniu) i wypisuje `COLD_START_MS=<n>` dla każdego uruchomienia.
+Do czasu od ikony do Home, razem ze startem procesu, zmierz prawdziwe
+uruchomienia wydaniowej wersji na telefonie w sieci Pi:
+`adb shell am force-stop <pakiet>` i `adb shell am start -W <pakiet>/.MainActivity`
+(pole `TotalTime`) powtórzone 20 razy. Liczby (po jednej w wierszu, albo
+wiersze logu `COLD_START_MS=`) liczy:
+
+```sh
+dart run tools/load/cold_start_p90.dart runs.txt
+```
+
+Wynik (min, mediana, średnia, p90, maks. i werdykt) wklejasz do
+[templates/cold-start-p90.md](templates/cold-start-p90.md). Pomiar wymaga
+telefonu i prawdziwego Pi; bez tego zostaje szkielet.
+
+## Kontrola wyrównania 16 KB (`tools/ci/check-16kb-alignment.sh`)
+
+Play wymaga od aplikacji kierowanych na Androida 15 i nowszy bibliotek
+natywnych wyrównanych do 16 KB. Skrypt sprawdza segmenty LOAD bibliotek
+`arm64-v8a` i `x86_64` w AAB albo APK. CI uruchamia go na AAB w
+`.github/workflows/build.yml`. Lokalnie, w Git Bash na Windows:
+
+```bash
+cd app
+flutter build apk --release --flavor prod -t lib/main.dart --dart-define-from-file=config/prod.json
+cd ..
+bash tools/ci/check-16kb-alignment.sh app/build/app/outputs/flutter-apk/app-prod-release.apk
+```
+
+Potrzebne są `unzip` (jest w Git Bash) i `readelf` albo `llvm-readelf`. Git
+Bash nie ma `readelf`; wystarczy ten z binutils (na przykład z pakietu WinLibs
+`mingw64/bin`) albo `llvm-readelf` z NDK, dodany do `PATH`. Wynik zerowy
+oznacza, że wszystkie biblioteki mają wyrównanie co najmniej 16384; kod 1 to
+biblioteka niewyrównana, kod 2 to brak narzędzi albo pliku. Wynik z 2026-11-22
+na APK prod (Windows): osiem bibliotek, najmniejsze wyrównanie 16384
+(`libdartjni.so`, `libdatastore_shared_counter.so`), pozostałe 65536.
 
 ## Bramka pokrycia (plan §17.2)
 

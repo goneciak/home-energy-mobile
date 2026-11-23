@@ -42,3 +42,5 @@ Każde stwierdzenie o działaniu aplikacji w `privacy.md` wynika z kodu
 | Diagnostyka lokalna, zredagowana, wysyłana tylko przez użytkownika | `app/lib/src/features/diagnostics/` (`redaction.dart`, `diagnostic_report.dart`, `diagnostic_report_sharer.dart`) |
 | Etykieta telefonu w `User-Agent` | `packages/gi_core_api/lib/src/http/client_info.dart`, `app/lib/src/core/platform/device_identity.dart` |
 | Uprawnienia | `app/android/app/src/main/AndroidManifest.xml`, `app/ios/Runner/Info.plist` |
+| Zmiana sieci i zapasowy multicast DNS (flagi domyślnie wyłączone) | ADR [0015](../docs/decisions/0015-network-change-no-write-replay.md), `app/lib/src/core/config/feature_flags.dart`, `app/android/app/src/main/AndroidManifest.xml` |
+| Odpowiedzi do formularzy sklepów | [docs/store/](../docs/store/data-safety.md); test `app/test/tooling/store_manifests_test.dart` pilnuje manifestów |

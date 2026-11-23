@@ -114,4 +114,28 @@ void main() {
       );
     });
   });
+
+  test('a sensor silent for over five minutes is stale, not current', () {
+    final seen = DateTime.utc(2026, 11, 18, 7, 40, 30);
+    final e = entity({
+      'lastSeenAt': seen.toIso8601String(),
+      'domain': 'sensor',
+      'value': 41.5,
+    });
+
+    expect(
+      HeatingReadings.temperatureOf(
+        e,
+        now: seen.add(const Duration(minutes: 4)),
+      ).status,
+      ReadingStatus.ok,
+    );
+    expect(
+      HeatingReadings.temperatureOf(
+        e,
+        now: seen.add(const Duration(minutes: 6)),
+      ).status,
+      ReadingStatus.stale,
+    );
+  });
 }

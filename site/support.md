@@ -39,6 +39,12 @@ Sterowanie mają role Właściciel i Administrator. Pozostałe role widzą stan
 domu bez możliwości zmian. Rolę nadaje właściciel lub administrator w
 panelu web GI Home.
 
+**Po zmianie Wi-Fi albo adresu urządzenia aplikacja pokazuje błąd**
+
+Aplikacja sama odświeża dane po zmianie sieci i szuka urządzenia pod nowym
+adresem. Jeśli to nie pomaga, wejdź na ekran łączenia i wybierz urządzenie
+ponownie albo wpisz jego adres IP.
+
 ## Raport diagnostyczny
 
 Jeśli problem się powtarza, w aplikacji wybierz **Ustawienia → Wyślij raport

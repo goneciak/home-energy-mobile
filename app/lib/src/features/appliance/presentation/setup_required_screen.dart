@@ -4,6 +4,7 @@ import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/centered_form.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/appliance/application/setup_check_controller.dart';
@@ -36,9 +37,9 @@ class SetupRequiredScreen extends ConsumerWidget {
         mode: LaunchMode.externalApplication,
       );
       if (!opened && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.setupRequiredOpenFailed)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          localizedSnackBar((l10n) => l10n.setupRequiredOpenFailed),
+        );
       }
     }
 

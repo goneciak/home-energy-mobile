@@ -7,7 +7,8 @@
 /// The fake device is LEGACY_ESPHOME: GI Core switches it synchronously and
 /// confirms from the device's echo. The GI Edge paths (optimistic write,
 /// dry-run returning the old state, heartbeat confirmation), DEVICE_OFFLINE,
-/// the ESPHOME 502/503/504 codes, PV boost and FAULT are not reachable here;
+/// the ESPHOME 502/503/504 codes, PV boost and FAULT are not reachable here
+/// (the edge ones live in `edge_contract_test.dart`);
 /// they are covered by hand-written fixtures (`m2_writes_test.dart`) and the
 /// mock Core (`tools/lib/src/mock_core`).
 ///

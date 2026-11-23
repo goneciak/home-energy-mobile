@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostic_report_sharer.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -29,8 +30,9 @@ class DiagnosticReportTile extends ConsumerWidget {
             .share(subject: l10n.diagnosticReportSubject, origin: origin);
       } on Object {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.diagnosticReportFailed)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          localizedSnackBar((l10n) => l10n.diagnosticReportFailed),
+        );
       }
     }
 

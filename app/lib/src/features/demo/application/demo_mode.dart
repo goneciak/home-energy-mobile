@@ -1,9 +1,11 @@
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
+import 'package:gi_home/src/features/account/domain/app_locale.dart';
 import 'package:gi_home/src/features/appliance/domain/appliance_profile.dart';
 import 'package:gi_home/src/features/demo/data/demo_core.dart';
 import 'package:gi_home/src/features/demo/data/demo_http_client_adapter.dart';
+import 'package:gi_home/src/features/settings/application/settings_providers.dart';
 import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -68,6 +70,12 @@ class DemoMode extends _$DemoMode {
       adapter: DemoHttpClientAdapter(
         core,
         latency: const Duration(milliseconds: 250),
+        // What the app shows in demo mode: the language picked in Settings,
+        // else the demo user's profile language.
+        languageCode: () =>
+            ref.read(languagePreferenceProvider)?.languageCode ??
+            supportedAppLocale(core.profileLocale)?.languageCode ??
+            'pl',
       ),
       profile: ApplianceProfile(
         profileId: demoProfileId,

@@ -15,6 +15,9 @@ import 'package:test/test.dart';
 ///   `tools/dev-up.ps1 -Contract` prints it for a contract stack.
 /// * `GI_CORE_URL_B`: a second Core with another `initializedAt`; enables the
 ///   §9.3 acceptance test.
+/// * `GI_EDGE_SIM_CONTROL_URL`: the control surface of the GI Edge simulator
+///   as published on the host; when set, the edge device MUST be provisioned
+///   (`tools/dev-up.ps1 -Contract -Seed -EdgeSim`).
 /// * `FAKE_ESPHOME_URL`: the contract stack's fake device as published on the
 ///   host; when set, the fake device MUST be provisioned in GI Core and its
 ///   physical state is checked too.
@@ -31,6 +34,9 @@ abstract final class ContractEnv {
   static String? get coreUrlB => _nonEmpty(_env['GI_CORE_URL_B']);
 
   static String? get fakeEsphomeUrl => _nonEmpty(_env['FAKE_ESPHOME_URL']);
+
+  static String? get edgeSimControlUrl =>
+      _nonEmpty(_env['GI_EDGE_SIM_CONTROL_URL']);
 
   static const clientInfo = ClientInfo(
     appVersion: '0.1.0',
@@ -186,4 +192,37 @@ Object? headerOf(RequestOptions options, String name) {
     if (key.toLowerCase() == lower) return value;
   }
   return null;
+}
+
+/// What the GI Edge simulator's manifest reports (tools/gi_edge_sim).
+abstract final class EdgeSimDevice {
+  static const manufacturer = 'GI Industries';
+  static const model = 'GI Boiler Room Controller';
+
+  static bool matches(DeviceListItem device) =>
+      device.manufacturer == manufacturer && device.model == model;
+}
+
+/// The simulator's loopback control surface (`GI_EDGE_SIM_CONTROL_URL`,
+/// docs/gi-edge-simulator.md). `POST /fake/reset` is not used between tests:
+/// it unprovisions the device. [normal] clears every injected failure instead.
+final class EdgeSimControl {
+  new(String url) : _dio = Dio(BaseOptions(baseUrl: url));
+
+  final Dio _dio;
+
+  Future<Map<String, dynamic>> state() async =>
+      (await _dio.get<Map<String, dynamic>>('/fake/state')).data!;
+
+  /// The controller's own view (`device` in `/fake/state`).
+  Future<Map<String, dynamic>> device() async =>
+      (await state())['device'] as Map<String, dynamic>;
+
+  Future<void> scenario(Map<String, Object?> body) async {
+    await _dio.post<Object?>('/fake/scenario', data: body);
+  }
+
+  Future<void> normal() => scenario({'mode': 'normal'});
+
+  void close() => _dio.close();
 }

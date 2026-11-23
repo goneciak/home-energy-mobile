@@ -124,21 +124,23 @@ jobs:
 
       # Builds GI Core (targets migrator and production) and the fake
       # ESPHome device, waits for health and prints GI_CORE_URL and
-      # FAKE_ESPHOME_URL (ephemeral 127.0.0.1 ports).
+      # FAKE_ESPHOME_URL, GI_EDGE_SIM_URL and GI_EDGE_SIM_CONTROL_URL (ephemeral
+      # 127.0.0.1 ports; the GI Edge simulator, docs/gi-edge-simulator.md).
       - name: Start the contract stack
         run: |
           bash tools/dev-up.sh --contract --run-id "$RUN_ID" \
             --backend-dir "$GITHUB_WORKSPACE/.ci-backend" --timeout 900 \
             | tee "$ARTIFACTS/dev-up.log"
-          grep -E '^(GI_CONTRACT_PROJECT|GI_CORE_URL|FAKE_ESPHOME_URL)=' "$ARTIFACTS/dev-up.log" >> "$GITHUB_ENV"
+          grep -E '^(GI_CONTRACT_PROJECT|GI_CORE_URL|FAKE_ESPHOME_URL|GI_EDGE_SIM_URL|GI_EDGE_SIM_CONTROL_URL)=' "$ARTIFACTS/dev-up.log" >> "$GITHUB_ENV"
 
       # Plan §17.3 seeder: initialize, owner login, ADMIN/USER, rooms, the fake
-      # device, control strategy. --fixtures records responses that have no
+      # device, control strategy and, with --edge-sim, the provisioned and activated GI Edge
+      # simulator. --fixtures records responses that have no
       # committed fixture yet (uploaded below). The owner's credentials are
       # generated into tools/backend/dev.env (gitignored, test-only).
       - name: Seed
         run: |
-          dart run tools/seed_core.dart --base-url "$GI_CORE_URL" --init --yes --fixtures \
+          dart run tools/seed_core.dart --base-url "$GI_CORE_URL" --init --yes --fixtures --edge-sim gi-edge-sim \
             | tee "$ARTIFACTS/seed.log"
           password="$(sed -n 's/^GI_DEV_PASSWORD=//p' tools/backend/dev.env)"
           [[ -z "$password" ]] || echo "::add-mask::$password"

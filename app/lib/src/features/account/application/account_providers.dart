@@ -56,8 +56,12 @@ Future<UserProfile?> userProfile(Ref ref) async {
 ///
 /// * A language picked in Settings ([languagePreferenceProvider]) wins
 ///   over everything below, signed in or not.
-/// * Signed out (before login, after logout or "Zmień użytkownika"): the
-///   phone language.
+/// * Signed out with a remembered last user on this appliance (after a
+///   logout, or on the login screen of a restart): the language last
+///   applied for that user, so the login screen matches the user's
+///   language.
+/// * Signed out without one (first connect, after "Zmień użytkownika"):
+///   the phone language.
 /// * Signed in: the language of the user's GI Core profile, or the phone
 ///   language when the profile has none the app supports.
 /// * Until the profile has answered (cold start, a failed profile call):
@@ -75,9 +79,8 @@ Locale? appLocale(Ref ref) {
   if (profileId == null) return null;
   final userId = switch (ref.watch(authSessionProvider)) {
     AsyncData(value: AuthAuthenticated(:final user)) => user.id,
-    AsyncData(value: AuthUnauthenticated() || AuthSessionLost()) => null,
-    // Restoring, or restoring failed: the session may still be the last
-    // user's.
+    // Signed out, restoring, or restoring failed: the last user of this
+    // appliance, if the app remembers one.
     _ => lastUserId,
   };
   if (userId == null) return null;

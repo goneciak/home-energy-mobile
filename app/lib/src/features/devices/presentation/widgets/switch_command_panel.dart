@@ -299,7 +299,7 @@ class SwitchCommandPanel extends StatelessWidget {
     String onOff(bool? value) => switch (value) {
       true => l10n.entityValueOn,
       false => l10n.entityValueOff,
-      null => l10n.switchCommandNotReported,
+      null => l10n.switchValueAwaitingReport,
     };
     final refresh = OutlinedButton(
       key: const ValueKey('switch-refresh'),

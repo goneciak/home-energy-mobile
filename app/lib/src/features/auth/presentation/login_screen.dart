@@ -12,6 +12,7 @@ import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/auth/application/login_controller.dart';
+import 'package:gi_home/src/features/settings/presentation/language_selector.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -95,6 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       body: CenteredForm(
         children: [
+          const LanguageSelector(),
           Icon(Icons.local_fire_department, size: 48, color: tokens.ember),
           SizedBox(height: tokens.gap),
           Text(

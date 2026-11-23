@@ -8,8 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 /// One key holds `{profileId, userId, languageCode}`: the preferences cache
 /// needs a fixed allow-list, and v1 has a single profile. A value stored
-/// for another profile or user reads as `null`. It belongs to the session:
-/// logout and "Zmień użytkownika" remove it.
+/// for another profile or user reads as `null`. It belongs to the user
+/// remembered on the appliance: a logout keeps it, so the login screen
+/// stays in the user's language (plan §13.2); "Zmień użytkownika" and
+/// forgetting the appliance remove it with the user.
 ///
 /// Nothing here throws: a preference that cannot be read or written only
 /// means the phone language is shown until the profile answers.

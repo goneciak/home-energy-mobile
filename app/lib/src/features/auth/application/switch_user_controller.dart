@@ -27,6 +27,9 @@ class SwitchUserController extends _$SwitchUserController {
     state = const AsyncLoading();
     // Before the logout: the login screen it routes to reads the email.
     await ref.read(applianceProfileProvider.notifier).forgetUser();
+    // Nobody is remembered, so neither is their language: the login screen
+    // is in the phone language.
+    await ref.read(sessionLocaleStoreProvider).clear();
     final result = await ref.read(authSessionProvider.notifier).logout();
     ref
       ..invalidate(userProfileProvider)

@@ -3,9 +3,9 @@ import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// How old one value is: "2 min temu", or "Brak danych" when it never
-/// arrived (plan §13.3, §14). Unlike the screen-wide `FreshnessBanner` it
-/// sits next to a single reading.
+/// How old one value is: "2 min temu", or "Czekamy na pierwszy odczyt" when
+/// it never arrived (plan §13.3, §14). Unlike the screen-wide
+/// `FreshnessBanner` it sits next to a single reading.
 ///
 /// An [isStale] value gets a warning icon, and screen readers hear
 /// "Zaktualizowano 2 min temu, dane mogą być nieaktualne", so neither the
@@ -30,10 +30,10 @@ class FreshnessLabel extends StatelessWidget {
     final updatedAt = this.updatedAt;
     final stale = isStale || updatedAt == null;
     final text = updatedAt == null
-        ? l10n.commonNoData
+        ? l10n.freshnessWaitingForReading
         : formatRelativeTime(l10n, updatedAt, now);
     final label = switch (updatedAt) {
-      null => l10n.commonNoData,
+      null => l10n.freshnessWaitingForReading,
       _ when isStale => l10n.freshnessUpdatedStale(text),
       _ => l10n.freshnessUpdated(text),
     };

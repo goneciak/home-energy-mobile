@@ -270,6 +270,7 @@ class _HeatingCardSlot extends ConsumerWidget {
       roomName: roomName,
       now: now,
       onTap: onTap,
+      freshness: ref.watch(heatingCardPolicyProvider),
       permission: HeatingPermission.of(
         ref.watch(currentUserProvider.select((user) => user?.role)),
       ),

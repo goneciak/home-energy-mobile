@@ -6,6 +6,7 @@ import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/status_chip.dart';
 import 'package:gi_home/src/features/devices/domain/controller_status.dart';
+import 'package:gi_home/src/features/devices/domain/entity_presentation.dart';
 import 'package:gi_home/src/features/devices/domain/freshness_policy.dart';
 import 'package:gi_home/src/features/devices/domain/heating_permission.dart';
 import 'package:gi_home/src/features/devices/presentation/device_labels.dart';
@@ -31,6 +32,7 @@ class HeatingCard extends StatelessWidget {
     required this.now,
     required this.onTap,
     this.permission = viewOnly,
+    this.freshness = FreshnessPolicy.heatingCard,
     this.onResume,
     this.commandStatus,
     super.key,
@@ -60,6 +62,9 @@ class HeatingCard extends StatelessWidget {
   /// What the signed-in user may do with heating (plan §12.8).
   final HeatingPermission permission;
 
+  /// Cadence the card is polled at; its data is outdated after twice that.
+  final FreshnessPolicy freshness;
+
   /// Resumes suspended heating; see [HeatingStrategySection.onResume].
   final VoidCallback? onResume;
 
@@ -81,6 +86,8 @@ class HeatingCard extends StatelessWidget {
     final faults = status.activeFaultCount?.value ?? 0;
     final needsConfiguration =
         fetched?.value.status == ProductStatus.needsConfiguration;
+    final benignConfiguration =
+        fetched != null && !needsRealConfiguration(fetched.value);
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -163,12 +170,16 @@ class HeatingCard extends StatelessWidget {
                     ),
                   if (needsConfiguration)
                     _stateChip(
-                      productStatusLook(l10n, ProductStatus.needsConfiguration),
+                      productStatusLook(
+                        l10n,
+                        ProductStatus.needsConfiguration,
+                        benign: benignConfiguration,
+                      ),
                     ),
                 ],
               ),
               const SizedBox(height: 8),
-              _Readings(detail: detail, now: now),
+              _Readings(detail: detail, now: now, policy: freshness),
               if (fetched != null) ...[
                 const SizedBox(height: 8),
                 HeatingStrategySection(
@@ -195,10 +206,11 @@ class HeatingCard extends StatelessWidget {
 }
 
 class _Readings extends StatelessWidget {
-  const new({required this.detail, required this.now});
+  const new({required this.detail, required this.now, required this.policy});
 
   final PolledData<DeviceDetail> detail;
   final DateTime now;
+  final FreshnessPolicy policy;
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +252,7 @@ class _Readings extends StatelessWidget {
       );
     }
 
-    final readings = HeatingReadings.of(fetched.value);
+    final readings = HeatingReadings.of(fetched.value, now: now);
     final pump = readings.pumpRelay;
     final temperature = readings.controlTemperature;
     return Column(
@@ -292,7 +304,7 @@ class _Readings extends StatelessWidget {
     }
     final time = formatClockTime(l10n, fetched.fetchedAt, now);
     if (detail.error != null) return l10n.heatingCardFailedSince(time);
-    return FreshnessPolicy.heatingCard.isStale(fetched.fetchedAt, now)
+    return policy.isStale(fetched.fetchedAt, now)
         ? l10n.heatingCardDataFrom(time)
         : null;
   }
@@ -326,6 +338,7 @@ class _Readings extends StatelessWidget {
     ),
     ReadingStatus.noData => l10n.commonNoDataValue,
     ReadingStatus.unavailable => l10n.entityUnavailable,
+    ReadingStatus.stale => l10n.entityStaleValue,
   };
 
   static String _withUnit(String text, String? unit) =>
