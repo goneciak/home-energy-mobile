@@ -75,7 +75,7 @@ void main() {
     expect(key('heating-dry-run-banner'), findsNothing);
     expect(key('heating-fault-latched'), findsNothing);
     expect(key('heating-strategy-source'), findsOneWidget);
-    expect(find.textContaining('Według GI Core · dane z'), findsOneWidget);
+    expect(find.textContaining('Według GI Home · dane z'), findsOneWidget);
   });
 
   testWidgets('every mode has its description', (tester) async {
@@ -162,7 +162,7 @@ void main() {
         'pvHeatingConfig': {'mode': 'HYBRID', 'safeMaxTemperatureCelsius': 75},
       },
     );
-    expect(find.text('PV boost: grzanie do 75,0 °C'), findsOneWidget);
+    expect(find.text('Dogrzewanie z PV: grzanie do 75,0 °C'), findsOneWidget);
     expect(
       find.text('Cel wyliczony z limitu bezpieczeństwa PV'),
       findsOneWidget,
@@ -171,7 +171,10 @@ void main() {
 
   testWidgets('PV boost without configuration: unknown target', (tester) async {
     await pump(tester, overrides: {'pvBoostActive': true});
-    expect(find.text('PV boost aktywny – cel nieznany'), findsOneWidget);
+    expect(
+      find.text('Dogrzewanie z PV aktywne – cel nieznany'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('dry-run banner and latched fault', (tester) async {

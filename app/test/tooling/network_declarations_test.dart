@@ -68,11 +68,11 @@ void main() {
   });
 
   group('feature flags', () {
-    test('the multicast DNS fallback is off in every flavor', () {
+    test('the multicast DNS fallback is on in beta only', () {
       for (final flavor in ['dev', 'beta', 'prod']) {
         expect(
           read('config/$flavor.json'),
-          contains('"FF_MDNS_FALLBACK": false'),
+          contains('"FF_MDNS_FALLBACK": ${flavor == 'beta'}'),
           reason: flavor,
         );
       }

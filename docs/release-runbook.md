@@ -278,3 +278,24 @@ wersje bety odróżniamy numerem builda.
 - Audyt stanów: [state-audit.md](state-audit.md); budżet obciążenia:
   [load-budget.md](load-budget.md); kompatybilność:
   [compatibility.md](compatibility.md).
+
+## 10. Kontrola końcowa przed wysyłką testerowi (2026-11-22)
+
+Przebieg na gałęzi `feat/real-data` (Windows, FVM 3.50.0), stos kontraktowy z
+symulatorem GI Edge (`tools/dev-up.ps1 -Contract -Seed -EdgeSim`).
+
+| Krok | Wynik |
+| --- | --- |
+| `flutter analyze` (app), `dart analyze --fatal-infos` (gi_core_api, tools, gi_edge_sim, fake_esphome) | czysto |
+| `dart format --set-exit-if-changed app packages tools` | bez zmian |
+| `flutter test` (app) | 1304 testów zielone |
+| `dart test -x contract` (gi_core_api) | 460 zielone |
+| `dart test` (tools, gi_edge_sim, fake_esphome) | 115, 37 i test fake_esphome zielone |
+| bramki pokrycia (`tools/check_coverage.dart`) | wszystkie przechodzą |
+| testy kontraktowe na żywym stosie (z testami `slow`) | 82 zielone, 1 pominięty |
+| `tools/build_tester_apk.ps1 -SplitAbi` + weryfikacja | 18 sprawdzeń OK |
+
+Nie sprawdzono na urządzeniu: APK nie był instalowany na telefonie ani w
+emulatorze (emulator jest zarezerwowany na testy E2E właściciela).
+Zanim APK trafi do testera, przejdź przez [przewodnik testera](tester-guide.md)
+na własnym telefonie.

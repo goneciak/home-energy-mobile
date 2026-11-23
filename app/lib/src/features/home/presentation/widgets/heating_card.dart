@@ -6,6 +6,7 @@ import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/status_chip.dart';
 import 'package:gi_home/src/features/devices/domain/controller_status.dart';
+import 'package:gi_home/src/features/devices/domain/entity_presentation.dart';
 import 'package:gi_home/src/features/devices/domain/freshness_policy.dart';
 import 'package:gi_home/src/features/devices/domain/heating_permission.dart';
 import 'package:gi_home/src/features/devices/presentation/device_labels.dart';
@@ -85,6 +86,8 @@ class HeatingCard extends StatelessWidget {
     final faults = status.activeFaultCount?.value ?? 0;
     final needsConfiguration =
         fetched?.value.status == ProductStatus.needsConfiguration;
+    final benignConfiguration =
+        fetched != null && !needsRealConfiguration(fetched.value);
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -167,7 +170,11 @@ class HeatingCard extends StatelessWidget {
                     ),
                   if (needsConfiguration)
                     _stateChip(
-                      productStatusLook(l10n, ProductStatus.needsConfiguration),
+                      productStatusLook(
+                        l10n,
+                        ProductStatus.needsConfiguration,
+                        benign: benignConfiguration,
+                      ),
                     ),
                 ],
               ),
@@ -245,7 +252,7 @@ class _Readings extends StatelessWidget {
       );
     }
 
-    final readings = HeatingReadings.of(fetched.value);
+    final readings = HeatingReadings.of(fetched.value, now: now);
     final pump = readings.pumpRelay;
     final temperature = readings.controlTemperature;
     return Column(
@@ -331,6 +338,7 @@ class _Readings extends StatelessWidget {
     ),
     ReadingStatus.noData => l10n.commonNoDataValue,
     ReadingStatus.unavailable => l10n.entityUnavailable,
+    ReadingStatus.stale => l10n.entityStaleValue,
   };
 
   static String _withUnit(String text, String? unit) =>

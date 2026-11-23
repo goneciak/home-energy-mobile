@@ -5,6 +5,7 @@ import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/platform/secure_display.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/core/widgets/secure_content.dart';
 import 'package:gi_home/src/features/account/application/account_controllers.dart';
@@ -53,9 +54,10 @@ class _RecoveryCodeScreenState extends ConsumerState<RecoveryCodeScreen> {
 
   Future<void> _copy(String code) async {
     final messenger = ScaffoldMessenger.of(context);
-    final message = context.l10n.recoveryCodeCopied;
     await SecureDisplay.copySensitive(code);
-    messenger.showSnackBar(SnackBar(content: Text(message)));
+    messenger.showSnackBar(
+      localizedSnackBar((l10n) => l10n.recoveryCodeCopied),
+    );
   }
 
   void _done() {

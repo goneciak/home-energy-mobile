@@ -78,7 +78,10 @@ jednorazowy projekt compose (plan §17.3, spike S8): GI Core zbudowany z
 folderu backendu (target `migrator` i `production`, tylko do odczytu, bez bind
 mountów), własny Postgres na tmpfs, mosquitto nasłuchujący tylko na
 `127.0.0.1` we wspólnej przestrzeni sieciowej z gi-core oraz udawany sterownik
-[`tools/fake_esphome`](../tools/fake_esphome). Nie ma stałych nazw kontenerów ani
+[`tools/fake_esphome`](../tools/fake_esphome). Drugi kontener, symulator sterownika GI Edge
+([`tools/gi_edge_sim`](../tools/gi_edge_sim), opis w
+[`gi-edge-simulator.md`](gi-edge-simulator.md)), działa jak prawdziwe
+urządzenie: wysyła do Core podpisany heartbeat i telemetrię i odbiera polecenia. Nie ma stałych nazw kontenerów ani
 portów hosta: Core dostaje efemeryczny port na `127.0.0.1`, więc działa
 równolegle ze stosem dev (i z innymi stosami kontraktowymi). Bez reverse
 proxy, Home Assistant i GI UI.
@@ -142,6 +145,8 @@ Kroki (plan §17.3), każdy idempotentny:
 7. `PATCH /devices/:id/control-strategy`: 55 °C, histereza 4 °C, tryb `MANUAL`
    (pętla histerezy Core działa tylko w `AUTO`, więc przekaźnik rusza się tylko
    na polecenie).
+   Z `--edge-sim <host>` (w `dev-up`: `-Seed -EdgeSim`) seeder dodaje też
+   symulator GI Edge i czeka na jego aktywację (`GI_EDGE_V1`).
 
 - **Strażnik:** wszystko, co pisze do Core, który już jest zainicjalizowany
   (`--init`, `--fixtures`), wymaga `--allow-initialized`. Bez tej flagi seeder
@@ -375,7 +380,31 @@ certyfikatem self-signed kończy się komunikatem „Certyfikat serwera nie jest
 zaufany” (`TlsUntrusted`). Taki certyfikat zadziała dopiero z przypinaniem przy
 pierwszym połączeniu (TOFU), planowanym na v1.1.
 
+## Adres, port i przekierowania
+
+- Adres wpisany bez portu (np. `192.168.1.20`) aplikacja sprawdza na porcie 80,
+  a gdy tam nic nie odpowiada jak GI Core, na porcie 3000. Zapisany profil
+  zawiera port, który zadziałał. Adres z portem sprawdzany jest dokładnie.
+  Ta sama kolejność obowiązuje dla nazw `.local` w „Znajdź GI Home”.
+- Przekierowanie na `https://` (np. Traefik na porcie 80 gotowego urządzenia)
+  nie jest wykonywane; użytkownik dostaje komunikat o wymaganym połączeniu
+  szyfrowanym (`HttpsRequired`). Zwykle pomaga wtedy port 3000, który
+  urządzenie publikuje w sieci domowej.
+- Ciasteczko odświeżania z flagą `Secure` działa przez zwykłe `http://`
+  w sieci domowej: aplikacja przechowuje je i odsyła sama, nagłówkiem
+  `Cookie`, bez magazynu ciasteczek `dart:io` (test `plain_http_access_test`).
+- Flavor `beta` ma włączone `FF_MDNS_FALLBACK`; ekran połączenia od niego nie
+  zależy, adres IP zawsze działa. Pomoc „Gdzie znajdę adres?” jest w aplikacji.
+- Przypinanie certyfikatu przy pierwszym połączeniu (TOFU) nie jest jeszcze
+  zaimplementowane. Projekt: `IOHttpClientAdapter` z `badCertificateCallback`,
+  który przyjmuje wyłącznie odcisk SHA-256 potwierdzony przez użytkownika na
+  ekranie połączenia (hosty `.local` i adresy prywatne), zapis odcisku w
+  profilu i twardy błąd „certyfikat się zmienił”. Do tego czasu urządzenia
+  dostępne tylko przez HTTPS z własnym certyfikatem nie połączą się.
+
 # Flavory, konfiguracja i flagi funkcji
+
+Build APK dla testera (flavor beta): [`docs/tester-build.md`](tester-build.md).
 
 Trzy flavory (plan §19.2), każdy z własnym punktem wejścia i plikiem
 konfiguracji w `app/config/` (bez sekretów). Na Androidzie mają osobne
@@ -537,6 +566,15 @@ GI_CORE_URL=http://127.0.0.1:<port> FAKE_ESPHOME_URL=http://127.0.0.1:<port2> da
 - `GI_CORE_URL` (domyślnie `http://localhost:3000`) wskazuje Core.
   `FAKE_ESPHOME_URL` deklaruje stos kontraktowy: wtedy brak urządzenia fake to
   błąd, a testy sprawdzają też fizyczny stan przekaźnika (`GET /fake/state`).
+- Urządzenie legacy (`fake-esphome`) potwierdza przełączenie synchronicznie;
+  testy `control_*`, `devices_*`, `schedules_*` i `core_quirks_*` zostają przy
+  nim. Ścieżkę GI Edge (zapis optymistyczny, potwierdzenie dopiero w kolejnym
+  heartbeat, `ACCEPTED` kończące jako `TIMED_OUT`, `FAILED`, offline,
+  zamrożony heartbeat, nieprawidłowy czujnik, awaria, zegar, restart) pokrywa
+  `edge_contract_test.dart` na symulatorze
+  ([gi-edge-simulator.md](gi-edge-simulator.md)). Wymaga `-Seed -EdgeSim` i
+  `GI_EDGE_SIM_CONTROL_URL` (bez niej grupa jest pomijana). Testy z tagiem
+  `slow` czekają na własne timery Core (do kilku minut): `-x slow` je pomija.
 - Wszystkie testy dekodują ściśle (`DecodeMode.strict`, plan §6.4): nieznane
   pole w odpowiedzi kończy wywołanie błędem `UnexpectedShape` z
   identyfikatorem endpointu i ścieżką pola (np. `$.items[0].nowePole`).

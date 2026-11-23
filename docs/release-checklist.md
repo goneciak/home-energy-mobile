@@ -70,7 +70,7 @@ cudzysłowie z kluczem w nawiasie musi zgadzać się z plikiem (pilnuje tego tes
 2. Przejdź do przycisku wstrzymania. Oczekiwane: „Przytrzymaj, aby wstrzymać ogrzewanie” (`suspendHoldAction`).
 3. Dotknij raz. Oczekiwane: nic się nie zmienia, podpowiedź „Przytrzymaj przycisk – zwykłe dotknięcie niczego nie zmienia.” (`suspendHoldHint`).
 4. Przytrzymaj do potwierdzenia i potwierdź w oknie „Wstrzymać ogrzewanie?” (`suspendConfirmTitle`) przyciskiem „Wstrzymaj ogrzewanie” (`suspendConfirmAction`).
-5. Oczekiwane: ogłoszenie stanu oczekiwania, nie sukcesu: „Wysłano · czekamy, aż GI Core potwierdzi wstrzymanie” (`suspendAwaiting`).
+5. Oczekiwane: ogłoszenie stanu oczekiwania, nie sukcesu: „Wysłano · czekamy, aż GI Home potwierdzi wstrzymanie” (`suspendAwaiting`).
 6. Po potwierdzeniu: baner „Ogrzewanie jest wstrzymane.” (`heatingSuspendedBanner`).
    Komunikat nie może twierdzić, że przekaźnik fizycznie się przełączył.
 7. Wznów: „Wznów ogrzewanie” (`heatingResumeAction`), arkusz „Wznowić ogrzewanie?” (`resumeSheetTitle`).
@@ -85,7 +85,7 @@ cudzysłowie z kluczem w nawiasie musi zgadzać się z plikiem (pilnuje tego tes
 3. Wpisz tekst zamiast liczby. Oczekiwane: komunikat błędu odczytany przy polu: „Wpisz liczbę” (`strategyErrorNotANumber`).
 4. Przejdź do pola „Histereza (°C)” (`strategyHysteresisLabel`) i do wyboru „Tryb sterowania” (`strategyModeLabel`).
 5. Zapisz przyciskiem „Zapisz” (`strategySave`), potwierdź „Zapisz zmiany” (`strategyConfirmSave`).
-6. Oczekiwane: „Zapisano w GI Core” (`strategySavedTitle`).
+6. Oczekiwane: „Zapisano w GI Home” (`strategySavedTitle`).
 
 - [ ] TalkBack: przeszło
 - [ ] VoiceOver: przeszło

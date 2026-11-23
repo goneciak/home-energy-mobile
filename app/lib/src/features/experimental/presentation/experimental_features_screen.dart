@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gi_home/src/core/config/config_providers.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/core/widgets/section_header.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -30,8 +31,9 @@ class ExperimentalFeaturesScreen extends ConsumerWidget {
     Future<void> reset() async {
       await notifier.resetToDefaults();
       if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(l10n.experimentalResetDone)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(localizedSnackBar((l10n) => l10n.experimentalResetDone));
       }
     }
 

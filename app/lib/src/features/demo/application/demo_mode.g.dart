@@ -120,7 +120,7 @@ final class DemoModeProvider extends $NotifierProvider<DemoMode, DemoSession?> {
   }
 }
 
-String _$demoModeHash() => r'e916270159e5be03071ac6a2ef66b8f279187c1c';
+String _$demoModeHash() => r'a9147fa881a8df259dbe830e0ac231131c83eacf';
 
 /// Demo mode (plan §19.5): entered with the visible "Wypróbuj wersję
 /// demonstracyjną" button on the connect screen, left with "Zakończ demo"

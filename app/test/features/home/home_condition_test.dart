@@ -306,11 +306,70 @@ void main() {
       final condition = evaluate(
         [heating],
         heatingCards: {
-          heating.id: loadedCard(heating, {'status': 'needs_configuration'}),
+          heating.id: loadedCard(heating, {
+            'status': 'needs_configuration',
+            'communicationMode': 'LEGACY_ESPHOME',
+          }),
         },
       );
 
       expect(condition.level, ConditionLevel.needsAttention);
+      expect(kinds(condition), [AttentionKind.needsConfiguration]);
+    });
+    test('a GI Edge device in needs_configuration is not an alert', () {
+      // Core flags every GI Edge device with unassigned diagnostics entities.
+      final heating = device(heating: true);
+      final condition = evaluate(
+        [heating],
+        heatingCards: {
+          heating.id: loadedCard(heating, {
+            'status': 'needs_configuration',
+            'communicationMode': 'GI_EDGE_V1',
+            'entities': [
+              for (final e
+                  in (entityRichDetailJson()['entities']! as List)
+                      .cast<Map<String, Object?>>())
+                if (e['assignedFunction'] != null || e['assignedRole'] != null)
+                  e,
+              {
+                ...(entityRichDetailJson()['entities']! as List).first
+                    as Map<String, Object?>,
+                'id': 'ent-uptime',
+                'sourceName': 'device_uptime',
+                'displayName': 'Uptime',
+                'assignedFunction': null,
+                'assignedRole': null,
+              },
+            ],
+          }),
+        },
+      );
+
+      expect(condition.level, ConditionLevel.good);
+      expect(kinds(condition), isEmpty);
+    });
+
+    test('a GI Edge relay without a role is still something to configure', () {
+      final heating = device(heating: true);
+      final entities = (entityRichDetailJson()['entities']! as List)
+          .cast<Map<String, Object?>>()
+          .map(
+            (e) => e['id'] == 'ent-relay-boiler'
+                ? {...e, 'assignedFunction': null, 'assignedRole': null}
+                : e,
+          )
+          .toList();
+      final condition = evaluate(
+        [heating],
+        heatingCards: {
+          heating.id: loadedCard(heating, {
+            'status': 'needs_configuration',
+            'communicationMode': 'GI_EDGE_V1',
+            'entities': entities,
+          }),
+        },
+      );
+
       expect(kinds(condition), [AttentionKind.needsConfiguration]);
     });
   });

@@ -183,12 +183,11 @@ void main() {
       expect(redact('mapped ::ffff:192.168.1.20'), 'mapped <ip>');
     });
 
-    test('times, versions and stack frames are not addresses', () {
+    test('times, versions and stack frames are kept', () {
       const frame =
           '#0 Foo.bar (package:gi_home/src/x.dart:12:5)\n'
           'at 12:30:45 version 1.2.3 build 10.0.19045.1';
       expect(redact(frame), frame);
-      expect(redact('aa:bb:cc:dd:ee:ff'), 'aa:bb:cc:dd:ee:ff');
     });
   });
 
@@ -211,6 +210,20 @@ void main() {
       '<email>': true,
       '42': null,
       'ok': 1.5,
+    });
+  });
+
+  group('hardware addresses', () {
+    test('a MAC address, colon or dash separated, is removed', () {
+      expect(
+        redact('physicalMac: AA:BB:CC:11:22:33 seen'),
+        'physicalMac: <mac> seen',
+      );
+      expect(redact('mac aa-bb-cc-11-22-33.'), 'mac <mac>.');
+    });
+
+    test('a request id and a time stamp are not MACs', () {
+      expect(redact('at 10:11:22 and 12:30'), 'at 10:11:22 and 12:30');
     });
   });
 }

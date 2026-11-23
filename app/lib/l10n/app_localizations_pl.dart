@@ -56,7 +56,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get connectAddressLabel => 'Adres GI Home';
 
   @override
-  String get connectAddressHint => 'np. gi-home.local lub 192.168.1.20';
+  String get connectAddressHint => 'np. gi-home.local lub 192.168.1.20:3000';
 
   @override
   String get connectAddressRequired => 'Wpisz adres GI Home';
@@ -69,7 +69,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get connectSearchNoneFound =>
-      'Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej.';
+      'Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej, najlepiej adres IP.';
 
   @override
   String get connectSearchAgain => 'Szukaj ponownie';
@@ -251,7 +251,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get errorDeviceOffline =>
-      'Urządzenie jest offline. Polecenie nie zostało wysłane.';
+      'Urządzenie jest niedostępne. Polecenie nie zostało wysłane.';
 
   @override
   String get errorDeviceUnreachable =>
@@ -670,7 +670,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get productStatusOnline => 'Działa';
 
   @override
-  String get productStatusOffline => 'Offline';
+  String get productStatusOffline => 'Niedostępne';
 
   @override
   String get productStatusConnecting => 'Łączenie…';
@@ -710,6 +710,12 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get deviceEntitiesSection => 'Elementy';
+
+  @override
+  String get entityStaleValue => 'Brak świeżych danych';
+
+  @override
+  String get deviceTechnicalEntitiesSection => 'Dane techniczne urządzenia';
 
   @override
   String get deviceEntitiesEmpty => 'To urządzenie nie ma jeszcze elementów.';
@@ -1332,7 +1338,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String heatingPvBoost(String temperature) {
-    return 'PV boost: grzanie do $temperature °C';
+    return 'Dogrzewanie z PV: grzanie do $temperature °C';
   }
 
   @override
@@ -1340,11 +1346,12 @@ class AppLocalizationsPl extends AppLocalizations {
       'Cel wyliczony z limitu bezpieczeństwa PV';
 
   @override
-  String get heatingPvBoostUnknownTarget => 'PV boost aktywny – cel nieznany';
+  String get heatingPvBoostUnknownTarget =>
+      'Dogrzewanie z PV aktywne – cel nieznany';
 
   @override
   String heatingStrategySource(String time) {
-    return 'Według GI Core · dane z $time';
+    return 'Według GI Home · dane z $time';
   }
 
   @override
@@ -1398,7 +1405,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get strategySuspendedNote =>
-      'Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu tryb efektywny to Wył.';
+      'Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu obowiązuje tryb Wył.';
 
   @override
   String get strategySave => 'Zapisz';
@@ -1449,7 +1456,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get strategyConflictDiscard => 'Odrzuć moje zmiany';
 
   @override
-  String get strategySavedTitle => 'Zapisano w GI Core';
+  String get strategySavedTitle => 'Zapisano w GI Home';
 
   @override
   String strategySavedBase(String value) {
@@ -1463,7 +1470,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get strategySavedSuspended =>
-      'Ogrzewanie jest wstrzymane, więc tryb efektywny pozostaje Wył. do czasu wznowienia.';
+      'Ogrzewanie jest wstrzymane, więc obowiązuje tryb Wył. do czasu wznowienia.';
 
   @override
   String strategyValue(String target, String hysteresis, String mode) {
@@ -1494,11 +1501,11 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get suspendAwaiting =>
-      'Wysłano · czekamy, aż GI Core potwierdzi wstrzymanie';
+      'Wysłano · czekamy, aż GI Home potwierdzi wstrzymanie';
 
   @override
   String get resumeAwaiting =>
-      'Wysłano · czekamy, aż GI Core potwierdzi wznowienie';
+      'Wysłano · czekamy, aż GI Home potwierdzi wznowienie';
 
   @override
   String get suspendAppliedAwaitingHeartbeat =>
@@ -1524,7 +1531,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get suspendAppliedLegacy =>
-      'Ogrzewanie wstrzymane w GI Core. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.';
+      'Ogrzewanie wstrzymane. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.';
 
   @override
   String get resumeApplied =>
@@ -1532,15 +1539,15 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get resumeAppliedPending =>
-      'Ogrzewanie wznowione. GI Core nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.';
+      'Ogrzewanie wznowione. GI Home nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.';
 
   @override
   String get suspendTimedOut =>
-      'GI Core nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.';
+      'GI Home nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.';
 
   @override
   String get resumeTimedOut =>
-      'GI Core nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.';
+      'GI Home nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.';
 
   @override
   String get resumeSheetTitle => 'Wznowić ogrzewanie?';
@@ -1577,6 +1584,11 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get settingsLanguageDialogTitle => 'Język aplikacji';
+
+  @override
+  String languageSelectorLabel(String language) {
+    return 'Język: $language';
+  }
 
   @override
   String get settingsCoreVersion => 'Wersja oprogramowania GI Home';
@@ -1645,7 +1657,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get schedulesEmptyBody =>
-      'Ogrzewanie przez cały czas działa według strategii bazowej.';
+      'Ogrzewanie przez cały czas działa według ustawienia domyślnego.';
 
   @override
   String get schedulesAdd => 'Dodaj harmonogram';
@@ -1777,7 +1789,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String scheduleDeleteConfirmBody(String name) {
-    return 'Harmonogram „$name” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do strategii bazowej.';
+    return 'Harmonogram „$name” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do ustawienia domyślnego.';
   }
 
   @override
@@ -2262,7 +2274,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get accountLanguageHint =>
-      'Po zalogowaniu aplikacja i panel WWW używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.';
+      'Po zalogowaniu aplikacja i panel web używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.';
 
   @override
   String get accountLanguagePolish => 'Polski';
@@ -2491,4 +2503,37 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get recoveryResetBack => 'Wróć do logowania';
+
+  @override
+  String get errorHttpsRequired =>
+      'To urządzenie wymaga połączenia szyfrowanego (https://), którego aplikacja jeszcze nie obsługuje. Użyj adresu bez szyfrowania w sieci domowej, np. 192.168.1.20:3000.';
+
+  @override
+  String get connectErrorUnreachable =>
+      'Nie znaleziono GI Home pod tym adresem. Sprawdź, czy telefon jest w tej samej sieci Wi-Fi co urządzenie (nie w sieci dla gości), i wpisz jego adres IP, np. 192.168.1.20:3000.';
+
+  @override
+  String get connectHelpLink => 'Gdzie znajdę adres?';
+
+  @override
+  String get connectHelpTitle => 'Gdzie znajdę adres GI Home?';
+
+  @override
+  String get connectHelpSameWifi =>
+      'Telefon musi być w tej samej sieci Wi-Fi co GI Home. Sieć dla gości i transmisja danych komórkowych nie działają.';
+
+  @override
+  String get connectHelpRouter =>
+      'Adres IP urządzenia sprawdzisz na liście podłączonych urządzeń w panelu routera, np. 192.168.1.20.';
+
+  @override
+  String get connectHelpPort =>
+      'Jeśli samo IP nie działa, dopisz port: 192.168.1.20:3000. Aplikacja sama sprawdza porty 80 i 3000.';
+
+  @override
+  String get connectHelpLocalName =>
+      'W gotowym urządzeniu GI Home zwykle działa też nazwa gi-home.local, ale nie na każdym telefonie. Adres IP zawsze zadziała.';
+
+  @override
+  String get connectHelpClose => 'Zamknij';
 }

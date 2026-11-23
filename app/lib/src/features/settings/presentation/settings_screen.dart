@@ -7,6 +7,7 @@ import 'package:gi_home/src/core/config/config_providers.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/core/widgets/section_header.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
 import 'package:gi_home/src/features/appliance/presentation/change_appliance_dialog.dart';
@@ -42,9 +43,9 @@ class SettingsScreen extends ConsumerWidget {
     Future<void> logout() async {
       final result = await ref.read(authSessionProvider.notifier).logout();
       if (!result.serverSessionEnded && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.settingsLogoutLocalOnly)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          localizedSnackBar((l10n) => l10n.settingsLogoutLocalOnly),
+        );
       }
     }
 
@@ -57,8 +58,10 @@ class SettingsScreen extends ConsumerWidget {
           .read(switchUserControllerProvider.notifier)
           .switchUser();
       if (!result.serverSessionEnded) {
+        // Worded when it shows: the login screen it appears on may be in
+        // another language than this screen (plan §13.2).
         messenger.showSnackBar(
-          SnackBar(content: Text(l10n.settingsLogoutLocalOnly)),
+          localizedSnackBar((l10n) => l10n.settingsLogoutLocalOnly),
         );
       }
     }

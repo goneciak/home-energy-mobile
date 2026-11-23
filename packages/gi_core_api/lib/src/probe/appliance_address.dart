@@ -55,6 +55,13 @@ final class ApplianceAddress {
   String get authority =>
       origin.hasPort ? '${origin.host}:${origin.port}' : origin.host;
 
+  /// Whether the address names a port explicitly.
+  bool get hasPort => origin.hasPort;
+
+  /// The same address on [port].
+  ApplianceAddress withPort(int port) =>
+      ApplianceAddress._(origin.replace(port: port));
+
   bool get isCleartext => origin.scheme == 'http';
 
   static String _stripApiPrefix(String path) {

@@ -57,6 +57,12 @@
   Contract stack only: the project is gi-mobile-contract-<RunId>. Default: a
   new random id when starting; required with -Down.
 
+.PARAMETER EdgeSim
+  Contract stack only, with -Seed: also provision the GI Edge device simulator
+  (discover, claim, complete, synchronize, activation) and wait until GI Core
+  reports communicationMode GI_EDGE_V1. The simulator container itself always
+  starts with the stack; see docs/gi-edge-simulator.md.
+
 .PARAMETER Down
   Contract stack only: `docker compose -p gi-mobile-contract-<RunId> down -v`.
 
@@ -82,6 +88,7 @@ param(
   [switch]$Lan,
   [int]$Port,
   [switch]$Seed,
+  [switch]$EdgeSim,
   [switch]$Contract,
   [string]$RunId,
   [switch]$Down,
@@ -193,18 +200,29 @@ if ($Contract) {
   if (-not $corePublished) { throw "Could not resolve the published GI Core port of $project." }
   $coreUrl = "http://$($corePublished.Trim())"
   $fakeUrl = "http://$($fakePublished.Trim())"
+  $simPublished = (Invoke-Docker compose -p $project -f $contractCompose port gi-edge-sim 80 | Select-Object -First 1)
+  $simControlPublished = (Invoke-Docker compose -p $project -f $contractCompose port gi-edge-sim 8081 | Select-Object -First 1)
+  $simUrl = "http://$($simPublished.Trim())"
+  $simControlUrl = "http://$($simControlPublished.Trim())"
   Wait-Health "$coreUrl/api/v1/health/live" $TimeoutSeconds "Logs: docker compose -p $project logs gi-core"
   Write-Host 'GI Core is up.'
 
-  if ($Seed) { Invoke-Seeder @('--base-url', $coreUrl, '--init', '--yes') }
+  if ($Seed) {
+    $seedArgs = @('--base-url', $coreUrl, '--init', '--yes')
+    if ($EdgeSim) { $seedArgs += @('--edge-sim', 'gi-edge-sim') }
+    Invoke-Seeder $seedArgs
+  }
 
   Write-Host ''
   Write-Host "GI_CONTRACT_PROJECT=$project"
   Write-Host "GI_CORE_URL=$coreUrl"
   Write-Host "FAKE_ESPHOME_URL=$fakeUrl"
+  Write-Host "GI_EDGE_SIM_URL=$simUrl"
+  Write-Host "GI_EDGE_SIM_CONTROL_URL=$simControlUrl"
   Write-Host ''
   Write-Host 'Contract tests (packages\gi_core_api):'
-  Write-Host "  `$env:GI_CORE_URL='$coreUrl'; `$env:FAKE_ESPHOME_URL='$fakeUrl'; dart test -t contract -j 1"
+  Write-Host "  `$env:GI_CORE_URL='$coreUrl'; `$env:FAKE_ESPHOME_URL='$fakeUrl'; `$env:GI_EDGE_SIM_CONTROL_URL='$simControlUrl'; dart test -t contract -j 1"
+  Write-Host "GI Edge simulator: curl $simControlUrl/fake/state  (docs/gi-edge-simulator.md)"
   Write-Host "Remove: .\tools\dev-up.ps1 -Contract -RunId $RunId -Down"
   return
 }

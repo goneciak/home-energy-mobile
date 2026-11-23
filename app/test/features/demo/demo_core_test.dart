@@ -371,6 +371,27 @@ void main() {
       expect(logout.statusCode, 204);
     });
 
+    test('answers with the names of the language it is asked for', () async {
+      Future<List<String>> roomNames(String Function()? language) async {
+        dio.httpClientAdapter = DemoHttpClientAdapter(
+          core,
+          languageCode: language,
+        );
+        final response = await dio.get<List<dynamic>>('/rooms');
+        return [
+          for (final room in response.data!)
+            (room as Map<String, dynamic>)['name'] as String,
+        ];
+      }
+
+      final polish = await roomNames(null);
+      expect(polish, contains('Salon'));
+      expect(await roomNames(() => 'pl'), polish);
+      final english = await roomNames(() => 'en');
+      expect(english, contains('Living room'));
+      expect(english, isNot(contains('Salon')));
+    });
+
     test('waits for its latency and survives close()', () async {
       dio.httpClientAdapter = DemoHttpClientAdapter(
         core,

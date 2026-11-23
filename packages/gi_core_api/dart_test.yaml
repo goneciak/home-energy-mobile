@@ -7,3 +7,7 @@ tags:
     # excluded from the unit run with `-x contract`. 3x: a login may wait out
     # GI Core's login rate limit (5/min, Retry-After up to 60 s) once.
     timeout: 3x
+  slow:
+    # Contract tests that wait for GI Core's own timers (command timeout
+    # sweep, offline detection): minutes each. Skip with `-x slow`.
+    timeout: 6x

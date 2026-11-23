@@ -1,7 +1,7 @@
 import 'package:gi_core_api/gi_core_api.dart';
-
 import 'package:gi_home/src/core/data/fetched.dart';
 import 'package:gi_home/src/core/data/polled_data.dart';
+import 'package:gi_home/src/features/devices/domain/entity_presentation.dart';
 import 'package:meta/meta.dart';
 
 /// Overall condition of the home, from the mildest to the most severe.
@@ -203,7 +203,13 @@ final class HomeCondition {
   ) sync* {
     if (card == null) return;
     if (card.error != null) yield AttentionKind.heatingDetailsUnavailable;
-    if (card.data?.value.status == ProductStatus.needsConfiguration) {
+    final detail = card.data?.value;
+    // A GI Edge device always lists unassigned diagnostics entities, so Core
+    // reports `needs_configuration` for them alone; only a non-technical
+    // entity without a role is something to configure.
+    if (detail != null &&
+        detail.status == ProductStatus.needsConfiguration &&
+        needsRealConfiguration(detail)) {
       yield AttentionKind.needsConfiguration;
     }
   }

@@ -22,7 +22,7 @@ part 'connection_ladder.g.dart';
 /// 2. [localNames] (`gi-home.local`, then `gi-home-2.local` …
 ///    `gi-home-5.local`, the names Avahi gives a first and further
 ///    appliances, §9.1) through the [HostResolver], probed as
-///    `http://<name>` (port 80).
+///    `http://<name>` (port 80, then 3000 where GI Core listens itself).
 ///
 /// A candidate is confirmed when `/health/live` answers 200 and
 /// `/setup/status` parses ([ApplianceProbe]). Both steps run at once:
@@ -174,12 +174,17 @@ final class ConnectionLadder {
       CandidateSource source,
       int rank, {
       Duration? healthTimeout,
+      bool tryFallbackPorts = false,
     }) async {
       if (!probed.add(address.origin.toString())) return;
       try {
         final result = await limiter.run(
           () => _probe
-              .probeAddress(address, healthTimeout: healthTimeout)
+              .probeAddress(
+                address,
+                healthTimeout: healthTimeout,
+                tryFallbackPorts: tryFallbackPorts,
+              )
               .timeout(candidateTimeout),
         );
         add(ApplianceCandidate(probe: result, source: source, rank: rank));
@@ -204,7 +209,13 @@ final class ConnectionLadder {
       } on FormatException {
         return;
       }
-      await tryAddress(address, CandidateSource.localName, rank);
+      // A name carries no port: port 80 first, then GI Core's own 3000.
+      await tryAddress(
+        address,
+        CandidateSource.localName,
+        rank,
+        tryFallbackPorts: true,
+      );
     }
 
     final remembered = <ApplianceAddress>[];

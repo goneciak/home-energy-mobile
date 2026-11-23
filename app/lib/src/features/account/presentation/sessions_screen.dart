@@ -5,6 +5,7 @@ import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/core/widgets/state_views.dart';
 import 'package:gi_home/src/core/widgets/status_chip.dart';
@@ -44,7 +45,9 @@ class SessionsScreen extends ConsumerWidget {
           .read(sessionActionsControllerProvider.notifier)
           .revoke(session);
       if (done && !session.current) {
-        messenger.showSnackBar(SnackBar(content: Text(l10n.sessionsRevoked)));
+        messenger.showSnackBar(
+          localizedSnackBar((l10n) => l10n.sessionsRevoked),
+        );
       }
     }
 

@@ -130,8 +130,12 @@ String _$userProfileHash() => r'ff9c6c4f8baefec7e7ff1177681bdc23626b6e07';
 ///
 /// * A language picked in Settings ([languagePreferenceProvider]) wins
 ///   over everything below, signed in or not.
-/// * Signed out (before login, after logout or "Zmień użytkownika"): the
-///   phone language.
+/// * Signed out with a remembered last user on this appliance (after a
+///   logout, or on the login screen of a restart): the language last
+///   applied for that user, so the login screen matches the user's
+///   language.
+/// * Signed out without one (first connect, after "Zmień użytkownika"):
+///   the phone language.
 /// * Signed in: the language of the user's GI Core profile, or the phone
 ///   language when the profile has none the app supports.
 /// * Until the profile has answered (cold start, a failed profile call):
@@ -146,8 +150,12 @@ final appLocaleProvider = AppLocaleProvider._();
 ///
 /// * A language picked in Settings ([languagePreferenceProvider]) wins
 ///   over everything below, signed in or not.
-/// * Signed out (before login, after logout or "Zmień użytkownika"): the
-///   phone language.
+/// * Signed out with a remembered last user on this appliance (after a
+///   logout, or on the login screen of a restart): the language last
+///   applied for that user, so the login screen matches the user's
+///   language.
+/// * Signed out without one (first connect, after "Zmień użytkownika"):
+///   the phone language.
 /// * Signed in: the language of the user's GI Core profile, or the phone
 ///   language when the profile has none the app supports.
 /// * Until the profile has answered (cold start, a failed profile call):
@@ -162,8 +170,12 @@ final class AppLocaleProvider
   ///
   /// * A language picked in Settings ([languagePreferenceProvider]) wins
   ///   over everything below, signed in or not.
-  /// * Signed out (before login, after logout or "Zmień użytkownika"): the
-  ///   phone language.
+  /// * Signed out with a remembered last user on this appliance (after a
+  ///   logout, or on the login screen of a restart): the language last
+  ///   applied for that user, so the login screen matches the user's
+  ///   language.
+  /// * Signed out without one (first connect, after "Zmień użytkownika"):
+  ///   the phone language.
   /// * Signed in: the language of the user's GI Core profile, or the phone
   ///   language when the profile has none the app supports.
   /// * Until the profile has answered (cold start, a failed profile call):
@@ -202,7 +214,7 @@ final class AppLocaleProvider
   }
 }
 
-String _$appLocaleHash() => r'fb445dd2801fb571184733f4f87c2be37f62c85b';
+String _$appLocaleHash() => r'4a9cdc374ba5b5b9a650230335d557948e0b4f60';
 
 /// [requestLanguageProvider], kept on the language the app shows
 /// ([appLocaleProvider]), so `Accept-Language` follows the signed-in user's

@@ -113,6 +113,37 @@ services:
       retries: 3
       start_period: 120s
 
+  # GI Edge device simulator (tools/gi_edge_sim, docs/gi-edge-simulator.md):
+  # a faithful push-first controller. It serves the device HTTP API on port 80
+  # like fake-esphome (so GI Core can discover, synchronize and activate it) and
+  # then pushes signed heartbeat/telemetry to GI Core and polls its commands.
+  gi-edge-sim:
+    build:
+      context: ../tools/gi_edge_sim
+    image: gi-mobile-contract/gi-edge-sim:local
+    environment:
+      # GI Core as seen from this container: it shares the mosquitto namespace.
+      CORE_URL: http://mosquitto:3000
+      STATE_FILE: /state/gi_edge_sim.json
+    volumes:
+      # Identity and the request counter survive a restart, like the device NVS.
+      - gi-edge-sim-state:/state
+    # Port 80: for GI Core (http://gi-edge-sim:80) and loopback tests. Port
+    # 8081: the /fake/* control surface, ephemeral port on loopback only.
+    ports:
+      - "127.0.0.1::80"
+      - "127.0.0.1::8081"
+    healthcheck:
+      test: ["CMD", "/app/gi_edge_sim", "--healthcheck"]
+      interval: 10s
+      start_interval: 1s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+volumes:
+  gi-edge-sim-state:
+
 configs:
   mosquitto-conf:
     # Local only: the broker is reachable from its own namespace (GI Core

@@ -47,6 +47,7 @@ String _genericFailureMessage(AppLocalizations l10n, Object error) =>
       LocalNetworkDeniedFailure() => l10n.errorLocalNetworkDenied,
       TlsUntrustedFailure() => l10n.errorTlsUntrusted,
       InsecureTransportFailure() => l10n.errorInsecureTransport,
+      HttpsRequiredFailure() => l10n.errorHttpsRequired,
       // A 401 that did not end the session (that is SessionLostFailure).
       UnauthorizedFailure() => l10n.errorUnauthorized,
       ForbiddenFailure() => l10n.errorForbidden,

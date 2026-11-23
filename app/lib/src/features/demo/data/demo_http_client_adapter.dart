@@ -4,14 +4,19 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:gi_home/src/features/demo/data/demo_core.dart';
+import 'package:gi_home/src/features/demo/data/demo_names.dart';
 
 /// The transport of demo mode (plan §19.5): every GI Core request is
 /// answered in process by [core]. No socket is opened, not even on
 /// localhost.
 final class DemoHttpClientAdapter implements HttpClientAdapter {
-  new(this.core, {this.latency = Duration.zero});
+  new(this.core, {this.latency = Duration.zero, this.languageCode});
 
   final DemoCore core;
+
+  /// The language the app shows now (`en` or `pl`), asked on every answer so
+  /// a language change shows at once; `null` leaves the Polish fixture names.
+  final String Function()? languageCode;
 
   /// Delay before each answer, so loading states show briefly.
   final Duration latency;
@@ -36,7 +41,11 @@ final class DemoHttpClientAdapter implements HttpClientAdapter {
         (options.uri.path.endsWith('/auth/login') ||
             options.uri.path.endsWith('/auth/refresh'));
     return ResponseBody.fromString(
-      reply.body == null ? '' : jsonEncode(reply.body),
+      reply.body == null
+          ? ''
+          : jsonEncode(
+              localizeDemoNames(reply.body, languageCode?.call() ?? 'pl'),
+            ),
       reply.status,
       headers: {
         Headers.contentTypeHeader: ['application/json; charset=utf-8'],

@@ -460,6 +460,7 @@ final class AuthSessionManager implements AccessTokenSource {
     // Not sent (unreachable, TLS, policy): the cookie is still valid.
     if (failure is! UnreachableFailure &&
         failure is! TlsUntrustedFailure &&
+        failure is! HttpsRequiredFailure &&
         failure is! InsecureTransportFailure) {
       _ambiguous = true;
     }

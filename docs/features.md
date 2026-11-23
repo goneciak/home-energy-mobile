@@ -25,8 +25,10 @@ ADR [0009](decisions/0009-switch-confirmation-semantics.md).
   wstrzymanie (tylko ON), zatrzaśnięta usterka FAULT/SAFE_MODE (tylko ON),
   encja wyłączona, niedostępna lub niezapisywalna. Każda blokada ma tekst z
   powodem.
-- **Ustawienia:** język aplikacji, informacje o sesji i urządzeniu,
-  wylogowanie.
+- **Ustawienia:** język aplikacji (Automatycznie / Polski / English; ten sam
+  wybór jest też na ekranach połączenia i logowania), informacje o sesji i
+  urządzeniu, wylogowanie. Ekran logowania po wylogowaniu używa języka
+  ostatniego użytkownika, a przed pierwszym logowaniem języka telefonu.
 
 ## Role
 

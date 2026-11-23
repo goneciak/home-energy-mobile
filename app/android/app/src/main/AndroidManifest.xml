@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Only the multicast DNS fallback (mdnsFallback flag, off by default)
+    <!-- Only the multicast DNS fallback (mdnsFallback flag, on in beta only)
          holds the multicast lock; it needs this permission to take it. -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <!-- Local network protection (plan §9.4): requested at runtime on

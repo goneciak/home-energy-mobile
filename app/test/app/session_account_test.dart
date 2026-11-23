@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gi_core_api/gi_core_api.dart';
 import 'package:gi_home/src/app/gi_home_app.dart';
+import 'package:gi_home/src/core/l10n/request_language.dart';
 import 'package:gi_home/src/core/lifecycle/app_foreground.dart';
 import 'package:gi_home/src/core/platform/platform_providers.dart';
 import 'package:gi_home/src/features/account/application/account_providers.dart';
@@ -21,6 +22,8 @@ import 'package:gi_home/src/features/diagnostics/application/diagnostics_provide
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_service.dart';
 import 'package:gi_home/src/features/diagnostics/data/diagnostics_store.dart';
 import 'package:gi_home/src/features/diagnostics/domain/error_log.dart';
+import 'package:gi_home/src/features/settings/presentation/language_selector.dart';
+import 'package:gi_home/src/features/settings/presentation/language_tile.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -396,7 +399,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Log out'));
       await tester.pumpAndSettle();
-      await logIn(tester, 'user@gihome.test');
+      // The login screen is still in the last user's language.
+      await logIn(tester, 'user@gihome.test', submit: 'Log in');
       await meThroughClient();
 
       // A user without a profile language: the phone language again.
@@ -428,22 +432,115 @@ void main() {
       expect(find.text('Dom'), findsWidgets);
     });
 
-    testWidgets('logout returns to the phone language', (tester) async {
+    testWidgets(
+      "after a logout the login screen keeps the last user's language",
+      (tester) async {
+        profileLocales = {ownerId: 'en-US'};
+        final container = await pumpApp(tester, profile: testProfile);
+        await logIn(tester, 'owner@gihome.test');
+        await tester.tap(find.text('Settings'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Log out'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Log in'), findsWidgets);
+        expect(find.text('Zaloguj się'), findsNothing);
+        expect(container.read(appLocaleProvider), const Locale('en'));
+        expect(
+          container.read(requestLanguageProvider).appLocale,
+          const Locale('en'),
+        );
+      },
+    );
+
+    testWidgets('switching user returns to the phone language', (tester) async {
       profileLocales = {ownerId: 'en-US'};
       final container = await pumpApp(tester, profile: testProfile);
       await logIn(tester, 'owner@gihome.test');
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Log out'));
+      await tester.tap(find.text('Switch user'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('switch-user-confirm')));
       await tester.pumpAndSettle();
 
       expect(find.text('Zaloguj się'), findsOneWidget);
+      expect(container.read(appLocaleProvider), isNull);
       expect(
         container
             .read(sharedPreferencesProvider)
             .containsKey(SessionLocaleStore.key),
         isFalse,
+      );
+    });
+
+    testWidgets('signed out with a remembered user, the stored language wins '
+        'over the phone language', (tester) async {
+      final container = await pumpApp(
+        tester,
+        profile: testProfile.copyWith(lastUserId: ownerId),
+        seed: (prefs) => SessionLocaleStore(prefs).write(
+          profileId: testProfile.profileId,
+          userId: ownerId,
+          languageCode: 'en',
+        ),
+      );
+
+      expect(find.text('Log in'), findsWidgets);
+      expect(container.read(appLocaleProvider), const Locale('en'));
+    });
+
+    testWidgets('a first connect (nobody remembered) uses the phone language '
+        'even when a language is stored', (tester) async {
+      final container = await pumpApp(
+        tester,
+        profile: testProfile,
+        seed: (prefs) => SessionLocaleStore(prefs).write(
+          profileId: testProfile.profileId,
+          userId: ownerId,
+          languageCode: 'en',
+        ),
+      );
+
+      expect(find.text('Zaloguj się'), findsOneWidget);
+      expect(container.read(appLocaleProvider), isNull);
+    });
+
+    testWidgets('signed out, a remembered user without a stored language '
+        'means the phone language', (tester) async {
+      final container = await pumpApp(
+        tester,
+        profile: testProfile.copyWith(lastUserId: ownerId),
+      );
+
+      expect(container.read(appLocaleProvider), isNull);
+    });
+
+    testWidgets('a language picked on the login screen wins over the stored '
+        'one and survives a logout', (tester) async {
+      final container = await pumpApp(
+        tester,
+        profile: testProfile.copyWith(lastUserId: ownerId),
+        seed: (prefs) => SessionLocaleStore(prefs).write(
+          profileId: testProfile.profileId,
+          userId: ownerId,
+          languageCode: 'en',
+        ),
+      );
+      expect(find.text('Log in'), findsWidgets);
+
+      await tester.tap(find.byKey(LanguageSelector.selectorKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(LanguageTile.optionKey('pl')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Zaloguj się'), findsOneWidget);
+      expect(container.read(appLocaleProvider), const Locale('pl'));
+      expect(
+        container.read(requestLanguageProvider).appLocale,
+        const Locale('pl'),
       );
     });
 
@@ -614,7 +711,9 @@ void main() {
           secrets.keys.where((key) => key.startsWith(profilePrefix)),
           isEmpty,
         );
-        expect(prefs.containsKey(SessionLocaleStore.key), isFalse);
+        // A logout keeps the language for the login screen; switching the
+        // user forgets it with the user.
+        expect(prefs.containsKey(SessionLocaleStore.key), action == 'Wyloguj');
         expect(files.directory.existsSync(), isFalse);
         expect(diagnostics.errors, isEmpty);
       });

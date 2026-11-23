@@ -451,4 +451,60 @@ void main() {
       expect(await resolver.resolve('gi-home-2.local'), isNull);
     });
   });
+
+  group('ports', () {
+    test('a bare IP is probed on :80, then on :3000, and the port that '
+        'answered is kept', () async {
+      core.routes['GET /api/v1/health/live'] = (request) {
+        if (request.uri.port != 3000) refuseConnection(request);
+        return jsonReply({'status': 'ok'});
+      };
+
+      final last = await ladder(
+        FakeHostResolver({'gi-home.local': resolvesTo('192.168.1.20')}),
+      ).search().last;
+
+      expect(hosts(last), ['http://192.168.1.20:3000']);
+      expect(
+        last.candidates.single.probe.address.authority,
+        '192.168.1.20:3000',
+      );
+      final ports = [
+        for (final r in core.requests)
+          if (r.uri.path.endsWith('/health/live')) r.uri.port,
+      ];
+      expect(ports, [80, 3000]);
+    });
+
+    test(
+      'an address on :80 that answers is not probed again on :3000',
+      () async {
+        final last = await ladder(
+          FakeHostResolver({'gi-home.local': resolvesTo('192.168.1.20')}),
+        ).search().last;
+
+        expect(hosts(last), ['http://192.168.1.20']);
+        expect(core.requestedRoutes, [
+          'GET /api/v1/health/live',
+          'GET /api/v1/setup/status',
+        ]);
+      },
+    );
+
+    test(
+      'a remembered host keeps its exact port and never falls back',
+      () async {
+        core.routes['GET /api/v1/health/live'] = (request) {
+          if (request.uri.port != 3000) refuseConnection(request);
+          return jsonReply({'status': 'ok'});
+        };
+
+        final last = await ladder(FakeHostResolver())
+            .search(rememberedHosts: ['http://192.168.1.20'])
+            .last;
+
+        expect(last.candidates, isEmpty);
+      },
+    );
+  });
 }

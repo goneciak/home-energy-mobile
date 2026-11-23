@@ -1,4 +1,5 @@
 import 'package:gi_core_api/gi_core_api.dart';
+import 'package:gi_home/src/features/devices/domain/entity_presentation.dart';
 import 'package:meta/meta.dart';
 
 /// Last reported state of a boiler or pump relay entity.
@@ -17,7 +18,15 @@ enum RelayState {
 }
 
 /// Availability of a reading taken from an entity.
-enum ReadingStatus { ok, noData, unavailable }
+enum ReadingStatus {
+  ok,
+  noData,
+  unavailable,
+
+  /// The sensor has been silent for longer than [sensorStaleAfter]; its
+  /// last value is not shown as current.
+  stale,
+}
 
 /// Control temperature reading: a number when the entity reports one.
 @immutable
@@ -55,14 +64,18 @@ final class HeatingReadings {
     this.controlTemperature,
   });
 
-  factory of(DeviceDetail detail) => HeatingReadings(
+  /// [now] enables the stale check of the control temperature.
+  factory of(DeviceDetail detail, {DateTime? now}) => HeatingReadings(
     boilerRelay: relayStateOf(detail.entityById(detail.heatingRelayEntityId)),
     pumpRelay: detail.pumpRelayEntityId == null
         ? null
         : relayStateOf(detail.entityById(detail.pumpRelayEntityId)),
     controlTemperature: detail.controlTemperatureEntityId == null
         ? null
-        : temperatureOf(detail.entityById(detail.controlTemperatureEntityId)),
+        : temperatureOf(
+            detail.entityById(detail.controlTemperatureEntityId),
+            now: now,
+          ),
   );
 
   final RelayState boilerRelay;
@@ -94,12 +107,18 @@ final class HeatingReadings {
   }
 
   /// Temperature of an entity: a number or numeric text.
-  static TemperatureReading temperatureOf(DeviceEntity? entity) {
+  static TemperatureReading temperatureOf(
+    DeviceEntity? entity, {
+    DateTime? now,
+  }) {
     if (entity == null) {
       return const TemperatureReading(status: ReadingStatus.noData);
     }
     if (!entity.enabled || !entity.availability) {
       return const TemperatureReading(status: ReadingStatus.unavailable);
+    }
+    if (now != null && isStaleReading(entity, now)) {
+      return const TemperatureReading(status: ReadingStatus.stale);
     }
     final value = switch (entity.value) {
       EntityValueNumber(:final value) when value.isFinite => value,

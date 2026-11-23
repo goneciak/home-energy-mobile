@@ -27,11 +27,11 @@
   "connectTitle": "Połącz z GI Home",
   "connectIntro": "Telefon musi być w tej samej sieci Wi-Fi co GI Home. Wybierz znalezione urządzenie albo wpisz jego adres.",
   "connectAddressLabel": "Adres GI Home",
-  "connectAddressHint": "np. gi-home.local lub 192.168.1.20",
+  "connectAddressHint": "np. gi-home.local lub 192.168.1.20:3000",
   "connectAddressRequired": "Wpisz adres GI Home",
   "connectSearchTitle": "Znajdź GI Home",
   "connectSearching": "Szukam GI Home…",
-  "connectSearchNoneFound": "Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej.",
+  "connectSearchNoneFound": "Nie znaleziono GI Home w tej sieci. Wpisz jego adres poniżej, najlepiej adres IP.",
   "connectSearchAgain": "Szukaj ponownie",
   "connectCandidateCurrent": "Obecne urządzenie",
   "@connectCandidateCurrent": {
@@ -111,7 +111,7 @@
   "errorHeatingSuspended": "Ogrzewanie jest wstrzymane, więc nie można niczego włączyć. Najpierw wznów ogrzewanie.",
   "errorEntityDisabled": "Ten element jest wyłączony w konfiguracji urządzenia.",
   "errorEntityNotWritable": "Tym elementem nie można sterować z aplikacji.",
-  "errorDeviceOffline": "Urządzenie jest offline. Polecenie nie zostało wysłane.",
+  "errorDeviceOffline": "Urządzenie jest niedostępne. Polecenie nie zostało wysłane.",
   "errorDeviceUnreachable": "GI Home nie zna adresu sterownika. Polecenie nie zostało wysłane.",
   "errorCommandUnconfirmed": "Sterownik nie potwierdził polecenia. Stan jest nieznany – odśwież widok i sprawdź go przed kolejną próbą.",
   "errorCommandTimeout": "Sterownik nie odpowiedział na czas. Nie wiadomo, czy polecenie zostało wykonane – odśwież widok przed kolejną próbą.",
@@ -339,7 +339,7 @@
   "heatingSuspendedBanner": "Ogrzewanie jest wstrzymane.",
   "connectivityLostLocalControl": "Brak łączności – lokalne sterowanie działa nadal",
   "productStatusOnline": "Działa",
-  "productStatusOffline": "Offline",
+  "productStatusOffline": "Niedostępne",
   "productStatusConnecting": "Łączenie…",
   "productStatusNeedsConfiguration": "Wymaga konfiguracji",
   "productStatusError": "Błąd",
@@ -353,6 +353,8 @@
   "deviceDetailsTitle": "Szczegóły urządzenia",
   "deviceNotFound": "Urządzenie zostało usunięte lub zmienione.",
   "deviceEntitiesSection": "Elementy",
+  "entityStaleValue": "Brak świeżych danych",
+  "deviceTechnicalEntitiesSection": "Dane techniczne urządzenia",
   "deviceEntitiesEmpty": "To urządzenie nie ma jeszcze elementów.",
   "deviceDiagnosticsSection": "Diagnostyka",
   "deviceControllerState": "Stan sterownika",
@@ -842,7 +844,7 @@
     "description": "Next action for USER/SERVICE."
   },
   "heatingResumeAction": "Wznów ogrzewanie",
-  "heatingPvBoost": "PV boost: grzanie do {temperature} °C",
+  "heatingPvBoost": "Dogrzewanie z PV: grzanie do {temperature} °C",
   "@heatingPvBoost": {
     "description": "pvBoostActive; the target is pvHeatingConfig.safeMaxTemperatureCelsius, not exposed directly.",
     "placeholders": {
@@ -853,11 +855,11 @@
     }
   },
   "heatingPvBoostDerived": "Cel wyliczony z limitu bezpieczeństwa PV",
-  "heatingPvBoostUnknownTarget": "PV boost aktywny – cel nieznany",
+  "heatingPvBoostUnknownTarget": "Dogrzewanie z PV aktywne – cel nieznany",
   "@heatingPvBoostUnknownTarget": {
     "description": "pvBoostActive without pvHeatingConfig."
   },
-  "heatingStrategySource": "Według GI Core · dane z {time}",
+  "heatingStrategySource": "Według GI Home · dane z {time}",
   "@heatingStrategySource": {
     "description": "Source and freshness of the strategy values.",
     "placeholders": {
@@ -905,7 +907,7 @@
       }
     }
   },
-  "strategySuspendedNote": "Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu tryb efektywny to Wył.",
+  "strategySuspendedNote": "Ogrzewanie jest wstrzymane. Zapisane ustawienie zacznie obowiązywać po wznowieniu – do tego czasu obowiązuje tryb Wył.",
   "strategySave": "Zapisz",
   "strategyChecking": "Sprawdzanie aktualnych ustawień…",
   "strategySaving": "Zapisywanie…",
@@ -934,7 +936,7 @@
   "strategyValueActive": "aktywne",
   "strategyConflictReapply": "Zapisz moje zmiany mimo to",
   "strategyConflictDiscard": "Odrzuć moje zmiany",
-  "strategySavedTitle": "Zapisano w GI Core",
+  "strategySavedTitle": "Zapisano w GI Home",
   "strategySavedBase": "Ustawienie domyślne: {value}",
   "@strategySavedBase": {
     "placeholders": {
@@ -951,7 +953,7 @@
       }
     }
   },
-  "strategySavedSuspended": "Ogrzewanie jest wstrzymane, więc tryb efektywny pozostaje Wył. do czasu wznowienia.",
+  "strategySavedSuspended": "Ogrzewanie jest wstrzymane, więc obowiązuje tryb Wył. do czasu wznowienia.",
   "strategyValue": "{target} °C, histereza {hysteresis} °C, {mode}",
   "@strategyValue": {
     "placeholders": {
@@ -973,8 +975,8 @@
   "suspendA11yHint": "otwiera potwierdzenie wstrzymania",
   "suspendConfirmTitle": "Wstrzymać ogrzewanie?",
   "suspendConfirmAction": "Wstrzymaj ogrzewanie",
-  "suspendAwaiting": "Wysłano · czekamy, aż GI Core potwierdzi wstrzymanie",
-  "resumeAwaiting": "Wysłano · czekamy, aż GI Core potwierdzi wznowienie",
+  "suspendAwaiting": "Wysłano · czekamy, aż GI Home potwierdzi wstrzymanie",
+  "resumeAwaiting": "Wysłano · czekamy, aż GI Home potwierdzi wznowienie",
   "suspendAppliedAwaitingHeartbeat": "Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników · czeka na raport sterownika",
   "suspendAppliedOutputsOff": "Ogrzewanie wstrzymane. Raport sterownika z {time}: wyjścia przekaźników wyłączone. To nie potwierdza fizycznego stanu przekaźników.",
   "@suspendAppliedOutputsOff": {
@@ -994,11 +996,11 @@
   },
   "suspendAppliedNotReported": "Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie raportuje stanu wyjść.",
   "suspendAppliedNoHeartbeat": "Ogrzewanie wstrzymane. Zlecono wyłączenie przekaźników, ale sterownik nie zgłosił się w ciągu 45 s – stan przekaźników jest nieznany.",
-  "suspendAppliedLegacy": "Ogrzewanie wstrzymane w GI Core. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.",
+  "suspendAppliedLegacy": "Ogrzewanie wstrzymane. To urządzenie ESPHome nie dostaje poleceń wyłączenia przekaźników – GI Home po prostu nie będzie włączać kotła.",
   "resumeApplied": "Ogrzewanie wznowione. Znów obowiązuje ustawienie domyślne lub harmonogram.",
-  "resumeAppliedPending": "Ogrzewanie wznowione. GI Core nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.",
-  "suspendTimedOut": "GI Core nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.",
-  "resumeTimedOut": "GI Core nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.",
+  "resumeAppliedPending": "Ogrzewanie wznowione. GI Home nie przywrócił jeszcze trybu sterowania – odśwież za chwilę.",
+  "suspendTimedOut": "GI Home nie potwierdził wstrzymania w ciągu 30 s. Odśwież widok i sprawdź stan.",
+  "resumeTimedOut": "GI Home nie potwierdził wznowienia w ciągu 30 s. Odśwież widok i sprawdź stan.",
   "resumeSheetTitle": "Wznowić ogrzewanie?",
   "resumeSheetWillApply": "Zacznie obowiązywać: {value}",
   "@resumeSheetWillApply": {
@@ -1032,6 +1034,13 @@
     "description": "Language name in its own language; same in every locale."
   },
   "settingsLanguageDialogTitle": "Język aplikacji",
+  "languageSelectorLabel": "Język: {language}",
+  "@languageSelectorLabel": {
+    "description": "Przycisk wyboru języka na ekranach przed logowaniem; {language} to bieżący wybór (Automatycznie, Polski, English).",
+    "placeholders": {
+      "language": {"type": "String"}
+    }
+  },
   "settingsCoreVersion": "Wersja oprogramowania GI Home",
   "settingsCoreVersionSubtitle": "{version} (według ostatniego sprawdzenia aktualizacji)",
   "@settingsCoreVersionSubtitle": {
@@ -1101,7 +1110,7 @@
   "@schedulesEmptyTitle": {
     "description": "Schedule list without schedules."
   },
-  "schedulesEmptyBody": "Ogrzewanie przez cały czas działa według strategii bazowej.",
+  "schedulesEmptyBody": "Ogrzewanie przez cały czas działa według ustawienia domyślnego.",
   "@schedulesEmptyBody": {
     "description": "Schedule list without schedules: what that means."
   },
@@ -1304,7 +1313,7 @@
   "@scheduleDeleteConfirmTitle": {
     "description": "Delete confirmation title."
   },
-  "scheduleDeleteConfirmBody": "Harmonogram „{name}” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do strategii bazowej.",
+  "scheduleDeleteConfirmBody": "Harmonogram „{name}” zostanie usunięty. Jeśli był aktywny, ogrzewanie wróci do ustawienia domyślnego.",
   "@scheduleDeleteConfirmBody": {
     "description": "Delete confirmation body.",
     "placeholders": {
@@ -1966,7 +1975,7 @@
   "accountSave": "Zapisz zmiany",
   "accountSaved": "Zapisano profil.",
   "accountLanguageSection": "Język konta",
-  "accountLanguageHint": "Po zalogowaniu aplikacja i panel WWW używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.",
+  "accountLanguageHint": "Po zalogowaniu aplikacja i panel web używają tego języka, chyba że w ustawieniach aplikacji wybrano inny.",
   "accountLanguagePolish": "Polski",
   "accountLanguageEnglish": "English",
   "accountLanguageSaved": "Zmieniono język konta.",
@@ -2059,5 +2068,14 @@
   "recoveryResetDoneTitle": "Hasło zostało zmienione",
   "recoveryResetDoneBody": "Zaloguj się nowym hasłem. Po zalogowaniu wygeneruj nowy kod odzyskiwania, bo obecny nadal działa.",
   "recoveryResetGoToLogin": "Przejdź do logowania",
-  "recoveryResetBack": "Wróć do logowania"
+  "recoveryResetBack": "Wróć do logowania",
+  "errorHttpsRequired": "To urządzenie wymaga połączenia szyfrowanego (https://), którego aplikacja jeszcze nie obsługuje. Użyj adresu bez szyfrowania w sieci domowej, np. 192.168.1.20:3000.",
+  "connectErrorUnreachable": "Nie znaleziono GI Home pod tym adresem. Sprawdź, czy telefon jest w tej samej sieci Wi-Fi co urządzenie (nie w sieci dla gości), i wpisz jego adres IP, np. 192.168.1.20:3000.",
+  "connectHelpLink": "Gdzie znajdę adres?",
+  "connectHelpTitle": "Gdzie znajdę adres GI Home?",
+  "connectHelpSameWifi": "Telefon musi być w tej samej sieci Wi-Fi co GI Home. Sieć dla gości i transmisja danych komórkowych nie działają.",
+  "connectHelpRouter": "Adres IP urządzenia sprawdzisz na liście podłączonych urządzeń w panelu routera, np. 192.168.1.20.",
+  "connectHelpPort": "Jeśli samo IP nie działa, dopisz port: 192.168.1.20:3000. Aplikacja sama sprawdza porty 80 i 3000.",
+  "connectHelpLocalName": "W gotowym urządzeniu GI Home zwykle działa też nazwa gi-home.local, ale nie na każdym telefonie. Adres IP zawsze zadziała.",
+  "connectHelpClose": "Zamknij"
 }

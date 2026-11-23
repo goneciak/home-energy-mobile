@@ -261,6 +261,10 @@ final class DemoCore {
     return '${hex(8)}-${hex(4)}-4${hex(3)}-8${hex(3)}-${hex(12)}';
   }
 
+  /// The demo user's profile language tag (changed by `PATCH
+  /// /users/me/profile`), `null` when none is set.
+  String? get profileLocale => _profile()['locale'] as String?;
+
   Map<String, Object?> _profile() => {
     ...user,
     ...?_fixtures['profile'] as Map<String, Object?>?,

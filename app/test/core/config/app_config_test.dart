@@ -142,7 +142,14 @@ void main() {
 
         expect(values['FLAVOR'], flavor.name);
         expect(values.keys.toSet(), AppConfig.compiledDefines.keys.toSet());
-        expect(config.flagDefaults, FeatureFlags.allOff);
+        // Beta looks for the appliance by multicast DNS too: testers on
+        // phones that cannot resolve gi-home.local (the IP always works).
+        expect(
+          config.flagDefaults,
+          flavor == AppFlavor.beta
+              ? FeatureFlags(const {FeatureFlag.mdnsFallback: true})
+              : FeatureFlags.allOff,
+        );
         // No store listing yet: the update banner shows its text only.
         expect(config.androidStoreUrl, isNull);
         expect(config.iosStoreUrl, isNull);

@@ -72,7 +72,7 @@ final class SwitchUserControllerProvider
 }
 
 String _$switchUserControllerHash() =>
-    r'407ce022db76b9e430a4429436ecb0570d2f103c';
+    r'e41715bf122030508d9a2ada613a672533d9e5ce';
 
 /// "Zmień użytkownika" (plan §7.8): a logout (server logout; refresh
 /// cookie, access token, per-session preferences and diagnostics wiped)

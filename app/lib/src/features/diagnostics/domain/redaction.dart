@@ -4,8 +4,8 @@
 /// Redacted: JWTs and `Bearer` tokens, the refresh cookie (by name and by
 /// its value format), values of sensitive keys (`accessToken`, `password`,
 /// `cookie`, ...; a quoted value whole), e-mail addresses, recovery codes,
-/// hosts of URLs, host lookups, `address =` and `host:`, `.local` names, and
-/// IPv4/IPv6 addresses. Server request ids (`m-…`/UUIDs), paths
+/// MAC addresses, hosts of URLs, host lookups, `address =` and `host:`,
+/// `.local` names, and IPv4/IPv6 addresses. Server request ids (`m-…`/UUIDs), paths
 /// and status codes are kept because they are what support needs.
 abstract final class Redactor {
   static const jwt = '<jwt>';
@@ -14,6 +14,7 @@ abstract final class Redactor {
   static const host = '<host>';
   static const ip = '<ip>';
   static const recoveryCode = '<recovery-code>';
+  static const mac = '<mac>';
 
   static final _jwt = RegExp(
     r'\beyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*',
@@ -99,6 +100,12 @@ abstract final class Redactor {
     caseSensitive: false,
   );
 
+  /// Six pairs of hex digits joined by `:` or `-` (a GI Edge `physicalMac`).
+  static final _mac = RegExp(
+    r'(?<![\w:-])[0-9A-F]{2}([:-])(?:[0-9A-F]{2}\1){4}[0-9A-F]{2}(?![\w:-])',
+    caseSensitive: false,
+  );
+
   static final _ipv4 = RegExp(
     r'(?<![\w.])(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)'
     r'(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}(?![\w.]*\w)',
@@ -121,6 +128,7 @@ abstract final class Redactor {
             .replaceAll(_email, email)
             .replaceAll(_recoveryGrouped, recoveryCode)
             .replaceAll(_recoveryPlain, recoveryCode)
+            .replaceAll(_mac, mac)
             .replaceAllMapped(_hostLookup, (m) => '${m[1]}$host')
             .replaceAll(_localName, host);
     out = out.replaceAllMapped(_ipv6, (m) {

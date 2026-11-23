@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -12,6 +13,7 @@ import 'package:gi_home/src/features/appliance/application/appliance_profile_not
 import 'package:gi_home/src/features/appliance/application/core_client_providers.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/diagnostics/application/diagnostics_providers.dart';
+import 'package:gi_home/src/features/settings/application/settings_providers.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../support/account_fixtures.dart';
@@ -50,8 +52,11 @@ void main() {
     final Object? other => other,
   };
 
-  Future<ProviderContainer> pumpApp(WidgetTester tester) async {
-    tester.platformDispatcher.localesTestValue = const [Locale('pl')];
+  Future<ProviderContainer> pumpApp(
+    WidgetTester tester, {
+    Locale phone = const Locale('pl'),
+  }) async {
+    tester.platformDispatcher.localesTestValue = [phone];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
     tester.view
       ..physicalSize = const Size(1200, 3600)
@@ -89,13 +94,14 @@ void main() {
   Future<void> logIn(
     WidgetTester tester, {
     String password = 'Secret123',
+    String submit = 'Zaloguj',
   }) async {
     await tester.enterText(
       find.byType(TextFormField).first,
       'owner@gihome.test',
     );
     await tester.enterText(find.byType(TextFormField).last, password);
-    await tester.tap(find.widgetWithText(FilledButton, 'Zaloguj'));
+    await tester.tap(find.widgetWithText(FilledButton, submit));
     await tester.pumpAndSettle();
   }
 
@@ -163,6 +169,63 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Ten telefon'), findsOneWidget);
+  });
+
+  testWidgets('the session offer is worded in the profile language, not the '
+      'phone language it was requested in (plan §13.2)', (tester) async {
+    // An English phone and a Polish profile that answers after the
+    // sessions list: the offer must not appear in English first.
+    final profileAnswer = Completer<void>();
+    core.routes['GET /api/v1/users/me/profile'] = (_) async {
+      await profileAnswer.future;
+      return jsonReply(profile());
+    };
+    await pumpApp(tester, phone: const Locale('en'));
+    expect(find.text('Log in'), findsWidgets);
+
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      'owner@gihome.test',
+    );
+    await tester.enterText(find.byType(TextFormField).last, 'Secret123');
+    await tester.tap(find.widgetWithText(FilledButton, 'Log in'));
+    await tester.pumpAndSettle();
+
+    // Nothing is shown in the wrong language while the profile is pending.
+    expect(find.byKey(const ValueKey('sessions-review-prompt')), findsNothing);
+    expect(find.textContaining('active session'), findsNothing);
+
+    profileAnswer.complete();
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Na Twoim koncie są jeszcze 2 aktywne sesje.'),
+      findsOneWidget,
+    );
+    expect(find.text('Przejrzyj'), findsOneWidget);
+    expect(find.textContaining('other active'), findsNothing);
+  });
+
+  testWidgets('a language switch while the offer shows rewords it', (
+    tester,
+  ) async {
+    profileLocale = null;
+    final container = await pumpApp(tester, phone: const Locale('en'));
+    await logIn(tester, submit: 'Log in');
+    expect(
+      find.text('Your account has 2 other active sessions.'),
+      findsOneWidget,
+    );
+
+    await container
+        .read(languagePreferenceProvider.notifier)
+        .select(const Locale('pl'));
+    await tester.pump();
+
+    expect(
+      find.text('Na Twoim koncie są jeszcze 2 aktywne sesje.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('no other session, no offer', (tester) async {

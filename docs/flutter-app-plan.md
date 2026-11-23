@@ -776,10 +776,14 @@ Blokada klienta jest **świadomie ostrzejsza niż serwer**: `validateEntity` w C
 - CI sprawdza kompletność pl/en.
 
 ### 13.2 Źródło języka
-- Przed logowaniem: język telefonu.
-- Po logowaniu: `GET /users/me/profile`.locale, bo `AuthUserDto` nie ma pola locale.
-- Zmiana: `PATCH /users/me/profile {locale}` (v1.0).
-- M2: Ustawienia → „Język” (Automatycznie / Polski / English) to preferencja telefonu (`app_language.v1`), ważniejsza od profilu i języka telefonu; przeżywa wylogowanie, a GI Core o niej nie wie.
+- Kolejność, od najważniejszego:
+  1. Preferencja telefonu (`app_language.v1`): Ustawienia → „Język” oraz przycisk „Język” na ekranach połączenia i logowania (Automatycznie / Polski / English). Wygrywa ze wszystkim, przeżywa wylogowanie, a GI Core o niej nie wie.
+  2. Zalogowany: `GET /users/me/profile`.locale, bo `AuthUserDto` nie ma pola locale. Do czasu odpowiedzi profilu obowiązuje język ostatnio zastosowany dla tego użytkownika na tym urządzeniu (`SessionLocaleStore`, klucz `session_locale.v1`).
+  3. Wylogowany, ale urządzenie pamięta ostatniego użytkownika (`lastUserId`): jego zapamiętany język, żeby ekran logowania po pierwszym logowaniu mówił językiem użytkownika. Wylogowanie go zachowuje; „Zmień użytkownika” i usunięcie urządzenia wymazują razem z użytkownikiem.
+  4. Przed pierwszym logowaniem na urządzeniu (pierwsze połączenie, po „Zmień użytkownika”): język telefonu, a gdy aplikacja go nie wspiera, polski.
+- `Accept-Language` zawsze niesie język, który aplikacja faktycznie pokazuje.
+- Teksty, które powstają po `await` albo przy zmianie ekranu (komunikaty snackbar, okna dialogowe), są układane w chwili pokazania, w bieżącym języku: dialogi czytają `context.l10n` w builderze, snackbary używają `localizedSnackBar`. Oferta przeglądu sesji po logowaniu czeka (do 5 s) na profil, żeby nie pojawiła się najpierw w języku telefonu.
+- Zmiana na serwerze: `PATCH /users/me/profile {locale}` (Konto → Język).
 
 ### 13.3 Formatowanie
 - `intl` z językiem aplikacji. Stopnie Celsjusza z 1 miejscem po przecinku. „—” z etykietą „Brak danych”.

@@ -122,6 +122,13 @@ ApiFailure failureFromResponse({
   Object? data,
   Headers? headers,
 }) {
+  if (const {301, 302, 303, 307, 308}.contains(statusCode)) {
+    // Never followed (a proxy or a captive portal must not get credentials).
+    final location = Uri.tryParse(headers?.value('location') ?? '');
+    if (location != null && location.scheme.toLowerCase() == 'https') {
+      return ApiFailure.httpsRequired(host: location.host);
+    }
+  }
   final envelope = ApiErrorEnvelope.tryParse(data);
   if (envelope == null) {
     if (statusCode == 429) {

@@ -24,17 +24,28 @@ class LanguageTile extends ConsumerWidget {
       key: tileKey,
       leading: const Icon(Icons.translate),
       title: Text(l10n.settingsLanguage),
-      subtitle: Text(_label(l10n, picked?.languageCode)),
-      onTap: () => unawaited(_choose(context, ref, picked?.languageCode)),
+      subtitle: Text(languageLabel(l10n, picked?.languageCode)),
+      onTap: () => unawaited(chooseLanguage(context, ref)),
     );
   }
 
-  Future<void> _choose(
+  /// Name of [code] as the dialog and the selectors show it; `null` is
+  /// "Automatycznie".
+  static String languageLabel(AppLocalizations l10n, String? code) =>
+      switch (code) {
+        null => l10n.settingsLanguageAutomatic,
+        'en' => l10n.settingsLanguageEnglish,
+        _ => l10n.settingsLanguagePolish,
+      };
+
+  /// Asks which language to use and applies the answer
+  /// ([LanguagePreference.select]); shared with `LanguageSelector`.
+  static Future<void> chooseLanguage(
     BuildContext context,
     WidgetRef ref,
-    String? current,
   ) async {
     final l10n = context.l10n;
+    final current = ref.read(languagePreferenceProvider)?.languageCode;
     final codes = [
       null,
       for (final locale in AppLocalizations.supportedLocales)
@@ -55,7 +66,7 @@ class LanguageTile extends ConsumerWidget {
                   RadioListTile<String?>(
                     key: optionKey(code),
                     value: code,
-                    title: Text(_label(l10n, code)),
+                    title: Text(languageLabel(l10n, code)),
                     subtitle: code == null
                         ? Text(l10n.settingsLanguageAutomaticSubtitle)
                         : null,
@@ -72,10 +83,4 @@ class LanguageTile extends ConsumerWidget {
         .read(languagePreferenceProvider.notifier)
         .select(code == null ? null : Locale(code));
   }
-
-  static String _label(AppLocalizations l10n, String? code) => switch (code) {
-    null => l10n.settingsLanguageAutomatic,
-    'en' => l10n.settingsLanguageEnglish,
-    _ => l10n.settingsLanguagePolish,
-  };
 }

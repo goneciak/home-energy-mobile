@@ -766,7 +766,7 @@ void main() {
     await pumpApp(
       tester,
       profile: testProfile,
-      physicalSize: const Size(1200, 9000),
+      physicalSize: const Size(1200, 12000),
     );
 
     // Five heating cards: three requests out, two waiting for a slot.

@@ -7,6 +7,7 @@ import 'package:gi_home/src/core/errors/failure_messages.dart';
 import 'package:gi_home/src/core/l10n/l10n.dart';
 import 'package:gi_home/src/core/theme/gi_tokens.dart';
 import 'package:gi_home/src/core/widgets/centered_form.dart';
+import 'package:gi_home/src/core/widgets/localized_snack_bar.dart';
 import 'package:gi_home/src/core/widgets/message_banner.dart';
 import 'package:gi_home/src/core/widgets/open_app_settings_button.dart';
 import 'package:gi_home/src/features/appliance/application/appliance_profile_notifier.dart';
@@ -16,6 +17,7 @@ import 'package:gi_home/src/features/appliance/domain/appliance_candidate.dart';
 import 'package:gi_home/src/features/appliance/presentation/change_appliance_dialog.dart';
 import 'package:gi_home/src/features/auth/application/auth_session_notifier.dart';
 import 'package:gi_home/src/features/demo/application/demo_mode.dart';
+import 'package:gi_home/src/features/settings/presentation/language_selector.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// "Znajdź GI Home" (plan §4.1, §9.2): the connection ladder runs as soon
@@ -77,9 +79,8 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       if (mounted) widget.onConnected?.call(context);
     } on Object {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(context.l10n.demoStartFailed)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(localizedSnackBar((l10n) => l10n.demoStartFailed));
       }
     } finally {
       if (mounted) setState(() => _startingDemo = false);
@@ -144,6 +145,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
         children: probe != null && !state.isLoading
             ? [_ConfirmCard(probe: probe, onConfirm: () => _confirm(probe))]
             : [
+                const LanguageSelector(),
                 ..._searchSection(context, search, probing: state.isLoading),
                 ..._addressForm(context, state),
                 ..._demoEntry(context, busy: state.isLoading),
@@ -168,11 +170,13 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     return [
       Text(l10n.connectIntro, style: textTheme.bodyLarge),
       SizedBox(height: tokens.gap * 1.5),
-      Row(
+      // A Wrap: at 200% text size the button goes under the title instead
+      // of overflowing.
+      Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Expanded(
-            child: Text(l10n.connectSearchTitle, style: textTheme.titleMedium),
-          ),
+          Text(l10n.connectSearchTitle, style: textTheme.titleMedium),
           if (done)
             TextButton.icon(
               onPressed: () => ref.invalidate(applianceSearchProvider),
@@ -243,6 +247,15 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
           onFieldSubmitted: (_) => _probe(),
         ),
       ),
+      Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton.icon(
+          key: const ValueKey('connect-help'),
+          onPressed: () => unawaited(_showAddressHelp(context)),
+          icon: const Icon(Icons.help_outline),
+          label: Text(l10n.connectHelpLink),
+        ),
+      ),
       if (error != null) ...[
         SizedBox(height: tokens.gap),
         MessageBanner(
@@ -299,6 +312,46 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     ];
   }
 
+  Future<void> _showAddressHelp(BuildContext context) {
+    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.connectHelpTitle, style: textTheme.titleLarge),
+              const SizedBox(height: 16),
+              for (final line in [
+                l10n.connectHelpSameWifi,
+                l10n.connectHelpRouter,
+                l10n.connectHelpPort,
+                l10n.connectHelpLocalName,
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(line, style: textTheme.bodyMedium),
+                ),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton(
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                  child: Text(l10n.connectHelpClose),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   static String _presetLabel(AppLocalizations l10n, DevAddressPreset preset) {
     final name = switch (preset) {
       DevAddressPreset.androidEmulator => l10n.connectHintAndroidEmulator,
@@ -316,6 +369,8 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
   static String _connectErrorMessage(AppLocalizations l10n, Object error) =>
       switch (error) {
         FormatException() => l10n.connectErrorInvalidAddress,
+        UnreachableFailure() ||
+        TimeoutFailure() => l10n.connectErrorUnreachable,
         // Something answered, but not like GI Core does.
         RouteAbsentFailure() ||
         NotFoundFailure() ||

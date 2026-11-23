@@ -83,6 +83,7 @@ opisuje [docs/development.md](docs/development.md).
 - [Kontrakt API backendu](docs/backend-contract.md)
 - [Decyzje architektoniczne](docs/decisions/)
 - [Procedura wydania](docs/release-runbook.md)
+- [Przewodnik testera](docs/tester-guide.md)
 - [Lista kontrolna wydania](docs/release-checklist.md)
 - [Plan rozwoju](docs/flutter-app-plan.md)
 - [Architektura aplikacji](app/README.md), [klient API](packages/gi_core_api/README.md)

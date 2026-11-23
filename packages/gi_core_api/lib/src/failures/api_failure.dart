@@ -67,6 +67,11 @@ sealed class ApiFailure with _$ApiFailure implements Exception {
   const factory insecureTransport({required String host}) =
       InsecureTransportFailure;
 
+  /// The address answered with a redirect to `https://`: the appliance sits
+  /// behind a TLS front (a reverse proxy) that this app cannot trust yet.
+  /// The redirect is never followed, so nothing sensitive was sent.
+  const factory httpsRequired({required String host}) = HttpsRequiredFailure;
+
   /// HTTP 401 that does not end the session (e.g. wrong credentials).
   const factory unauthorized({
     required String code,
@@ -159,6 +164,7 @@ sealed class ApiFailure with _$ApiFailure implements Exception {
     LocalNetworkDeniedFailure() => 'LOCAL_NETWORK_DENIED',
     TlsUntrustedFailure() => 'TLS_CERT_UNTRUSTED',
     InsecureTransportFailure() => 'INSECURE_TRANSPORT',
+    HttpsRequiredFailure() => 'HTTPS_REQUIRED',
     UnauthorizedFailure(:final code) => code,
     ForbiddenFailure(:final code) => code,
     NotFoundFailure(:final code) => code,
