@@ -4,3 +4,8 @@ linter:
   rules:
     # Command-line tools report on stdout/stderr.
     avoid_print: false
+
+analyzer:
+  exclude:
+    # A standalone package with its own pubspec, analysed by its own CI step.
+    - gi_edge_sim/**
